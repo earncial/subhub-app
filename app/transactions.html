@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Transactions | SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="/assets/css/app.css"/>
+<style>
+/* FILTER CHIPS */
+.filter-wrap{display:flex;gap:6px;overflow-x:auto;padding:0 0 4px;margin-bottom:14px;}
+.filter-wrap::-webkit-scrollbar{display:none;}
+.fchip{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:.72rem;font-weight:700;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:.18s;white-space:nowrap;font-family:'Sora',sans-serif;}
+.fchip.on{border-color:var(--pr);color:var(--pr);background:rgba(0,170,255,.08);}
+.fchip:hover:not(.on){border-color:var(--border2);color:var(--text);}
+
+/* STATUS FILTER */
+.status-filter{display:flex;gap:6px;margin-bottom:14px;}
+.sfchip{flex:1;padding:7px 5px;border-radius:11px;font-size:.68rem;font-weight:700;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:.18s;text-align:center;font-family:'Sora',sans-serif;}
+.sfchip.on.all{border-color:var(--pr);color:var(--pr);background:rgba(0,170,255,.08);}
+.sfchip.on.success{border-color:var(--success);color:var(--success);background:rgba(16,185,129,.08);}
+.sfchip.on.failed{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.08);}
+.sfchip.on.pending{border-color:var(--warning);color:var(--warning);background:rgba(245,158,11,.08);}
+
+/* TX LIST */
+.tx-page-list{display:flex;flex-direction:column;gap:8px;}
+.txp{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--r-lg);border:1px solid var(--border);padding:13px;cursor:pointer;transition:.18s;}
+.txp:hover{border-color:rgba(0,170,255,.2);transform:translateY(-1px);}
+.txp:active{transform:scale(.98);}
+.txp-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.txp-body{flex:1;min-width:0;}
+.txp-desc{font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:capitalize;margin-bottom:4px;}
+.txp-meta{font-size:.64rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.txp-meta i{font-size:.58rem;}
+.txp-ref{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);}
+.txp-r{text-align:right;flex-shrink:0;}
+.txp-amt{font-size:.84rem;font-weight:800;margin-bottom:4px;letter-spacing:-.3px;}
+.txp-amt.crd{color:var(--success);}
+.txp-amt.dbt{color:var(--text);}
+
+/* DATE GROUP */
+.date-sep{font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:10px 2px 6px;display:flex;align-items:center;gap:8px;}
+.date-sep::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* LOAD MORE */
+.load-more-btn{width:100%;padding:13px;border-radius:var(--r-lg);border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;}
+.load-more-btn:hover{border-color:var(--pr);color:var(--pr);}
+
+/* SUMMARY BAR */
+.tx-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.txs-card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:11px 8px;text-align:center;}
+.txs-val{font-size:.88rem;font-weight:800;letter-spacing:-.3px;margin-bottom:2px;}
+.txs-lbl{font-size:.58rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:12px;}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.82rem;}
+.search-inp{width:100%;padding:11px 12px 11px 36px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.82rem;font-weight:600;color:var(--text);background:var(--card);outline:none;font-family:'Sora',sans-serif;transition:.18s;}
+.search-inp:focus{border-color:var(--pr);}
+.search-inp::placeholder{color:var(--muted);}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;display:none;}
+
+/* EMPTY */
+.tx-empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.tx-empty i{font-size:2.2rem;opacity:.18;display:block;margin-bottom:10px;color:var(--pr);}
+.tx-empty p{font-size:.8rem;font-weight:600;}
+.tx-empty small{font-size:.7rem;opacity:.7;}
+
+/* VERIFY BANNER */
+.verify-banner{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.08));border:1.5px solid rgba(245,158,11,.3);border-radius:var(--r-xl,20px);padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.verify-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(245,158,11,.06);}
+.vb-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:10px;}
+.vb-ico{width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,.15);color:var(--warning);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.vb-title{font-size:.82rem;font-weight:800;margin-bottom:3px;}
+.vb-sub{font-size:.68rem;color:var(--muted);line-height:1.5;}
+.vb-benefits{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.vb-benefit{display:flex;align-items:center;gap:7px;font-size:.7rem;font-weight:600;color:var(--muted);}
+.vb-benefit i{color:var(--success);font-size:.64rem;flex-shrink:0;}
+.vb-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.vb-hint{font-size:.66rem;color:var(--muted);}
+.vb-resend{padding:8px 16px;border-radius:9px;background:var(--warning);color:#fff;border:none;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;display:flex;align-items:center;gap:5px;}
+.vb-resend:hover{opacity:.88;}
+.vb-resend:disabled{opacity:.5;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<!-- PROCESSING OVERLAY -->
+<div class="proc-ov" id="procOv">
+  <div class="proc-card">
+    <div class="proc-logo">
+      <div class="proc-inner-ring">
+        <img src="logo.png" alt="S" style="width:44px;height:44px;object-fit:contain;border-radius:50%" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="proc-logo-text" style="display:none">S</span>
+      </div>
+    </div>
+    <div class="proc-title" id="procTitle">Loading…</div>
+    <div class="proc-sub" id="procSub">Please wait</div>
+    <div class="proc-dots"><div class="pd2"></div><div class="pd2"></div><div class="pd2"></div></div>
+  </div>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="ov" id="alertModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="alert-body" id="alertBody"></div>
+    <button class="btn-p" data-close="alertModal">OK</button>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="ov" id="receiptModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-receipt"></i>Transaction Details</div>
+      <button class="m-close" data-close="receiptModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="rec-ring ok" id="recRing"><i class="fas fa-check" id="recRingIco"></i></div>
+      <div class="rec-amt" id="recAmt">₦0.00</div>
+      <div class="rec-stat ok" id="recStat">Transaction Successful!</div>
+    </div>
+    <div class="rec-rows" id="recRows"></div>
+    <div class="rec-acts">
+      <button class="ra-done" data-close="receiptModal"><i class="fas fa-home"></i>Done</button>
+      <button class="ra-dl" onclick="downloadReceipt()"><i class="fas fa-download"></i>Download</button>
+      <button class="ra-sh" onclick="shareReceipt()"><i class="fas fa-share-nodes"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-btn" href="/app/index.html" style="font-size:.82rem"><i class="fas fa-chevron-left"></i></a>
+  <div class="nav-brand">
+    <img src="logo.png" class="nav-logo" id="logoImg" alt="SubHub" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
+    <div class="nav-logo-fb" id="logoFb">S</div>
+    <div class="nav-brand-name">Sub<span>Hub</span></div>
+  </div>
+  <button class="nav-btn" id="dmBtn"><i class="fas fa-moon" id="dmIco"></i></button>
+</nav>
+
+<!-- PAGE -->
+<div class="container" style="padding-bottom:90px">
+
+  <!-- VERIFY BANNER — shown if not verified -->
+  <div class="verify-banner" id="verifyBanner" style="display:none">
+    <div class="vb-top">
+      <div class="vb-ico"><i class="fas fa-envelope-open-text"></i></div>
+      <div>
+        <div class="vb-title">Verify your email address</div>
+        <div class="vb-sub">Your email is not verified. Verify now to unlock full benefits.</div>
+      </div>
+    </div>
+    <div class="vb-benefits">
+      <div class="vb-benefit"><i class="fas fa-check-circle"></i>Email alerts for every successful or failed transaction instantly</div>
+      <div class="vb-benefit"><i class="fas fa-check-circle"></i>Security alerts — login from new device or location</div>
+      <div class="vb-benefit"><i class="fas fa-check-circle"></i>Password reset & account recovery via email</div>
+      <div class="vb-benefit"><i class="fas fa-check-circle"></i>Exclusive offers and cashback notifications</div>
+    </div>
+    <div class="vb-footer">
+      <span class="vb-hint">Didn't get the email? <span id="vbCountdown"></span></span>
+      <button class="vb-resend" id="vbResendBtn" onclick="resendVerification()"><i class="fas fa-paper-plane"></i>Resend Email</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="tx-summary" id="txSummary">
+    <div class="txs-card"><div class="txs-val" id="sumTotal" style="color:var(--pr)">—</div><div class="txs-lbl">Total</div></div>
+    <div class="txs-card"><div class="txs-val" id="sumSuccess" style="color:var(--success)">—</div><div class="txs-lbl">Success</div></div>
+    <div class="txs-card"><div class="txs-val" id="sumFailed" style="color:var(--danger)">—</div><div class="txs-lbl">Failed</div></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <i class="fas fa-search search-ico"></i>
+    <input type="text" class="search-inp" id="searchInp" placeholder="Search by reference, type, phone…"/>
+    <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- TYPE FILTERS -->
+  <div class="filter-wrap" id="typeFilters"></div>
+
+  <!-- STATUS FILTERS -->
+  <div class="status-filter">
+    <button class="sfchip on all"    data-sf="all"    onclick="setStatus('all',this)">All</button>
+    <button class="sfchip success"   data-sf="success" onclick="setStatus('success',this)"><i class="fas fa-circle-check" style="font-size:.6rem"></i> Success</button>
+    <button class="sfchip failed"    data-sf="failed"  onclick="setStatus('failed',this)"><i class="fas fa-circle-xmark" style="font-size:.6rem"></i> Failed</button>
+    <button class="sfchip pending"   data-sf="pending" onclick="setStatus('pending',this)"><i class="fas fa-clock" style="font-size:.6rem"></i> Pending</button>
+  </div>
+
+  <!-- TX LIST -->
+  <div class="tx-page-list" id="txPageList">
+    <div class="tx-empty"><i class="fas fa-circle-notch fa-spin" style="opacity:1;font-size:1.5rem"></i><p>Loading transactions…</p></div>
+  </div>
+
+  <!-- LOAD MORE -->
+  <button class="load-more-btn" id="loadMoreBtn" style="display:none" onclick="loadMore()">
+    <i class="fas fa-chevron-down"></i>Load More
+  </button>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<!-- FUND MODAL -->
+<div class="ov" id="fundModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-wallet"></i>Fund Wallet</div>
+      <button class="m-close" data-close="fundModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="text-align:center;padding:8px 0 18px">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--success)">
+        <i class="fas fa-bank"></i>
+      </div>
+      <div style="font-size:.86rem;font-weight:800;margin-bottom:4px">Fund via Virtual Account</div>
+      <div style="font-size:.74rem;color:var(--muted);line-height:1.5">Transfer any amount to your virtual account below.<br/>Wallet will be credited instantly.</div>
+    </div>
+    <div id="fundVAContent" style="display:none">
+      <div style="background:linear-gradient(145deg,#064e3b,#047857,#10b981);border-radius:14px;padding:16px;color:#fff;position:relative;overflow:hidden;margin-bottom:12px">
+        <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(255,255,255,.08)"></div>
+        <div style="font-size:.6rem;font-weight:600;opacity:.7;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Virtual Account</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:.68rem;opacity:.75">Bank</span>
+          <span style="font-size:.82rem;font-weight:700" id="fundVABank">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:.68rem;opacity:.75">Account Number</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:1rem;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:1.5px" id="fundVANumber">—</span>
+            <button onclick="copyFundVA()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:4px 10px;border-radius:6px;font-size:.64rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">Copy</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.68rem;opacity:.75">Account Name</span>
+          <span style="font-size:.8rem;font-weight:700" id="fundVAName">—</span>
+        </div>
+      </div>
+      <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:9px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px">
+        <i class="fas fa-triangle-exclamation" style="color:var(--warning);font-size:.82rem;flex-shrink:0;margin-top:1px"></i>
+        <span style="font-size:.7rem;color:var(--muted);line-height:1.5">A <strong style="color:var(--text)">1.5% fee</strong> is charged per deposit by the payment provider. Minimum deposit ₦100.</span>
+      </div>
+    </div>
+    <div id="fundNoVA" style="text-align:center;padding:8px 0">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Generate a virtual account to fund your wallet instantly</p>
+      <button class="btn-p" id="fundGenVA"><i class="fas fa-plus"></i><span>Generate Virtual Account</span></button>
+    </div>
+  </div>
+</div>
+
+<nav class="bnav">
+  <a class="bnav-i" href="/app/index.html"><i class="fas fa-home"></i><span>Home</span></a>
+  <a class="bnav-i active" href="/app/transactions.html"><i class="fas fa-receipt"></i><span>History</span></a>
+  <button class="bnav-i" id="bn-fund" onclick="openFundModal()"><i class="fas fa-plus-circle"></i><span>Fund</span></button>
+  <a class="bnav-i" href="/app/profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+</nav>
+
+<script src="/assets/js/transactions.js"></script>
+</body>
+</html>

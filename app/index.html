@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SubHub | Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="/assets/css/app.css"/>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT MODAL -->
+<div class="ov" id="annModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div id="annContent"></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <img src="logo.png" class="nav-logo" id="logoImg" alt="SubHub" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
+    <div class="nav-logo-fb" id="logoFb">S</div>
+    <div class="nav-brand-name">Sub<span>Hub</span></div>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn" id="annBtn" title="Announcements"><i class="fas fa-bell"></i><span class="notif-dot" id="annDot"></span></button>
+    <button class="nav-btn" id="dmBtn" title="Toggle theme"><i class="fas fa-moon" id="dmIco"></i></button>
+    <div class="av-wrap">
+      <button class="av-btn" id="avBtn"><span id="avLetter">A</span></button>
+      <div class="av-drop" id="avDrop">
+        <div class="av-head">
+          <div class="av-name" id="ddName">Loading…</div>
+          <div class="av-phone" id="ddPhone"></div>
+        </div>
+        <button class="dd-i" id="dd-profile"><i class="fas fa-user"></i>My Profile</button>
+        <button class="dd-i" id="dd-pin"><i class="fas fa-key"></i>Change PIN</button>
+        <button class="dd-i" id="dd-fund"><i class="fas fa-wallet"></i>Fund Wallet</button>
+        <button class="dd-i" id="dd-ref"><i class="fas fa-link"></i>Referral Link</button>
+        <div class="dd-sep"></div>
+        <button class="dd-i red" id="dd-logout"><i class="fas fa-sign-out-alt"></i>Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- WELCOME -->
+  <div class="welcome">
+    <div class="wlc-left">
+      <h2>Hey, <span id="userName">…</span> <i class="fas fa-sun" style="color:var(--warning);font-size:.85rem"></i></h2>
+      <p id="greetMsg">Loading…</p>
+    </div>
+    <div class="wlc-right">
+      <div class="wlc-date" id="wDate"></div>
+      <div class="wlc-time" id="wTime"></div>
+    </div>
+  </div>
+
+  <!-- WALLET SLIDER -->
+  <div class="wallet-wrap">
+    <div class="wallet-slider" id="walletSlider">
+      <div class="wallet-track" id="walletTrack">
+        <!-- Card 1: Main wallet -->
+        <div class="wallet-card wc-main" style="padding-bottom:52px">
+          <div class="wc-ring1"></div><div class="wc-ring2"></div><div class="wc-blob"></div>
+          <div class="wc-in">
+            <div class="wc-top">
+              <div class="wc-lbl"><i class="fas fa-wallet"></i> Wallet Balance</div>
+              <button class="wc-eye" id="eyeBtn"><i class="fas fa-eye" id="eyeIco"></i></button>
+            </div>
+            <div class="wc-bal" id="walletDisp">
+              <span class="wc-bal-sym">₦</span><span id="walletNum">0.00</span>
+            </div>
+            <div class="wc-sub">Available · Updated just now</div>
+          </div>
+          <button id="wc-fund" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);padding:7px 28px;border-radius:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;white-space:nowrap">+ Deposit</button>
+        </div>
+        <!-- Card 2: Virtual Account -->
+        <div class="wallet-card wc-virtual" id="vcCard">
+          <div class="wc-ring1"></div><div class="wc-ring2"></div><div class="wc-blob"></div>
+          <div class="wc-in" id="vcContent"></div>
+        </div>
+      </div>
+    </div>
+    <div class="wallet-dots">
+      <div class="wd on" data-slide="0"></div>
+      <div class="wd" data-slide="1"></div>
+    </div>
+  </div>
+
+  <!-- STATS — Fix 5: Spent, Funds, TX, Done -->
+  <div class="stats-row">
+    <div class="sc">
+      <div class="sc-lbl"><i class="fas fa-arrow-down" style="color:var(--danger)"></i>Spent</div>
+      <div class="sc-val spend">₦<span id="statSpent">0</span></div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl"><i class="fas fa-arrow-up" style="color:var(--success)"></i>Funds</div>
+      <div class="sc-val fund">₦<span id="statFunds">0</span></div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl"><i class="fas fa-receipt" style="color:var(--pr)"></i>TX</div>
+      <div class="sc-val blue" id="statTx">0</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl"><i class="fas fa-check-circle" style="color:var(--success)"></i>Done</div>
+      <div class="sc-val green" id="statSuc">0</div>
+    </div>
+  </div>
+
+  <!-- PROMO -->
+  <div class="promo" id="promoBanner">
+    <div>
+      <div class="promo-t">🎉 Refer & Earn ₦500</div>
+      <div class="promo-s">Invite friends · earn on every top-up</div>
+    </div>
+    <div class="promo-badge">Earn Now →</div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="sec-hd">
+    <div class="sec-t"><i class="fas fa-th-large"></i>Services</div>
+  </div>
+  <div class="svc-grid" id="svcGrid"></div>
+
+  <!-- RECENT NUMBERS — Fix 8: Export button -->
+  <div class="sec-hd" style="margin-bottom:8px">
+    <div class="sec-t"><i class="fas fa-clock-rotate-left"></i>Recent Numbers</div>
+    <div style="display:flex;gap:6px">
+      <button class="export-btn" id="exportContactsBtn"><i class="fas fa-file-export"></i>Export</button>
+      <button class="sec-a" id="saveContactBtn"><i class="fas fa-user-plus"></i>Add New</button>
+    </div>
+  </div>
+  <div class="rn-box">
+    <div class="save-bar" id="saveBar">
+      <div class="save-bar-title"><i class="fas fa-address-book"></i>Save a contact</div>
+      <div class="save-form">
+        <input class="fi" id="scName" placeholder="Full name" style="font-size:.75rem"/>
+        <input class="fi" id="scPhone" placeholder="08012345678" maxlength="11" type="tel" style="font-size:.75rem"/>
+        <select class="fi" id="scNet" style="font-size:.75rem">
+          <option value="MTN">MTN</option><option value="Airtel">Airtel</option>
+          <option value="Glo">Glo</option><option value="9Mobile">9Mobile</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:5px">
+          <button class="save-confirm" id="scSaveBtn"><i class="fas fa-check"></i> Save</button>
+          <button class="save-cancel" id="scCancelBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="rn-search"><i class="fas fa-search"></i><input type="text" id="rnSearch" placeholder="Search by name or number…"/></div>
+    <div class="rn-scroll" id="rnScroll"><div class="rn-empty"><i class="fas fa-users"></i><span>No recent numbers yet</span></div></div>
+  </div>
+
+  <!-- REFERRAL LINK — Fix 6: input with copy icon -->
+  <div class="ref-banner">
+    <div class="ref-top">
+      <div class="ref-left">
+        <div class="ref-title">🎁 Your Referral Link</div>
+        <div class="ref-sub">Friends get ₦200 off · You earn ₦500 per referral</div>
+      </div>
+    </div>
+    <div class="ref-input-wrap">
+      <input type="text" class="ref-input" id="refLinkInput" readonly value="Loading…"/>
+      <button class="ref-copy-btn" id="refLinkBtn">
+        <i class="fas fa-copy" id="refCopyIco"></i>
+        <span id="refCopyTxt">Copy</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="sec-hd">
+    <div class="sec-t"><i class="fas fa-receipt"></i>Transactions</div>
+    <button class="sec-a" id="viewAllBtn"><i class="fas fa-arrow-right"></i>View All</button>
+  </div>
+  <div class="tx-list" id="txList"><div class="empty"><i class="fas fa-receipt"></i><p>No transactions yet</p></div></div>
+  <button class="view-all" id="viewAllBtn2"><i class="fas fa-list-ul"></i>All Transactions<i class="fas fa-chevron-right" style="font-size:.62rem;opacity:.5;margin-left:2px"></i></button>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-i active" id="bn-home"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="bnav-i" id="bn-history"><i class="fas fa-receipt"></i><span>History</span></button>
+  <button class="bnav-i" id="bn-fund"><i class="fas fa-plus-circle"></i><span>Fund</span></button>
+<!--  <button class="bnav-i" id="bn-refe"><i class="fas fa-gift"></i><span>Referral</span></button>-->
+  <button class="bnav-i" id="bn-profile"><i class="fas fa-user"></i><span>Profile</span></button>
+</nav>
+
+<!-- PROCESSING OVERLAY -->
+<div class="proc-ov" id="procOv">
+  <div class="proc-card">
+    <div class="proc-logo">
+      <div class="proc-inner-ring" id="procLogoInner">
+        <img src="logo.png" alt="S" style="width:44px;height:44px;object-fit:contain;border-radius:50%" id="procLogoImg" onerror="this.style.display='none';document.getElementById('procLogoTxt').style.display='block'"/>
+        <span class="proc-logo-text" id="procLogoTxt" style="display:none">S</span>
+      </div>
+    </div>
+    <div class="proc-title" id="procTitle">Processing…</div>
+    <div class="proc-sub" id="procSub">Please wait</div>
+    <div class="proc-dots"><div class="pd2"></div><div class="pd2"></div><div class="pd2"></div></div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="ov" id="confirmModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-shield-check"></i>Confirm Transaction</div>
+      <button class="m-close" data-close="confirmModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cd-amt" id="confAmt">₦0</div>
+    <div class="cd-service" id="confService">Service</div>
+    <div class="confirm-details" id="confDetails"></div>
+    <div class="confirm-warn">
+      <i class="fas fa-triangle-exclamation"></i>
+      <span>Please verify all details before proceeding. Transactions cannot be reversed once confirmed.</span>
+    </div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" data-close="confirmModal">Cancel</button>
+      <button class="btn-confirm" id="confProceedBtn">Confirm & Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATA MODAL -->
+<div class="ov" id="dataModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-wifi"></i>Buy Data</div>
+      <button class="m-close" data-close="dataModal"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="flbl">Select Network</label>
+    <div class="nets" id="dnChips"></div>
+    <div id="planSection" style="display:none">
+      <div class="plan-tabs" id="planTabs"></div>
+      <div class="plans-wrap" id="plansWrap"></div>
+      <button class="load-more" id="loadMoreBtn" style="display:none"><i class="fas fa-chevron-down"></i> Load More Plans</button>
+      <div class="fg" style="margin-top:13px">
+        <label class="flbl">Phone Number <small>— who receives data</small></label>
+        <input type="tel" class="fi" id="dataPhone" placeholder="e.g. 08012345678" maxlength="11"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AIRTIME MODAL -->
+<div class="ov" id="airtimeModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-phone"></i>Buy Airtime</div>
+      <button class="m-close" data-close="airtimeModal"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="flbl">Select Network</label>
+    <div class="nets" id="atChips"></div>
+    <div class="fg">
+      <label class="flbl">Phone Number</label>
+      <input type="tel" class="fi" id="atPhone" placeholder="e.g. 08012345678" maxlength="11"/>
+    </div>
+    <div class="fg">
+      <label class="flbl">Amount (₦)</label>
+      <div class="qa">
+        <button class="qa-btn" data-sv="atAmt:100">₦100</button>
+        <button class="qa-btn" data-sv="atAmt:200">₦200</button>
+        <button class="qa-btn" data-sv="atAmt:500">₦500</button>
+        <button class="qa-btn" data-sv="atAmt:1000">₦1K</button>
+        <button class="qa-btn" data-sv="atAmt:2000">₦2k</button>
+      </div>
+      <input type="number" class="fi" id="atAmt" placeholder="or enter amount"/>
+    </div>
+    <button class="btn-p" id="atSubmit"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- CABLE MODAL -->
+<div class="ov" id="cableModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-tv"></i>Cable TV</div>
+      <button class="m-close" data-close="cableModal"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="flbl">Select Provider</label>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px" id="cableProvChips">
+      <div class="nc" data-prov="dstv"><div class="nc-logo" style="background:#003087">DSTV</div><div class="nc-name">DStv</div></div>
+      <div class="nc" data-prov="gotv"><div class="nc-logo" style="background:#00a651">GOTV</div><div class="nc-name">GOtv</div></div>
+      <div class="nc" data-prov="startimes"><div class="nc-logo" style="background:#cc0000">STAR</div><div class="nc-name">StarTimes</div></div>
+    </div>
+    <div class="fg">
+      <label class="flbl">Select Plan</label>
+      <div id="cablePlansWrap" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:4px">
+        <p style="font-size:.78rem;color:var(--muted);text-align:center;padding:16px 0">Select a provider to see plans</p>
+      </div>
+    </div>
+    <div class="price-box" id="cablePriceBox" style="display:none">
+      <span class="pbox-lbl"><i class="fas fa-tag"></i>Amount</span>
+      <span class="pbox-val" id="cablePriceVal">₦0</span>
+    </div>
+    <div class="fg">
+      <label class="flbl">Smart Card / IUC Number</label>
+      <input type="text" class="fi" id="cableCard" placeholder="Enter smart card number"/>
+    </div>
+    <button class="btn-p" id="cableSubmit"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- ELECTRICITY MODAL -->
+<div class="ov" id="elecModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-bolt"></i>Electricity</div>
+      <button class="m-close" data-close="elecModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="fg">
+      <label class="flbl">Select DISCO</label>
+      <select class="fi" id="disco">
+        <option value="ikeja">Ikeja Electric</option>
+        <option value="eko">Eko Electric</option>
+        <option value="kano" selected>Kano Electric</option>
+        <option value="phed">Port Harcourt (PHED)</option>
+        <option value="jos">Jos Electric</option>
+        <option value="ibadan">Ibadan Electric</option>
+        <option value="kaduna">Kaduna Electric</option>
+        <option value="abuja">Abuja Electric (AEDC)</option>
+      </select>
+    </div>
+    <div class="fg"><label class="flbl">Meter Number</label><input type="text" class="fi" id="elecMeter" placeholder="Enter meter number"/></div>
+    <div class="fg">
+      <label class="flbl">Meter Type</label>
+      <select class="fi" id="elecMtype"><option value="prepaid">Prepaid</option><option value="postpaid">Postpaid</option></select>
+    </div>
+    <div class="fg">
+      <label class="flbl">Amount (₦)</label>
+      <div class="qa">
+        <button class="qa-btn" data-sv="elecAmt:1000">₦1K</button>
+        <button class="qa-btn" data-sv="elecAmt:2000">₦2K</button>
+        <button class="qa-btn" data-sv="elecAmt:5000">₦5K</button>
+        <button class="qa-btn" data-sv="elecAmt:10000">₦10K</button>
+      </div>
+      <input type="number" class="fi" id="elecAmt" placeholder="Enter amount"/>
+    </div>
+    <button class="btn-p" id="elecSubmit"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- EXAM MODAL -->
+<div class="ov" id="examModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-graduation-cap"></i>Exam Pins</div>
+      <button class="m-close" data-close="examModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="fg">
+      <label class="flbl">Exam Type</label>
+      <select class="fi" id="examType">
+        <option value="waec" data-p="3350">WAEC Result Checker — ₦3,350</option>
+        <option value="neco" data-p="2100">NECO Result Checker — ₦2,100</option>
+        <option value="nabteb" data-p="855">NABTEB — ₦855</option>
+      </select>
+    </div>
+    <div class="fg"><label class="flbl">Quantity <small>(max 10)</small></label><input type="number" class="fi" id="examQty" value="1" min="1" max="10"/></div>
+    <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="examTotal">₦3,350</span></div>
+    <button class="btn-p" id="examSubmit"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- RECHARGE CARD MODAL -->
+<div class="ov" id="rcModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-id-card"></i>Recharge Card</div>
+      <button class="m-close" data-close="rcModal"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="flbl">Select Network</label>
+    <div class="nets" id="rcChips"></div>
+    <div class="fg">
+      <label class="flbl">Denomination</label>
+      <select class="fi" id="rcDenom"><option value="100">₦100</option><option value="200">₦200</option><option value="500">₦500</option><option value="1000">₦1,000</option></select>
+    </div>
+    <div class="fg"><label class="flbl">Quantity <small>(max 50)</small></label><input type="number" class="fi" id="rcQty" value="1" min="1" max="50"/></div>
+    <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="rcTotal">₦100</span></div>
+    <button class="btn-p" id="rcSubmit"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- PRINT CARDS MODAL -->
+<div class="ov" id="printModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-id-card"></i>Your Recharge Cards</div>
+      <button class="m-close" data-close="printModal"><i class="fas fa-times"></i></button>
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px">Tap the copy icon on any card to copy the PIN</p>
+    <div class="print-cards-wrap" id="printCardsWrap"></div>
+    <button class="print-all-btn" id="printAllBtn"><i class="fas fa-print"></i>Print All Cards</button>
+  </div>
+</div>
+
+<!-- BULK SMS MODAL -->
+<div class="ov" id="smsModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-comment-dots"></i>Bulk SMS</div>
+      <button class="m-close" data-close="smsModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="fg"><label class="flbl">Sender ID <small>(max 11 chars)</small></label><input type="text" class="fi" id="smsSender" placeholder="e.g. SubHub" maxlength="11"/></div>
+    <div class="fg">
+      <label class="flbl">Recipients <small>— comma-separated</small></label>
+      <textarea class="fi" id="smsNums" rows="3" placeholder="08012345678, 07034567890, …"></textarea>
+      <div style="font-size:.66rem;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px"><i class="fas fa-users"></i><b id="smsCount">0</b> recipients · ₦4/SMS</div>
+    </div>
+    <div class="fg">
+      <label class="flbl">Message <small>(<span id="smsLen">0</span>/160)</small></label>
+      <textarea class="fi" id="smsMsg" rows="4" placeholder="Type your message here…"></textarea>
+    </div>
+    <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total Cost</span><span class="pbox-val" id="smsCost">₦0</span></div>
+    <button class="btn-p" id="smsSubmit"><span>Send SMS</span></button>
+  </div>
+</div>
+
+<!-- PRINT DATA MODAL -->
+<div class="ov" id="printDataModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-wifi"></i>Print Data</div>
+      <button class="m-close" data-close="printDataModal"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="flbl">Select Network</label>
+    <div class="nets" id="pdChips"></div>
+    <div id="pdSection" style="display:none">
+      <div class="plan-tabs" id="pdTabs"></div>
+      <div class="plans-wrap" id="pdPlansWrap"></div>
+      <div class="fg" style="margin-top:13px"><label class="flbl">Quantity <small>(max 10)</small></label><input type="number" class="fi" id="pdQty" value="1" min="1" max="10"/></div>
+      <div class="price-box" id="pdPriceBox" style="display:none"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="pdTotal">₦0</span></div>
+    </div>
+    <button class="btn-p" id="pdSubmit" style="display:none"><span>Continue</span></button>
+  </div>
+</div>
+
+<!-- FUND MODAL — Fix 4: Virtual account only, no transfer -->
+<div class="ov" id="fundModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-wallet"></i>Fund Wallet</div>
+      <button class="m-close" data-close="fundModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="text-align:center;padding:8px 0 18px">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--success)">
+        <i class="fas fa-bank"></i>
+      </div>
+      <div style="font-size:.86rem;font-weight:800;margin-bottom:4px">Fund via Virtual Account</div>
+      <div style="font-size:.74rem;color:var(--muted);line-height:1.5">Transfer any amount to your virtual account below.<br/>Wallet will be credited instantly.</div>
+    </div>
+    <div id="fundVAContent">
+      <div style="background:var(--bg);border-radius:12px;padding:16px;border:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Bank</span>
+          <span style="font-size:.82rem;font-weight:700" id="fundVABank">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Account Number</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.96rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--pr)" id="fundVANumber">—</span>
+            <button onclick="copyVA()" style="background:rgba(0,170,255,.1);border:none;color:var(--pr);padding:4px 8px;border-radius:6px;font-size:.66rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">Copy</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Account Name</span>
+          <span style="font-size:.82rem;font-weight:700" id="fundVAName">—</span>
+        </div>
+      </div>
+      <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:9px;padding:10px 12px;margin-top:12px;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-triangle-exclamation" style="color:var(--warning);font-size:.82rem;flex-shrink:0"></i>
+        <span style="font-size:.7rem;color:var(--muted);line-height:1.4">Transfer exact amount. Do not include charges. Minimum ₦100.</span>
+      </div>
+    </div>
+    <div id="fundNoVA" style="display:none;text-align:center;padding:8px 0">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Generate a virtual account to fund your wallet instantly</p>
+      <button class="btn-p" id="fundGenVA"><i class="fas fa-plus"></i><span>Generate Virtual Account</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSFER REMOVED — Fix 4: No bank transfer feature -->
+
+<!-- QUICK SERVICE MODAL -->
+<div class="ov" id="quickSvcModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-bolt"></i>Quick Action</div>
+      <button class="m-close" data-close="quickSvcModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="qs-net-badge" id="qsNetBadge"></div>
+    <div class="fg"><label class="flbl">Phone Number</label><input type="tel" class="fi" id="qsPhone" readonly/></div>
+    <label class="flbl">Select Service</label>
+    <div class="qs-svc-list">
+      <div class="qs-svc" data-qsvc="data"><i class="fas fa-wifi"></i><span>Buy Data</span></div>
+      <div class="qs-svc" data-qsvc="airtime"><i class="fas fa-phone"></i><span>Buy Airtime</span></div>
+      <div class="qs-svc" data-qsvc="gift"><i class="fas fa-gift"></i><span>Gift Data</span></div>
+      <div class="qs-svc" data-qsvc="rc"><i class="fas fa-id-card"></i><span>Recharge Card</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN MODAL -->
+<div class="ov" id="pinModal">
+  <div class="modal" style="padding-bottom:20px">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-lock"></i>Transaction PIN</div>
+      <button class="m-close" data-close="pinModal"><i class="fas fa-times"></i></button>
+    </div>
+    <p style="text-align:center;font-size:.76rem;color:var(--muted)">Enter your 4-digit PIN to confirm</p>
+    <div class="pin-sum" id="pinSum"></div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="pin-kp" id="pinKp">
+      <button class="pk" data-pk="1">1</button><button class="pk" data-pk="2">2</button><button class="pk" data-pk="3">3</button>
+      <button class="pk" data-pk="4">4</button><button class="pk" data-pk="5">5</button><button class="pk" data-pk="6">6</button>
+      <button class="pk" data-pk="7">7</button><button class="pk" data-pk="8">8</button><button class="pk" data-pk="9">9</button>
+      <button class="pk fp" data-pk="fp"><i class="fas fa-fingerprint"></i></button>
+      <button class="pk" data-pk="0">0</button>
+      <button class="pk del" data-pk="del"><i class="fas fa-delete-left"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="ov" id="receiptModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="rec-top">
+      <div class="rec-ring" id="recRing"><i id="recRingIco" class="fas fa-check"></i></div>
+      <div class="rec-amt" id="recAmt">₦0</div>
+      <div class="rec-stat ok" id="recStat">Transaction Successful!</div>
+    </div>
+    <div class="rec-rows" id="recRows"></div>
+    <div class="rec-acts">
+      <button class="ra-done" data-close="receiptModal"><i class="fas fa-home"></i>Done</button>
+      <button class="ra-dl" id="dlBtn"><i class="fas fa-download"></i>Download</button>
+      <button class="ra-sh" id="shareBtn"><i class="fas fa-share-nodes"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PIN MODAL -->
+<div class="ov" id="cpModal">
+  <div class="modal" style="padding-bottom:20px">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-key"></i>Change PIN</div>
+      <button class="m-close" data-close="cpModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cp-bar"><div class="cp-step on" id="cps1"></div><div class="cp-step" id="cps2"></div><div class="cp-step" id="cps3"></div></div>
+    <p style="text-align:center;font-size:.84rem;font-weight:700;margin-bottom:4px" id="cpInstr">Enter current PIN</p>
+    <div class="pin-dots" id="cpDots">
+      <div class="pdot" id="cpd0"></div><div class="pdot" id="cpd1"></div>
+      <div class="pdot" id="cpd2"></div><div class="pdot" id="cpd3"></div>
+    </div>
+    <div class="pin-err" id="cpErr"></div>
+    <div class="pin-kp" id="cpKp">
+      <button class="pk" data-cpk="1">1</button><button class="pk" data-cpk="2">2</button><button class="pk" data-cpk="3">3</button>
+      <button class="pk" data-cpk="4">4</button><button class="pk" data-cpk="5">5</button><button class="pk" data-cpk="6">6</button>
+      <button class="pk" data-cpk="7">7</button><button class="pk" data-cpk="8">8</button><button class="pk" data-cpk="9">9</button>
+      <button class="pk fp" data-cpk="fp"><i class="fas fa-fingerprint"></i></button>
+      <button class="pk" data-cpk="0">0</button>
+      <button class="pk del" data-cpk="del"><i class="fas fa-delete-left"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PIN MODAL -->
+<div class="ov" id="setPinModal">
+  <div class="modal" style="padding-bottom:20px">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-lock"></i>Set Transaction PIN</div>
+    </div>
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="width:52px;height:52px;border-radius:50%;background:rgba(0,170,255,.1);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--pr)">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <div style="font-size:.82rem;font-weight:700;margin-bottom:3px" id="spTitle">Create a PIN</div>
+      <div style="font-size:.7rem;color:var(--muted)" id="spSub">Choose a 4-digit transaction PIN</div>
+    </div>
+    <div class="cp-bar" style="margin:12px 0 6px">
+      <div class="cp-step on" id="sps1"></div>
+      <div class="cp-step"    id="sps2"></div>
+    </div>
+    <div class="pin-dots" id="spDots">
+      <div class="pdot" id="spd0"></div><div class="pdot" id="spd1"></div>
+      <div class="pdot" id="spd2"></div><div class="pdot" id="spd3"></div>
+    </div>
+    <div class="pin-err" id="spErr"></div>
+    <div class="pin-kp">
+      <button class="pk" onclick="spKey('1')">1</button><button class="pk" onclick="spKey('2')">2</button><button class="pk" onclick="spKey('3')">3</button>
+      <button class="pk" onclick="spKey('4')">4</button><button class="pk" onclick="spKey('5')">5</button><button class="pk" onclick="spKey('6')">6</button>
+      <button class="pk" onclick="spKey('7')">7</button><button class="pk" onclick="spKey('8')">8</button><button class="pk" onclick="spKey('9')">9</button>
+      <button class="pk fp"><i class="fas fa-fingerprint"></i></button>
+      <button class="pk" onclick="spKey('0')">0</button>
+      <button class="pk del" onclick="spKey('del')"><i class="fas fa-delete-left"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="ov" id="alertModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="alert-body" id="alertBody"></div>
+    <button class="btn-p" data-close="alertModal">OK</button>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER — Fix 9: Professional toast -->
+<div class="toast-container" id="toastContainer"></div>
+<!-- Keep for JS compatibility -->
+<div id="toast" style="display:none"><i id="toastIco"></i><span id="toastTxt"></span></div>
+
+<script src="/assets/js/app.js"></script>
+</body>
+</html>

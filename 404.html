@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Page Not Found | SubHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+ <link rel="icon" type="image/png" href="logo.png">
+<style>
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --brand: #00aaff;
+  --brand-dim: rgba(0,170,255,0.10);
+  --brand-glow: rgba(0,170,255,0.30);
+  --brand-dark: #0088cc;
+  --success: #00c07a;
+  --error: #e8334a;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="light"] {
+  --bg: #f3f8ff; --bg2: #e8f2ff;
+  --surface: #ffffff; --surface2: #f7faff;
+  --border: rgba(0,100,200,0.10); --border-focus: rgba(0,170,255,0.55);
+  --text: #0d1a2e; --text-muted: #8096b8; --text-sub: #4d6480;
+  --shadow: rgba(0,80,180,0.10); --grid-color: rgba(0,120,255,0.06);
+}
+[data-theme="dark"] {
+  --bg: #080c12; --bg2: #0d1117;
+  --surface: #111820; --surface2: #161e2a;
+  --border: rgba(255,255,255,0.07); --border-focus: rgba(0,170,255,0.5);
+  --text: #eef2ff; --text-muted: #6b7a99; --text-sub: #8896b3;
+  --shadow: rgba(0,0,0,0.6); --grid-color: rgba(255,255,255,0.04);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-display);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* BG */
+.bg-grid {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+.bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+.bg-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,170,255,0.12), transparent 70%); top: -150px; right: -100px; animation: orbFloat 8s ease-in-out infinite; }
+.bg-orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,170,255,0.07), transparent 70%); bottom: -100px; left: -100px; animation: orbFloat 10s ease-in-out infinite reverse; }
+@keyframes orbFloat { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+
+/* THEME TOGGLE */
+.theme-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 100;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--surface);
+  color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); box-shadow: 0 4px 20px var(--shadow);
+}
+.theme-toggle:hover { border-color: var(--brand); color: var(--brand); box-shadow: 0 0 0 4px var(--brand-dim); transform: scale(1.08); }
+.theme-toggle svg { width: 18px; height: 18px; }
+
+/* WRAPPER */
+.wrapper {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  gap: 0;
+}
+
+/* STICKER */
+.sticker-wrap {
+  position: relative;
+  margin-bottom: 8px;
+  animation: fadeUp 0.6s ease both;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sticker {
+  width: 200px; height: 200px;
+  position: relative;
+  animation: stickerFloat 4s ease-in-out infinite;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  filter: drop-shadow(0 20px 40px rgba(0,170,255,0.25));
+}
+.sticker:hover { transform: scale(1.08) rotate(-3deg); }
+.sticker:active { transform: scale(0.94) rotate(2deg); }
+
+/* SVG sticker — robot astronaut lost in space */
+.sticker svg { width: 100%; height: 100%; }
+
+/* Wobble on click */
+.sticker.wobble { animation: wobble 0.5s cubic-bezier(0.36,0.07,0.19,0.97); }
+@keyframes wobble {
+  0%   { transform: rotate(0deg) scale(1); }
+  15%  { transform: rotate(-8deg) scale(1.05); }
+  30%  { transform: rotate(6deg) scale(1.05); }
+  45%  { transform: rotate(-5deg) scale(1.03); }
+  60%  { transform: rotate(4deg) scale(1.02); }
+  75%  { transform: rotate(-2deg) scale(1.01); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Stars around sticker */
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--brand);
+  animation: starTwinkle var(--d, 2s) ease-in-out infinite var(--delay, 0s);
+}
+@keyframes starTwinkle {
+  0%,100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+/* 404 NUMBER */
+.error-code {
+  font-size: clamp(5rem, 20vw, 7rem);
+  font-weight: 900;
+  letter-spacing: -4px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--brand) 0%, #0055aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeUp 0.7s ease 0.1s both;
+  position: relative;
+  margin-bottom: 4px;
+}
+.error-code::after {
+  content: '404';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--brand) 0%, #0055aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(18px);
+  opacity: 0.35;
+  z-index: -1;
+}
+
+/* CARD */
+.card {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 60px var(--shadow);
+  position: relative; overflow: hidden;
+  animation: fadeUp 0.7s ease 0.2s both;
+  width: 100%;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+  opacity: 0.6;
+}
+
+.card-title {
+  font-size: 1.3rem; font-weight: 800; color: var(--text);
+  letter-spacing: -0.4px; margin-bottom: 8px;
+}
+.card-sub {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* ERROR CODE BADGE */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 6px;
+  background: var(--brand-dim); border: 1px solid rgba(0,170,255,0.2);
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  color: var(--brand); margin-bottom: 16px;
+  animation: fadeUp 0.6s ease 0.15s both;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-primary {
+  flex: 1; min-width: 120px; padding: 13px 20px;
+  background: linear-gradient(135deg, var(--brand), #0070cc);
+  border: none; border-radius: var(--radius-sm); color: white;
+  font-family: var(--font-display); font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 6px 24px var(--brand-glow);
+  text-decoration: none;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 36px var(--brand-glow); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  flex: 1; min-width: 120px; padding: 13px 20px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-sub);
+  font-family: var(--font-display); font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: var(--transition); text-decoration: none;
+}
+.btn-secondary:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-dim); }
+
+.btn-primary svg, .btn-secondary svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* LOGO */
+.logo-wrap {
+  margin-bottom: 20px;
+  animation: fadeUp 0.5s ease both;
+}
+.logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.logo-img {
+  width: 36px; height: 36px; border-radius: 10px; object-fit: contain;
+  box-shadow: 0 4px 16px var(--brand-glow);
+  background: var(--surface); padding: 3px;
+  border: 1.5px solid var(--border);
+}
+.logo-text { font-size: 1.3rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.logo-text span { color: var(--brand); }
+
+/* ANIMATIONS */
+@keyframes stickerFloat {
+  0%,100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .card { padding: 24px 18px; }
+  .sticker { width: 160px; height: 160px; }
+  .btn-row { flex-direction: column; }
+  .btn-primary, .btn-secondary { flex: none; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+</button>
+
+<div class="wrapper">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <a href="/" class="logo">
+      <img src="/logo.png" alt="SubHub" class="logo-img" onerror="this.style.display='none'">
+      <span class="logo-text">Sub<span>Hub</span></span>
+    </a>
+  </div>
+
+  <!-- Animated Sticker -->
+  <div class="sticker-wrap">
+    <!-- Stars -->
+    <div class="star" style="width:5px;height:5px;top:10px;left:30px;--d:2.1s;--delay:0s;"></div>
+    <div class="star" style="width:4px;height:4px;top:25px;right:25px;--d:1.7s;--delay:0.3s;"></div>
+    <div class="star" style="width:3px;height:3px;top:60px;left:8px;--d:2.4s;--delay:0.6s;"></div>
+    <div class="star" style="width:5px;height:5px;bottom:30px;right:15px;--d:1.9s;--delay:0.9s;"></div>
+    <div class="star" style="width:3px;height:3px;bottom:50px;left:20px;--d:2.2s;--delay:0.4s;"></div>
+    <div class="star" style="width:4px;height:4px;top:80px;right:5px;--d:1.6s;--delay:0.7s;"></div>
+
+    <div class="sticker" id="sticker" onclick="wobbleSticker()">
+      <!-- Robot astronaut lost in space SVG sticker -->
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="helmetGrad" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="#d0f0ff"/>
+            <stop offset="60%" stop-color="#7dd8ff"/>
+            <stop offset="100%" stop-color="#0099ee"/>
+          </radialGradient>
+          <radialGradient id="visorGrad" cx="35%" cy="30%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
+            <stop offset="100%" stop-color="rgba(0,120,200,0.4)"/>
+          </radialGradient>
+          <radialGradient id="bodyGrad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="#e8f6ff"/>
+            <stop offset="100%" stop-color="#a0d8f8"/>
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <linearGradient id="signalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00aaff" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#00aaff" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#00aaff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Outer space glow -->
+        <circle cx="100" cy="100" r="90" fill="rgba(0,170,255,0.04)" stroke="rgba(0,170,255,0.12)" stroke-width="1"/>
+
+        <!-- Signal waves (lost signal) -->
+        <g opacity="0.5" filter="url(#glow)">
+          <path d="M 148 68 Q 162 60 158 45" stroke="#00aaff" stroke-width="2" fill="none" stroke-linecap="round">
+            <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 150 65 Q 170 53 165 35" stroke="#00aaff" stroke-width="1.5" fill="none" stroke-linecap="round">
+            <animate attributeName="opacity" values="1;0;1" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 152 62 Q 178 46 172 25" stroke="#00aaff" stroke-width="1" fill="none" stroke-linecap="round">
+            <animate attributeName="opacity" values="1;0;1" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+          </path>
+        </g>
+
+        <!-- Antenna -->
+        <line x1="100" y1="52" x2="100" y2="38" stroke="#7dd8ff" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="100" cy="35" r="5" fill="#00aaff" filter="url(#glow)">
+          <animate attributeName="r" values="4;6;4" dur="1s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Helmet -->
+        <ellipse cx="100" cy="78" rx="36" ry="34" fill="url(#helmetGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+
+        <!-- Helmet shine -->
+        <ellipse cx="88" cy="65" rx="14" ry="10" fill="rgba(255,255,255,0.25)" transform="rotate(-20,88,65)"/>
+
+        <!-- Visor -->
+        <ellipse cx="100" cy="80" rx="24" ry="21" fill="url(#visorGrad)" stroke="rgba(0,150,220,0.3)" stroke-width="1"/>
+
+        <!-- Eyes (inside visor) -->
+        <circle cx="91" cy="78" r="5" fill="#001830"/>
+        <circle cx="109" cy="78" r="5" fill="#001830"/>
+        <!-- Eye shine -->
+        <circle cx="93" cy="76" r="2" fill="rgba(255,255,255,0.8)"/>
+        <circle cx="111" cy="76" r="2" fill="rgba(255,255,255,0.8)"/>
+        <!-- Worried eyes (little curved lines below) -->
+        <path d="M 88 84 Q 91 87 94 84" stroke="#0077cc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 106 84 Q 109 87 112 84" stroke="#0077cc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Sweat drop -->
+        <ellipse cx="118" cy="70" rx="3" ry="4.5" fill="#7dd8ff" opacity="0.8">
+          <animate attributeName="cy" values="70;75;70" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite"/>
+        </ellipse>
+
+        <!-- Collar/neck -->
+        <rect x="84" y="108" width="32" height="8" rx="4" fill="#a0d8f8" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+
+        <!-- Body suit -->
+        <rect x="72" y="114" width="56" height="48" rx="14" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+
+        <!-- Chest panel -->
+        <rect x="84" y="122" width="32" height="22" rx="7" fill="rgba(0,100,180,0.2)" stroke="rgba(0,170,255,0.4)" stroke-width="1"/>
+        <!-- Chest lights -->
+        <circle cx="91" cy="130" r="3" fill="#00aaff" filter="url(#glow)">
+          <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="100" cy="130" r="3" fill="#00ff88" filter="url(#glow)">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="109" cy="130" r="3" fill="#ff6644" filter="url(#glow)">
+          <animate attributeName="opacity" values="1;0.3;1" dur="0.9s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Left arm -->
+        <rect x="50" y="116" width="20" height="34" rx="10" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" transform="rotate(10,60,133)"/>
+        <!-- Left glove -->
+        <circle cx="48" cy="150" r="9" fill="#7dd8ff" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+
+        <!-- Right arm (waving!) -->
+        <rect x="130" y="110" width="20" height="34" rx="10" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" transform="rotate(-30,140,127)">
+          <animateTransform attributeName="transform" type="rotate" values="-30,140,127;-10,140,127;-30,140,127" dur="1.2s" repeatCount="indefinite"/>
+        </rect>
+        <!-- Right glove -->
+        <circle fill="#7dd8ff" stroke="rgba(255,255,255,0.3)" stroke-width="1" r="9">
+          <animateMotion dur="1.2s" repeatCount="indefinite" path="M 152,142 Q 158,132 152,142"/>
+        </circle>
+
+        <!-- Legs -->
+        <rect x="80" y="158" width="18" height="26" rx="8" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        <rect x="102" y="158" width="18" height="26" rx="8" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        <!-- Boots -->
+        <ellipse cx="89" cy="184" rx="12" ry="7" fill="#5bbde8" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        <ellipse cx="111" cy="184" rx="12" ry="7" fill="#5bbde8" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+
+        <!-- Question marks floating -->
+        <text x="32" y="75" font-size="14" fill="#00aaff" font-weight="900" opacity="0.7" font-family="Plus Jakarta Sans, sans-serif">
+          ?
+          <animate attributeName="y" values="75;65;75" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.7;0.1;0.7" dur="2.5s" repeatCount="indefinite"/>
+        </text>
+        <text x="158" y="95" font-size="11" fill="#00aaff" font-weight="900" opacity="0.5" font-family="Plus Jakarta Sans, sans-serif">
+          ?
+          <animate attributeName="y" values="95;83;95" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+          <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+        </text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 404 Number -->
+  <div class="error-code">404</div>
+
+  <!-- Card -->
+  <div class="card">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      ERROR_NOT_FOUND
+    </div>
+    <div class="card-title">Oops! Page Not Found</div>
+    <div class="card-sub">
+      The page you're looking for doesn't exist or has been moved. Don't worry 😄 let's get you back on track.
+    </div>
+    <div class="btn-row">
+      <a href="/" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Go Home
+      </a>
+      <a href="/app" class="btn-secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+        </svg>
+        Dashboard
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Theme toggle
+  const html = document.documentElement;
+  const icon = document.getElementById('theme-icon');
+
+  function toggleTheme() {
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    icon.innerHTML = isLight
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+
+  // Sticker wobble on click
+  function wobbleSticker() {
+    const s = document.getElementById('sticker');
+    s.classList.remove('wobble');
+    void s.offsetWidth;
+    s.classList.add('wobble');
+    setTimeout(() => s.classList.remove('wobble'), 500);
+  }
+</script>
+</body>
+</html>

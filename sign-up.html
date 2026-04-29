@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===== SEO & AI DISCOVERY ===== -->
+<title>SubHub | Create Your Free Account | Nigeria's #1 Data & Airtime Platform</title>
+<meta name="description" content="Join SubHub today. Buy cheap data bundles, airtime, pay bills and earn rewards instantly. Nigeria's fastest and most reliable VTU platform. Sign up free in 30 seconds.">
+<meta name="keywords" content="SubHub, buy data Nigeria, cheap data bundle, airtime recharge Nigeria, VTU platform, pay electricity bill Nigeria, SubHub register, Nigeria data reseller, cheap MTN data, Airtel data, Glo data, 9mobile data">
+<meta name="robots" content="index, follow">
+<meta name="author" content="SubHub">
+<meta name="theme-color" content="#00aaff">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="SubHub — Create Your Free Account">
+<meta property="og:description" content="Buy cheap data, airtime & pay bills instantly. Join thousands of Nigerians on SubHub.">
+<meta property="og:image" content="/logo.png">
+<meta property="og:url" content="https://subhub.ng/register">
+<meta property="og:site_name" content="SubHub">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SubHub — Nigeria's Fastest Data & Airtime Platform">
+<meta name="twitter:description" content="Create your free SubHub account and start buying cheap data bundles and airtime instantly.">
+<meta name="twitter:image" content="/logo.png">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://subhub.ng/sign-up">
+
+<!-- Schema.org structured data for AI/search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "SubHub Registration",
+  "description": "Create a free SubHub account to buy data bundles, airtime, and pay bills in Nigeria.",
+  "url": "https://subhub.ng/sign-up",
+  "provider": {
+    "@type": "Organization",
+    "name": "SubHub",
+    "url": "https://subhub.ng",
+    "logo": "/logo.png",
+    "description": "Nigeria's fastest data, airtime, and bill payment platform",
+    "areaServed": "NG"
+  }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="/assets/css/sign-up.css">
+</head>
+<body>
+
+<!-- BG Effects -->
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+  <!-- Moon icon (shown in light mode) --> 
+  <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+  <!-- Sun icon (shown in dark mode, hidden by default) -->
+  <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+</button>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Main Content -->
+<div class="wrapper">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <a href="/" class="logo" aria-label="SubHub Home">
+      <!-- Real logo.png -->
+      <img 
+        class="logo-img" 
+        id="logoImg"
+        src="logo.png" 
+        alt="SubHub Logo"
+        onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+      >
+      <!-- Fallback icon if logo.png missing -->
+      <div class="logo-icon-fallback" id="logoFallback">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">Sub<span>Hub</span></div>
+      </div>
+    </a>
+    <p class="logo-sub">Nigeria's fastest data &amp; airtime  and resell all in one platform</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">Create your account</h1>
+      <p class="card-sub">Join thousands of Nigerians buying cheap data &amp; airtime and resell  instantly</p>
+    </div>
+
+    <form class="form" id="signupForm" novalidate>
+
+      <!-- Full Name + Username -->
+      <div class="field-row">
+        <div class="field">
+          <label for="fullname">Full Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <!-- User icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input type="text" id="fullname" placeholder="e.g. Aminu Bello" autocomplete="name">
+          </div>
+          <span class="field-error" id="fullname-err">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Enter your full name
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <!-- At sign icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+            </span>
+            <input type="text" id="username" placeholder="e.g. aminub" autocomplete="username">
+            <span class="username-status" id="usernameStatus"></span>
+          </div>
+          <span class="field-error" id="username-err">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Username unavailable
+          </span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <!-- Mail icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input type="email" id="email" placeholder="e.g. aminu@email.com" autocomplete="email">
+        </div>
+        <span class="field-error" id="email-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Enter a valid email address
+        </span>
+      </div>
+
+      <!-- Phone -->
+      <div class="field">
+        <label for="phone">Phone Number</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <!-- Phone icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          <input type="tel" id="phone" placeholder="e.g. 08123456789">
+        </div>
+        <span class="field-error" id="phone-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Enter a valid Nigerian phone number
+        </span>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <!-- Lock icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password">
+          <button type="button" class="pwd-toggle" id="togglePwd" aria-label="Show password">
+            <!-- Eye icon -->
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="strength-bar" id="strengthBar">
+          <div class="strength-seg" id="s1"></div>
+          <div class="strength-seg" id="s2"></div>
+          <div class="strength-seg" id="s3"></div>
+          <div class="strength-seg" id="s4"></div>
+        </div>
+        <div class="strength-label" id="strengthLabel"></div>
+        <span class="field-error" id="password-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Password must be at least 8 characters
+        </span>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="field">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <!-- Shield check icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </span>
+          <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">
+          <button type="button" class="pwd-toggle" id="toggleConfirm" aria-label="Show confirm password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <span class="field-error" id="confirm-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Passwords do not match
+        </span>
+      </div>
+
+      <!-- Referral (optional) -->
+      <div class="field">
+        <label for="referral">referral By?<span style="font-weight:400;text-transform:none;font-size:0.7rem;color:var(--text-muted)">(optional)</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <!-- Gift icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </span>
+          <input type="text" id="referral" placeholder="Enter referral username" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <label class="terms">
+        <input type="checkbox" id="terms">
+        <span class="terms-text">
+          I agree to SubHub's <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>. 
+        </span>
+      </label>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="btn-text" style="display:flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Create Account
+        </span>
+        <div class="btn-spinner"></div>
+      </button>
+
+    </form>
+  
+
+  <!-- Sign In Link -->
+  <p class="signin-link">Already have an account? <a href="login.html">Sign in here &rarr;</a></p>
+</div>
+<br><br>
+</div>
+
+<script src="/assets/js/sign-up.js"></script>
+</body>
+</html>

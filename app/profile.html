@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Profile | SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="/assets/css/app.css"/>
+<link rel="stylesheet" href="/assets/css/profile.css">
+</head>
+<body>
+
+<!-- PROCESSING OVERLAY -->
+<div class="proc-ov" id="procOv">
+  <div class="proc-card">
+    <div class="proc-logo">
+      <div class="proc-inner-ring" id="procLogoInner">
+        <img src="logo.png" alt="S" style="width:44px;height:44px;object-fit:contain;border-radius:50%" id="procLogoImg" onerror="this.style.display='none';document.getElementById('procLogoTxt').style.display='block'"/>
+        <span class="proc-logo-text" id="procLogoTxt" style="display:none">S</span>
+      </div>
+    </div>
+    <div class="proc-title" id="procTitle">Processing…</div>
+    <div class="proc-sub" id="procSub">Please wait</div>
+    <div class="proc-dots"><div class="pd2"></div><div class="pd2"></div><div class="pd2"></div></div>
+  </div>
+</div>
+
+<!-- CHANGE PIN MODAL -->
+<div class="ov" id="cpModal">
+  <div class="modal" style="padding-bottom:20px">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-key"></i>Change PIN</div>
+      <button class="m-close" data-close="cpModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cp-bar">
+      <div class="cp-step on" id="cps1"></div>
+      <div class="cp-step"    id="cps2"></div>
+      <div class="cp-step"    id="cps3"></div>
+    </div>
+    <p style="text-align:center;font-size:.84rem;font-weight:700;margin-bottom:4px" id="cpInstr">Enter your current PIN</p>
+    <div class="pin-dots" id="cpDots">
+      <div class="pdot" id="cpd0"></div><div class="pdot" id="cpd1"></div>
+      <div class="pdot" id="cpd2"></div><div class="pdot" id="cpd3"></div>
+    </div>
+    <div class="pin-err" id="cpErr"></div>
+    <div class="pin-kp" id="cpKp">
+      <button class="pk" data-cpk="1">1</button><button class="pk" data-cpk="2">2</button><button class="pk" data-cpk="3">3</button>
+      <button class="pk" data-cpk="4">4</button><button class="pk" data-cpk="5">5</button><button class="pk" data-cpk="6">6</button>
+      <button class="pk" data-cpk="7">7</button><button class="pk" data-cpk="8">8</button><button class="pk" data-cpk="9">9</button>
+      <button class="pk fp" data-cpk="fp"><i class="fas fa-fingerprint"></i></button>
+      <button class="pk" data-cpk="0">0</button>
+      <button class="pk del" data-cpk="del"><i class="fas fa-delete-left"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="ov" id="pwdModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-lock"></i>Change Password</div>
+      <button class="m-close" data-close="pwdModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="fg">
+      <label class="flbl">Current Password</label>
+      <div class="pwd-field">
+        <input type="password" class="fi" id="pwdOld" placeholder="Enter current password"/>
+        <button class="eye-toggle" onclick="toggleEye('pwdOld',this)"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flbl">New Password</label>
+      <div class="pwd-field">
+        <input type="password" class="fi" id="pwdNew" placeholder="Min 6 characters"/>
+        <button class="eye-toggle" onclick="toggleEye('pwdNew',this)"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flbl">Confirm New Password</label>
+      <div class="pwd-field">
+        <input type="password" class="fi" id="pwdConf" placeholder="Repeat new password"/>
+        <button class="eye-toggle" onclick="toggleEye('pwdConf',this)"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="field-err" id="pwdErr"></div>
+    <button class="btn-p" id="pwdSubmit"><i class="fas fa-save"></i><span>Save Password</span></button>
+  </div>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="ov" id="alertModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="alert-body" id="alertBody"></div>
+    <button class="btn-p" data-close="alertModal">OK</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <button class="nav-btn" onclick="history.back()" style="font-size:.82rem"><i class="fas fa-chevron-left"></i></button>
+  <div class="nav-brand">
+    <img src="logo.png" class="nav-logo" id="logoImg" alt="SubHub Logo" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
+    <div class="nav-logo-fb" id="logoFb">S</div>
+    <div class="nav-brand-name">Sub<span>Hub</span></div>
+  </div>
+  <button class="nav-btn" id="dmBtn"><i class="fas fa-moon" id="dmIco"></i></button>
+</nav>
+
+<!-- PAGE -->
+<div class="container" id="pgBody"></div>
+
+<!-- VIRTUAL ACCOUNT MODAL -->
+<div class="ov" id="vaModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+    <div class="modal-hd">
+      <div class="modal-ttl"><i class="fas fa-building-columns"></i>Fund Wallet</div>
+      <button class="m-close" data-close="vaModal"><i class="fas fa-times"></i></button>
+    </div>
+    <p style="font-size:.74rem;color:var(--muted);margin-bottom:14px">Transfer to the account below to fund your wallet instantly.</p>
+    <div id="vaModalBody"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-i" id="bn-home"    onclick="location.href='/app/index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="bnav-i" id="bn-history" onclick="location.href='/app/transactions.html'"><i class="fas fa-receipt"></i><span>History</span></button>
+  <button class="bnav-i" id="bn-fund"    onclick="openVAModal()"><i class="fas fa-plus-circle"></i><span>Fund</span></button>
+  <button class="bnav-i active" id="bn-profile"><i class="fas fa-user"></i><span>Profile</span></button>
+</nav>
+
+<script src="/assets/js/profile.js"></script>
+</body>
+</html>

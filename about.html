@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>About Us | SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+ <link rel="icon" type="image/png" href="logo.png">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:#fff;color:#001e3c;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+/* ── VARIABLES ── */
+:root{
+  --brand:#00aaff;
+  --brand-d:#0088cc;
+  --brand-xl:#e0f5ff;
+  --ink:#001e3c;
+  --ink2:#003166;
+  --slate:#64748b;
+  --mist:#f0f8ff;
+  --border:#d8edf8;
+}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:64px;display:flex;align-items:center;
+  padding:0 max(24px,calc((100vw - 1200px)/2));
+  justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo-img{width:34px;height:34px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.2)}
+.nav-logo-fb{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px}
+.nav-wordmark{font-weight:800;font-size:1.15rem;letter-spacing:-.3px;color:var(--ink)}
+.nav-wordmark span{color:var(--brand)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{padding:7px 14px;border-radius:100px;font-size:.8rem;font-weight:600;color:var(--slate);border:none;background:none;cursor:pointer;transition:.15s}
+.nav-link:hover{color:var(--brand);background:rgba(0,170,255,.07)}
+.nav-link.active{color:var(--brand);background:rgba(0,170,255,.1);font-weight:700}
+.nav-cta{padding:9px 20px;border-radius:100px;font-size:.8rem;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,170,255,.35);transition:.2s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,170,255,.45)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(160deg,#001e3c 0%,#003166 55%,#005cbf 100%);
+  padding:90px max(24px,calc((100vw - 1200px)/2)) 80px;
+  position:relative;overflow:hidden;
+  text-align:center;
+}
+.hero-orb1{position:absolute;width:600px;height:600px;border-radius:50%;top:-200px;right:-150px;background:radial-gradient(circle,rgba(0,170,255,.18),transparent 65%)}
+.hero-orb2{position:absolute;width:400px;height:400px;border-radius:50%;bottom:-120px;left:-100px;background:radial-gradient(circle,rgba(0,170,255,.1),transparent 65%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:50px 50px}
+.hero-in{position:relative;z-index:2;max-width:700px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;background:rgba(0,170,255,.15);border:1px solid rgba(0,170,255,.25);font-size:.72rem;font-weight:700;color:rgba(0,170,255,.9);margin-bottom:22px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--brand);animation:hdot 2s infinite}
+@keyframes hdot{0%,100%{box-shadow:0 0 0 0 rgba(0,170,255,.7)}50%{box-shadow:0 0 0 5px transparent}}
+.hero h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.05em;margin-bottom:18px}
+.hero h1 span{background:linear-gradient(90deg,#00aaff,#66d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-p{font-size:1rem;color:rgba(255,255,255,.55);line-height:1.75;max-width:560px;margin:0 auto 36px}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+.hero-stat{}
+.hero-stat-num{font-size:2rem;font-weight:900;color:#fff;letter-spacing:-.04em;font-family:'JetBrains Mono',monospace}
+.hero-stat-lbl{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:3px;font-weight:500}
+.hero-stat-divider{width:1px;height:40px;background:rgba(255,255,255,.1)}
+
+/* ── SHARED SECTION ── */
+section{padding:90px max(24px,calc((100vw - 1200px)/2))}
+.sec-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;background:rgba(0,170,255,.08);border:1px solid rgba(0,170,255,.18);font-size:.7rem;font-weight:700;color:#006699;margin-bottom:14px}
+.sec-h{font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:900;letter-spacing:-.05em;color:var(--ink);line-height:1.1;margin-bottom:14px}
+.sec-h span{color:var(--brand)}
+.sec-p{font-size:.9rem;color:var(--slate);line-height:1.8;max-width:560px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.up{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+/* ── MISSION SECTION ── */
+.mission{background:#fff}
+.mission-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.mission-visual{position:relative}
+.mission-card{
+  background:linear-gradient(145deg,#001e3c,#003166,#005cbf);
+  border-radius:28px;padding:36px;color:#fff;
+  box-shadow:0 24px 60px rgba(0,34,68,.2);
+  position:relative;overflow:hidden;
+}
+.mission-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(0,170,255,.1)}
+.mission-card::after{content:'';position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.03)}
+.mc-in{position:relative;z-index:1}
+.mc-logo-row{display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.mc-logo-img{width:44px;height:44px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.3);background:rgba(0,170,255,.1)}
+.mc-logo-fb{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+.mc-brand{font-weight:800;font-size:1.1rem;color:#fff}
+.mc-by{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:2px}
+.mc-quote{font-size:.95rem;font-weight:600;line-height:1.6;color:rgba(255,255,255,.85);margin-bottom:22px;font-style:italic}
+.mc-quote span{color:var(--brand);font-style:normal;font-weight:700}
+.mc-vals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mc-val{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px}
+.mc-val-ico{font-size:.85rem;color:var(--brand);margin-bottom:6px}
+.mc-val-title{font-size:.75rem;font-weight:800;color:#fff;margin-bottom:2px}
+.mc-val-desc{font-size:.63rem;color:rgba(255,255,255,.45);line-height:1.5}
+/* floating badges */
+.mf-badge{position:absolute;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,34,68,.14);border:1px solid rgba(0,170,255,.1);padding:11px 14px;animation:mfloat 4s ease-in-out infinite}
+.mf1{top:-18px;right:-18px;animation-delay:0s;min-width:130px}
+.mf2{bottom:-18px;left:-18px;animation-delay:-2s;min-width:140px}
+@keyframes mfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.mf-lbl{font-size:.58rem;color:var(--slate);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.mf-val{font-size:.92rem;font-weight:900;color:var(--ink);letter-spacing:-.02em}
+.mf-sub{font-size:.56rem;color:var(--slate);margin-top:1px}
+/* mission right */
+.mission-story{font-size:.88rem;color:var(--slate);line-height:1.85;margin-bottom:22px}
+.mission-story strong{color:var(--ink);font-weight:700}
+.mission-pillars{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.pillar{display:flex;align-items:flex-start;gap:14px}
+.pillar-num{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand-d));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.82rem;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(0,170,255,.3)}
+.pillar-title{font-size:.86rem;font-weight:800;color:var(--ink);margin-bottom:3px}
+.pillar-desc{font-size:.78rem;color:var(--slate);line-height:1.6}
+.nigerian-box{display:flex;align-items:center;gap:14px;padding:15px 18px;background:rgba(0,170,255,.06);border-radius:14px;border:1px solid rgba(0,170,255,.14)}
+.nigerian-box-flag{font-size:1.6rem;flex-shrink:0}
+.nigerian-box-text{font-size:.8rem;color:var(--slate);line-height:1.6}
+.nigerian-box-text strong{color:var(--ink)}
+
+/* ── EARNCIAL SECTION ── */
+.earncial{background:var(--mist);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.earncial-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.earncial-left{}
+.earncial-card{
+  background:linear-gradient(145deg,#001e3c,#002a55);
+  border-radius:24px;padding:32px;
+  box-shadow:0 20px 50px rgba(0,34,68,.2);
+  position:relative;overflow:hidden;
+}
+.ec-orb{position:absolute;width:250px;height:250px;border-radius:50%;top:-80px;right:-80px;background:radial-gradient(circle,rgba(0,170,255,.15),transparent 70%)}
+.ec-in{position:relative;z-index:1}
+.ec-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.ec-logo-circle{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#00aaff,#0055aa);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#fff;box-shadow:0 6px 18px rgba(0,170,255,.4)}
+.ec-name{font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:-.03em}
+.ec-tagline{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:2px}
+.ec-desc{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.75;margin-bottom:22px}
+.ec-products{display:flex;flex-direction:column;gap:8px}
+.ec-product{display:flex;align-items:center;gap:11px;padding:10px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px}
+.ec-product-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0}
+.ec-product-name{font-size:.78rem;font-weight:700;color:#fff}
+.ec-product-desc{font-size:.66rem;color:rgba(255,255,255,.4);margin-left:auto}
+/* right */
+.earncial-right{}
+.earncial-right .sec-p{margin-bottom:24px}
+.ec-points{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.ec-point{display:flex;align-items:flex-start;gap:12px}
+.ec-point-ico{width:36px;height:36px;border-radius:10px;background:rgba(0,170,255,.1);border:1px solid rgba(0,170,255,.2);display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--brand);flex-shrink:0}
+.ec-point-title{font-size:.84rem;font-weight:800;color:var(--ink);margin-bottom:3px}
+.ec-point-desc{font-size:.78rem;color:var(--slate);line-height:1.6}
+.ec-website{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:100px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;font-size:.82rem;font-weight:800;cursor:pointer;border:none;box-shadow:0 5px 16px rgba(0,170,255,.35);transition:.2s}
+.ec-website:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(0,170,255,.45)}
+
+/* ── TEAM / VALUES SECTION ── */
+.values{background:#fff}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+.val-card{padding:28px 24px;border:1.5px solid var(--border);border-radius:20px;transition:.25s;position:relative;overflow:hidden}
+.val-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-d));transform:scaleX(0);transition:.3s;transform-origin:left}
+.val-card:hover{border-color:rgba(0,170,255,.35);transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,170,255,.12)}
+.val-card:hover::before{transform:scaleX(1)}
+.val-card-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:18px;transition:.3s}
+.val-card:hover .val-card-ico{transform:rotate(-8deg) scale(1.1)}
+.val-card-title{font-size:.92rem;font-weight:800;color:var(--ink);margin-bottom:8px;letter-spacing:-.02em}
+.val-card-desc{font-size:.8rem;color:var(--slate);line-height:1.7}
+
+/* ── TIMELINE SECTION ── */
+.timeline-section{background:var(--mist);border-top:1px solid var(--border)}
+.timeline{margin-top:48px;position:relative;max-width:700px}
+.timeline::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--brand),rgba(0,170,255,.1))}
+.tl-item{display:flex;gap:28px;margin-bottom:32px;position:relative}
+.tl-dot{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-d));display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(0,170,255,.35);position:relative;z-index:1;border:3px solid #f0f8ff}
+.tl-content{}
+.tl-year{font-size:.65rem;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.tl-title{font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:5px}
+.tl-desc{font-size:.78rem;color:var(--slate);line-height:1.65}
+
+/* ── NUMBERS SECTION ── */
+.numbers{background:linear-gradient(135deg,#001e3c,#003166,#005cbf);position:relative;overflow:hidden}
+.numbers::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:50px 50px}
+.numbers-orb{position:absolute;width:500px;height:500px;border-radius:50%;top:-200px;right:-100px;background:radial-gradient(circle,rgba(0,170,255,.15),transparent 65%)}
+.numbers-inner{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.num-item{text-align:center;padding:20px;position:relative}
+.num-item::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:rgba(255,255,255,.08)}
+.num-item:last-child::after{display:none}
+.num-val{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:#fff;letter-spacing:-.05em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:7px}
+.num-val span{color:var(--brand)}
+.num-lbl{font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.5}
+.num-sub{font-size:.66rem;color:rgba(0,170,255,.6);margin-top:3px;font-weight:600}
+
+/* ── CTA ── */
+.cta-section{background:#fff;text-align:center}
+.cta-inner{max-width:600px;margin:0 auto}
+.cta-section h2{font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:900;letter-spacing:-.05em;color:var(--ink);margin-bottom:14px}
+.cta-section h2 span{color:var(--brand)}
+.cta-section p{font-size:.9rem;color:var(--slate);line-height:1.75;margin-bottom:32px}
+.cta-btns{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;font-size:.9rem;font-weight:800;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(0,170,255,.38);transition:.2s;font-family:'Sora',sans-serif}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,170,255,.48)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;border:1.5px solid rgba(0,170,255,.3);color:var(--brand);font-size:.9rem;font-weight:700;background:transparent;cursor:pointer;transition:.2s;font-family:'Sora',sans-serif}
+.btn-ghost:hover{background:rgba(0,170,255,.07);border-color:var(--brand)}
+
+/* ── FOOTER ── */
+footer{background:linear-gradient(160deg,#001e3c,#003166);color:rgba(255,255,255,.6);padding:44px max(24px,calc((100vw - 1200px)/2)) 24px}
+.footer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.footer-logo{display:flex;align-items:center;gap:9px}
+.f-logo-img{width:32px;height:32px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.25)}
+.f-logo-fb{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px}
+.f-wordmark{font-weight:800;font-size:1.1rem;color:#fff}
+.f-wordmark span{color:var(--brand)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-link{font-size:.78rem;color:rgba(255,255,255,.4);transition:.15s}
+.footer-link:hover{color:var(--brand)}
+.footer-bottom{padding-top:20px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:8px}
+.footer-bottom strong{color:rgba(255,255,255,.5)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1000px){.mission-inner,.earncial-inner{grid-template-columns:1fr;gap:40px}.mf-badge{display:none}}
+@media(max-width:720px){.values-grid{grid-template-columns:1fr 1fr}.numbers-inner{grid-template-columns:1fr 1fr}.num-item:nth-child(2)::after{display:none}}
+@media(max-width:500px){.values-grid{grid-template-columns:1fr}.numbers-inner{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/index.html" class="nav-logo">
+    <img src="logo.png" class="nav-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <span class="nav-logo-fb">S</span>
+    <span class="nav-wordmark">Sub<span>Hub</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="/index.html#services" class="nav-link">Services</a>
+    <a href="about.html" class="nav-link active">About</a>
+    <a href="index.html#pricing" class="nav-link">Pricing</a>
+    <a href="index.html#faq" class="nav-link">FAQ</a>
+  </div>
+  <button class="nav-cta" onclick="location.href='sign-up.html'">Get Started Free</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb1"></div><div class="hero-orb2"></div><div class="hero-grid"></div>
+  <div class="hero-in">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Our Story</div>
+    <h1>Built for Nigeria.<br/><span>Powered by Purpose.</span></h1>
+    <p class="hero-p">SubHub was created with one mission — to give every Nigerian access to fast, affordable and reliable digital services. From data to electricity, we've got you covered.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">50K+</div>
+        <div class="hero-stat-lbl">Happy Users</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">99.8%</div>
+        <div class="hero-stat-lbl">Success Rate</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">1.2s</div>
+        <div class="hero-stat-lbl">Avg Delivery</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">8+</div>
+        <div class="hero-stat-lbl">Services</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MISSION -->
+<section class="mission">
+  <div class="mission-inner">
+
+    <div class="mission-visual reveal">
+      <div class="mission-card">
+        <div class="mc-in">
+          <div class="mc-logo-row">
+            <img src="logo.png" class="mc-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+            <span class="mc-logo-fb">S</span>
+            <div>
+              <div class="mc-brand">SubHub</div>
+              <div class="mc-by">Operated by Earncial Global</div>
+            </div>
+          </div>
+          <div class="mc-quote">"We exist to make <span>digital transactions</span> accessible, affordable and instant for every Nigerian from every states."</div>
+          <div class="mc-vals">
+            <div class="mc-val"><div class="mc-val-ico"><i class="fas fa-bolt"></i></div><div class="mc-val-title">Speed</div><div class="mc-val-desc">Under 2 seconds per transaction</div></div>
+            <div class="mc-val"><div class="mc-val-ico"><i class="fas fa-shield-halved"></i></div><div class="mc-val-title">Security</div><div class="mc-val-desc">Bank-grade protection</div></div>
+            <div class="mc-val"><div class="mc-val-ico"><i class="fas fa-tags"></i></div><div class="mc-val-title">Savings</div><div class="mc-val-desc">Nigeria's lowest rates</div></div>
+            <div class="mc-val"><div class="mc-val-ico"><i class="fas fa-headset"></i></div><div class="mc-val-title">Support</div><div class="mc-val-desc">24/7 live assistance</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mf-badge mf1">
+        <div class="mf-lbl"><i class="fas fa-users" style="color:#00aaff"></i>Active Users</div>
+        <div class="mf-val">50,000+</div>
+        <div class="mf-sub">Across all 36 states</div>
+      </div>
+      <div class="mf-badge mf2">
+        <div class="mf-lbl"><i class="fas fa-check-circle" style="color:#10b981"></i>Uptime</div>
+        <div class="mf-val">99.8%</div>
+        <div class="mf-sub">Transaction success rate</div>
+      </div>
+    </div>
+
+    <div class="reveal d2">
+      <div class="sec-badge"><i class="fas fa-bullseye"></i>Our Mission</div>
+      <h2 class="sec-h">Why We Built <span>SubHub</span></h2>
+      <div class="mission-story">
+        <strong>SubHub</strong> was born out of frustration. As Nigerians ourselves, we experienced firsthand the pain of slow VTU platforms, hidden charges, failed transactions and terrible customer service. We knew there had to be a better way.<br/><br/>
+        So we built SubHub a platform that treats every user with respect, delivers every service instantly, charges the fairest prices in the market and is always available when you need it. No gimmicks. No hidden fees. Just results.
+      </div>
+      <div class="mission-pillars">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <div>
+            <div class="pillar-title">Built for Every Nigerian</div>
+            <div class="pillar-desc">From students buying cheap data to business owners running bulk SMS campaigns and resell SubHub works perfectly for everyone.</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <div>
+            <div class="pillar-title">Powered by Multiple Providers</div>
+            <div class="pillar-desc">We integrate with Nigeria's most reliable API providers. If one is slow, we switch automatically  ensuring maximum uptime.</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <div>
+            <div class="pillar-title">Empowering Resellers & Entrepreneurs</div>
+            <div class="pillar-desc">SubHub gives resellers the tools to build profitable businesses bulk data, print vouchers, recharge cards and more.</div>
+          </div>
+        </div>
+      </div>
+      <div class="nigerian-box">
+        <div class="nigerian-box-flag">🇳🇬</div>
+        <div class="nigerian-box-text"><strong>Proudly Nigerian.</strong> SubHub was built in Nigeria, for Nigerians. We understand the unique challenges of our digital economy and have designed every feature to solve them directly.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EARNCIAL GLOBAL -->
+<section class="earncial">
+  <div class="earncial-inner">
+
+    <div class="reveal">
+      <div class="sec-badge"><i class="fas fa-building"></i>Our Parent Company</div>
+      <h2 class="sec-h">Backed by <span>Earncial Global</span></h2>
+      <p class="sec-p" style="margin-bottom:24px">SubHub is proudly operated under the Earncial Global umbrella a technology holding company focused on building impactful digital products across Africa.</p>
+      <div class="ec-points">
+        <div class="ec-point">
+          <div class="ec-point-ico"><i class="fas fa-globe"></i></div>
+          <div>
+            <div class="ec-point-title">Pan-African Vision</div>
+            <div class="ec-point-desc">Earncial Global builds products designed to solve real problems for African users starting with Nigeria, expanding across the continent.</div>
+          </div>
+        </div>
+        <div class="ec-point">
+          <div class="ec-point-ico"><i class="fas fa-rocket"></i></div>
+          <div>
+            <div class="ec-point-title">Innovation at the Core</div>
+            <div class="ec-point-desc">Every Earncial product is built with cutting-edge technology, exceptional UX design and a relentless focus on user satisfaction.</div>
+          </div>
+        </div>
+        <div class="ec-point">
+          <div class="ec-point-ico"><i class="fas fa-shield-halved"></i></div>
+          <div>
+            <div class="ec-point-title">Trust & Compliance</div>
+            <div class="ec-point-desc">Earncial Global operates with full regulatory compliance, transparent governance and the highest standards of financial integrity.</div>
+          </div>
+        </div>
+      </div>
+      <a href="https://earncial.com" target="_blank"><button class="ec-website"><i class="fas fa-external-link-alt" style="font-size:.72rem"></i>Visit Earncial Global</button></a>
+    </div>
+
+    <div class="reveal d2">
+      <div class="earncial-card">
+        <div class="ec-orb"></div>
+        <div class="ec-in">
+          <div class="ec-logo-row">
+            <div class="ec-logo-circle">EG</div>
+            <div>
+              <div class="ec-name">Earncial Global</div>
+              <div class="ec-tagline">Digital Innovation · Africa</div>
+            </div>
+          </div>
+          <div class="ec-desc">Earncial Global is a technology company focused on building digital products that create real value for African users. SubHub is our flagship fintech product and we're just getting started.</div>
+          <div class="ec-products">
+            <div class="ec-product">
+              <div class="ec-product-dot" style="background:#00aaff"></div>
+              <div class="ec-product-name">SubHub</div>
+              <div class="ec-product-desc">VTU Platform · Live</div>
+            </div>
+            <div class="ec-product">
+              <div class="ec-product-dot" style="background:#10b981"></div>
+              <div class="ec-product-name">Earncial Pay</div>
+              <div class="ec-product-desc">Payments</div>
+            </div>
+            <div class="ec-product">
+              <div class="ec-product-dot" style="background:#8b5cf6"></div>
+              <div class="ec-product-name">Earncial Market</div>
+              <div class="ec-product-desc">E-commerce</div>
+            </div>
+              <div class="ec-product">
+              <div class="ec-product-dot" style="background:#8b5cf6"></div>
+              <div class="ec-product-name">ZobitPay</div>
+              <div class="ec-product-desc">Digital Products Marketplace</div>
+            </div>
+            <div class="ec-product">
+              <div class="ec-product-dot" style="background:#f59e0b"></div>
+              <div class="ec-product-name">Earncial Learn</div>
+              <div class="ec-product-desc">EdTech · In Development</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values">
+  <div style="text-align:center;max-width:600px;margin:0 auto 0" class="reveal">
+    <div class="sec-badge"><i class="fas fa-heart"></i>What We Stand For</div>
+    <h2 class="sec-h">Our Core <span>Values</span></h2>
+    <p class="sec-p" style="margin:0 auto">These are the principles that guide every decision we make — from how we build our products to how we treat our users.</p>
+  </div>
+  <div class="values-grid">
+    <div class="val-card reveal">
+      <div class="val-card-ico" style="background:rgba(0,170,255,.1);color:#00aaff"><i class="fas fa-bolt"></i></div>
+      <div class="val-card-title">Speed Above All</div>
+      <div class="val-card-desc">We obsess over transaction speed. Every second matters to our users. Our infrastructure is built to deliver services in under 2 seconds, every single time.</div>
+    </div>
+    <div class="val-card reveal d1">
+      <div class="val-card-ico" style="background:rgba(16,185,129,.1);color:#10b981"><i class="fas fa-shield-halved"></i></div>
+      <div class="val-card-title">Uncompromising Security</div>
+      <div class="val-card-desc">We treat your money like our own. Bank-grade encryption, PIN verification, real-time fraud detection and zero unauthorized access always.</div>
+    </div>
+    <div class="val-card reveal d2">
+      <div class="val-card-ico" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fas fa-handshake"></i></div>
+      <div class="val-card-title">Radical Transparency</div>
+      <div class="val-card-desc">No hidden fees. No fine print surprises. What you see is exactly what you pay. We believe trust is built through complete transparency.</div>
+    </div>
+    <div class="val-card reveal d1">
+      <div class="val-card-ico" style="background:rgba(139,92,246,.1);color:#8b5cf6"><i class="fas fa-users"></i></div>
+      <div class="val-card-title">User First, Always</div>
+      <div class="val-card-desc">Every feature we build starts with one question: "Does this make life easier for our users?" If not, we don't build it. Simple.</div>
+    </div>
+    <div class="val-card reveal d2">
+      <div class="val-card-ico" style="background:rgba(239,68,68,.1);color:#ef4444"><i class="fas fa-star"></i></div>
+      <div class="val-card-title">Excellence Always</div>
+      <div class="val-card-desc">We don't settle for "good enough". From our UI design to our transaction processing, we hold everything to the highest possible standard.</div>
+    </div>
+    <div class="val-card reveal d3">
+      <div class="val-card-ico" style="background:rgba(0,170,255,.1);color:#00aaff"><i class="fas fa-seedling"></i></div>
+      <div class="val-card-title">Community Growth</div>
+      <div class="val-card-desc">We grow when Nigeria grows. That's why we invest in features that empower resellers, entrepreneurs and everyday Nigerians to build wealth.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+  <div class="reveal">
+    <div class="sec-badge"><i class="fas fa-clock"></i>Our Journey</div>
+    <h2 class="sec-h">How We Got <span>Here</span></h2>
+  </div>
+  <div class="timeline">
+    <div class="tl-item reveal">
+      <div class="tl-dot"><i class="fas fa-lightbulb" style="font-size:.7rem"></i></div>
+      <div class="tl-content">
+        <div class="tl-year">2024 · Q1</div>
+        <div class="tl-title">The Idea is Born</div>
+        <div class="tl-desc">Frustrated with existing VTU platforms, the Earncial Global team decides to build something better  a platform that actually respects Nigerian users.</div>
+      </div>
+    </div>
+    <div class="tl-item reveal d1">
+      <div class="tl-dot"><i class="fas fa-code" style="font-size:.7rem"></i></div>
+      <div class="tl-content">
+        <div class="tl-year">2024 · Q2</div>
+        <div class="tl-title">Development Begins</div>
+        <div class="tl-desc">Our engineering team begins building SubHub from the ground up focusing on speed, reliability and a beautiful user experience.</div>
+      </div>
+    </div>
+    <div class="tl-item reveal d2">
+      <div class="tl-dot"><i class="fas fa-rocket" style="font-size:.7rem"></i></div>
+      <div class="tl-content">
+        <div class="tl-year">2024 · Q4</div>
+        <div class="tl-title">Public Launch</div>
+        <div class="tl-desc">SubHub officially launches to the public. Within the first month, we onboard thousands of users across Nigeria  surpassing all our early targets.</div>
+      </div>
+    </div>
+    <div class="tl-item reveal d3">
+      <div class="tl-dot"><i class="fas fa-chart-line" style="font-size:.7rem"></i></div>
+      <div class="tl-content">
+        <div class="tl-year">2025 · Q2</div>
+        <div class="tl-title">50,000 Users Milestone</div>
+        <div class="tl-desc">SubHub reaches 50,000 active users. We add virtual accounts, print data cards, referral program and bulk SMS — all highly requested features.</div>
+      </div>
+    </div>
+    <div class="tl-item reveal d4">
+      <div class="tl-dot" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="fas fa-flag" style="font-size:.7rem"></i></div>
+      <div class="tl-content">
+        <div class="tl-year">2026 · Now</div>
+        <div class="tl-title">Still Growing 🚀</div>
+        <div class="tl-desc">We're continuously improving SubHub adding new services, improving speeds and expanding our reach across Nigeria and beyond. The journey has only just begun.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="numbers" style="padding:70px max(24px,calc((100vw - 1200px)/2))">
+  <div class="numbers-orb"></div>
+  <div class="numbers-inner">
+    <div class="num-item reveal">
+      <span class="num-val" data-count="50000" data-suffix="+">0</span>
+      <div class="num-lbl">Happy customers<br/>across Nigeria</div>
+      <div class="num-sub">Growing 40% monthly</div>
+    </div>
+    <div class="num-item reveal d1">
+      <span class="num-val" data-count="99" data-suffix=".8%">0</span>
+      <div class="num-lbl">Transaction success<br/>rate maintained</div>
+      <div class="num-sub">Industry best</div>
+    </div>
+    <div class="num-item reveal d2">
+      <span class="num-val" data-count="8" data-suffix="+">0</span>
+      <div class="num-lbl">Services available<br/>on the platform</div>
+      <div class="num-sub">More coming soon</div>
+    </div>
+    <div class="num-item reveal d3">
+      <span class="num-val" data-count="24" data-suffix="/7">0</span>
+      <div class="num-lbl">Support available<br/>every single day</div>
+      <div class="num-sub">WhatsApp & Live Chat</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner reveal">
+    <div class="sec-badge"><i class="fas fa-rocket"></i>Join Us</div>
+    <h2>Ready to Start <span>Saving?</span></h2>
+    <p>Join over 50,000 Nigerians who trust SubHub for all their daily digital transactions. Create your free account in under 60 seconds.</p>
+    <div class="cta-btns">
+      <button class="btn-primary" onclick="location.href='sign-up.html'"><i class="fas fa-user-plus"></i>Create Free Account</button>
+      <button class="btn-ghost" onclick="location.href='index.html'"><i class="fas fa-arrow-left"></i>Back to Home</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-logo">
+      <img src="logo.png" class="f-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="f-logo-fb">S</span>
+      <span class="f-wordmark">Sub<span>Hub</span></span>
+    </div>
+    <div class="footer-links">
+      <a href="index.html" class="footer-link">Home</a>
+      <a href="index.html#services" class="footer-link">Services</a>
+      <a href="about.html" class="footer-link">About</a>
+      <a href="sign-up.html" class="footer-link">Sign Up</a>
+      <a href="login.html" class="footer-link">Sign In</a>
+      <a href="#" class="footer-link">Privacy Policy</a>
+      <a href="#" class="footer-link">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 SubHub · Operated by <strong>Earncial Global</strong> · All rights reserved.</span>
+    <span>Made with ❤️ for Nigeria 🇳🇬</span>
+  </div>
+</footer>
+
+<script>
+/* Scroll reveal */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('up') });
+}, {threshold:.1, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* Counter animation */
+function animateCount(el){
+  const target = parseInt(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  const dur = 1800;
+  const start = Date.now();
+  const tick = () => {
+    const t = Math.min((Date.now()-start)/dur,1);
+    const ease = t < .5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+    const val = Math.floor(ease*target);
+    el.textContent = (val>=1000 ? val.toLocaleString() : val) + suffix;
+    if(t<1) requestAnimationFrame(tick);
+    else el.textContent = target.toLocaleString() + suffix;
+  };
+  tick();
+}
+const numObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ animateCount(e.target); numObs.unobserve(e.target); } });
+}, {threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el => numObs.observe(el));
+</script>
+</body>
+</html>
