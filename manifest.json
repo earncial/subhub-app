@@ -2,7 +2,7 @@
   "name": "SubHub",
   "short_name": "SubHub",
   "description": "Buy airtime, data, and pay bills instantly on SubHub.",
-  "start_url": "/",
+  "start_url": "/index.html",
   "id": "/",
   "scope": "/",
   "display": "standalone",
@@ -12,6 +12,7 @@
   "orientation": "portrait",
   "lang": "en-US",
   "dir": "ltr",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "categories": ["finance", "utilities"],
   "screenshots": [],
   "shortcuts": [
@@ -27,21 +28,9 @@
     }
   ],
   "icons": [
-    {
-      "src": "/logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/favicon/favicon-96x96.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "/favicon/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicon/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon/web-app-manifest-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
