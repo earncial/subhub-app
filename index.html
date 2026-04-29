@@ -1143,9 +1143,9 @@ footer{
 <div class="cursor-dot" id="cursorDot"></div>
 
 <!-- FLOATING CTA -->
-<button class="floating-cta" id="floatingCta" onclick="document.querySelector('#hero').scrollIntoView({behavior:'smooth'})">
+<a href"sign-up.html"><button class="floating-cta" id="floatingCta">
   <i class="fas fa-bolt"></i>Get Started Free
-</button>
+</button></a>
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" id="mainNav">
@@ -1168,8 +1168,8 @@ footer{
     </div>
 
     <div class="nav-ctas">
-      <button class="btn-nav-ghost">Sign In</button>
-      <button class="btn-nav-solid">Get Started <i class="fas fa-arrow-right" style="font-size:.7rem;margin-left:3px"></i></button>
+      <a href"login.html"><button class="btn-nav-ghost">Sign In</button></a>
+     <a href"sign-up.html"> <button class="btn-nav-solid">Get Started <i class="fas fa-arrow-right" style="font-size:.7rem;margin-left:3px"></i></button></a>
     </div>
 
     <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
@@ -1852,7 +1852,7 @@ END APP DOWNLOAD SECTION -->
     <div>
       <h4>Company</h4>
       <div class="footer-links">
-        <a href="#" onclick="scrollToSection('about');return false;" class="footer-link">About SubHub</a>
+        <a href="about.html" class="footer-link">About SubHub</a>
         <a href="about.html" class="footer-link">Blog</a>
         <a href="#" class="footer-link">Careers</a>
         <a href="#" class="footer-link">Press Kit</a>
@@ -2207,6 +2207,11 @@ if(sf){
   },{threshold:.5});
   sfObs.observe(sf);
 }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
 </script>
 </body>
 </html>
