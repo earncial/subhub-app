@@ -69,5 +69,11 @@
       "form_factor": "narrow",
       "label": "Transactions"
     }
-  ]
+  ],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "related_applications": []
 }
