@@ -1,10 +1,31 @@
 {
   "name": "SubHub",
   "short_name": "SubHub",
+  "description": "Buy airtime, data, and pay bills instantly on SubHub.",
   "start_url": "/",
+  "id": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#00aaff",
+  "orientation": "portrait",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["finance", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Buy Airtime",
+      "url": "/airtime",
+      "description": "Quick airtime purchase"
+    },
+    {
+      "name": "Buy Data",
+      "url": "/data",
+      "description": "Quick data purchase"
+    }
+  ],
   "icons": [
     {
       "src": "/logo.png",
@@ -15,6 +36,12 @@
       "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
