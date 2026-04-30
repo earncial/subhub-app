@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Terms of Service — SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:#fff;color:#001e3c;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+:root{--brand:#00aaff;--brand-d:#0088cc;--ink:#001e3c;--slate:#64748b;--mist:#f0f8ff;--border:#d8edf8}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;padding:0 max(24px,calc((100vw - 1200px)/2));justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo-img{width:34px;height:34px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.2)}
+.nav-logo-fb{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px}
+.nav-word{font-weight:800;font-size:1.15rem;letter-spacing:-.3px;color:var(--ink)}.nav-word span{color:var(--brand)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{padding:7px 14px;border-radius:100px;font-size:.8rem;font-weight:600;color:var(--slate);border:none;background:none;cursor:pointer;transition:.15s}
+.nav-link:hover{color:var(--brand);background:rgba(0,170,255,.07)}
+.nav-cta{padding:9px 20px;border-radius:100px;font-size:.8rem;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,170,255,.35);transition:.2s;font-family:'Sora',sans-serif}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,170,255,.45)}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#001e3c 0%,#003166 55%,#005cbf 100%);padding:70px max(24px,calc((100vw - 1200px)/2)) 60px;position:relative;overflow:hidden}
+.h-orb1{position:absolute;width:500px;height:500px;border-radius:50%;top:-150px;right:-100px;background:radial-gradient(circle,rgba(0,170,255,.18),transparent 65%)}
+.h-orb2{position:absolute;width:350px;height:350px;border-radius:50%;bottom:-100px;left:-80px;background:radial-gradient(circle,rgba(0,170,255,.1),transparent 65%)}
+.h-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:50px 50px}
+.hero-in{position:relative;z-index:2;max-width:1200px}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;background:rgba(0,170,255,.15);border:1px solid rgba(0,170,255,.25);font-size:.72rem;font-weight:700;color:rgba(0,170,255,.9);margin-bottom:18px}
+.hero-in h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.05em;margin-bottom:14px}
+.hero-in h1 span{background:linear-gradient(90deg,#00aaff,#66d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-meta{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.hero-meta-item{display:flex;align-items:center;gap:7px;font-size:.78rem;color:rgba(255,255,255,.5);font-weight:500}
+.hero-meta-item i{color:rgba(0,170,255,.7);font-size:.72rem}
+.hero-meta-item strong{color:rgba(255,255,255,.75)}
+
+/* MAIN LAYOUT */
+.layout{max-width:1200px;margin:0 auto;padding:56px 24px;display:grid;grid-template-columns:260px 1fr;gap:56px;align-items:start}
+
+/* SIDEBAR TOC */
+.toc{position:sticky;top:84px}
+.toc-title{font-size:.65rem;font-weight:800;color:rgba(0,170,255,.7);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-left:4px}
+.toc-list{display:flex;flex-direction:column;gap:2px}
+.toc-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:10px;
+  font-size:.76rem;font-weight:600;color:var(--slate);
+  cursor:pointer;border:none;background:none;text-align:left;width:100%;
+  transition:.15s;border-left:2px solid transparent;
+}
+.toc-item:hover{color:var(--brand);background:rgba(0,170,255,.06)}
+.toc-item.active{color:var(--brand);background:rgba(0,170,255,.09);border-left-color:var(--brand);font-weight:700}
+.toc-num{font-size:.62rem;font-weight:800;width:20px;height:20px;border-radius:6px;background:var(--mist);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;color:var(--slate)}
+.toc-item.active .toc-num{background:rgba(0,170,255,.15);color:var(--brand)}
+
+/* accept box */
+.accept-box{margin-top:20px;background:var(--mist);border:1.5px solid var(--border);border-radius:14px;padding:16px}
+.accept-box-title{font-size:.74rem;font-weight:800;color:var(--ink);margin-bottom:6px}
+.accept-box-p{font-size:.68rem;color:var(--slate);line-height:1.6;margin-bottom:12px}
+.accept-btn{width:100%;padding:9px;border-radius:100px;background:linear-gradient(135deg,#00aaff,#0088cc);color:#fff;font-size:.75rem;font-weight:800;border:none;cursor:pointer;font-family:'Sora',sans-serif;transition:.2s}
+.accept-btn:hover{filter:brightness(1.08)}
+.download-btn{width:100%;padding:9px;border-radius:100px;border:1.5px solid var(--border);background:#fff;color:var(--slate);font-size:.73rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;margin-top:7px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.download-btn:hover{border-color:var(--brand);color:var(--brand)}
+
+/* CONTENT */
+.content{}
+.section{margin-bottom:44px;scroll-margin-top:84px}
+.sec-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--mist)}
+.sec-num{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand),var(--brand-d));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:900;color:#fff;
+  box-shadow:0 4px 12px rgba(0,170,255,.3);
+}
+.sec-title{font-size:1.05rem;font-weight:900;color:var(--ink);letter-spacing:-.03em;margin-bottom:3px}
+.sec-sub{font-size:.72rem;color:var(--slate);font-weight:500}
+.sec-body{font-size:.84rem;color:var(--slate);line-height:1.85}
+.sec-body p{margin-bottom:14px}
+.sec-body p:last-child{margin-bottom:0}
+.sec-body strong{color:var(--ink);font-weight:700}
+.sec-body a{color:var(--brand);font-weight:600}
+.sec-body a:hover{text-decoration:underline}
+
+/* lists */
+.term-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.term-list li{display:flex;align-items:flex-start;gap:10px;font-size:.83rem;color:var(--slate);line-height:1.65}
+.term-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:8px}
+.term-list li strong{color:var(--ink)}
+
+/* highlight boxes */
+.hl-box{border-radius:14px;padding:16px 18px;margin:16px 0;display:flex;align-items:flex-start;gap:13px}
+.hl-box.info{background:rgba(0,170,255,.06);border:1px solid rgba(0,170,255,.15)}
+.hl-box.warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)}
+.hl-box.danger{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15)}
+.hl-box.ok{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15)}
+.hl-ico{font-size:.9rem;flex-shrink:0;margin-top:1px}
+.hl-box.info .hl-ico{color:var(--brand)}
+.hl-box.warn .hl-ico{color:#f59e0b}
+.hl-box.danger .hl-ico{color:#ef4444}
+.hl-box.ok .hl-ico{color:#10b981}
+.hl-text{font-size:.8rem;color:var(--slate);line-height:1.7}
+.hl-text strong{color:var(--ink)}
+
+/* divider */
+.sec-divider{height:1px;background:linear-gradient(90deg,var(--border),transparent);margin:40px 0}
+
+/* summary card */
+.summary-card{background:linear-gradient(145deg,#001e3c,#003166);border-radius:20px;padding:28px;margin-bottom:40px;position:relative;overflow:hidden}
+.summary-card::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(0,170,255,.15),transparent 70%)}
+.sc-in{position:relative;z-index:1}
+.sc-title{font-size:.72rem;font-weight:800;color:rgba(0,170,255,.8);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.sc-body{font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:16px}
+.sc-points{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc-point{display:flex;align-items:center;gap:7px;font-size:.76rem;color:rgba(255,255,255,.65);font-weight:500}
+.sc-point i{color:#00aaff;font-size:.7rem;flex-shrink:0}
+
+/* last updated bar */
+.updated-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--mist);border-radius:11px;margin-bottom:28px;border:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.updated-bar-left{font-size:.76rem;color:var(--slate);display:flex;align-items:center;gap:7px}
+.updated-bar-left i{color:var(--brand);font-size:.72rem}
+.updated-bar-left strong{color:var(--ink)}
+.updated-bar-version{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(0,170,255,.1);color:var(--brand);border:1px solid rgba(0,170,255,.2)}
+
+/* contact section */
+.contact-section{background:linear-gradient(135deg,#001e3c,#003166);border-radius:20px;padding:32px;text-align:center;margin-top:44px;position:relative;overflow:hidden}
+.contact-section::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,170,255,.15),transparent 70%)}
+.cs-in{position:relative;z-index:1}
+.contact-section h3{font-size:1.15rem;font-weight:900;color:#fff;letter-spacing:-.04em;margin-bottom:8px}
+.contact-section p{font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.65;max-width:400px;margin:0 auto 20px}
+.cs-btns{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.cs-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:100px;font-size:.78rem;font-weight:800;border:none;cursor:pointer;font-family:'Sora',sans-serif;transition:.2s}
+.cs-btn-primary{background:linear-gradient(135deg,#00aaff,#0088cc);color:#fff;box-shadow:0 5px 16px rgba(0,170,255,.35)}
+.cs-btn-primary:hover{transform:translateY(-2px)}
+.cs-btn-ghost{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2)}
+.cs-btn-ghost:hover{background:rgba(255,255,255,.18)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.up{opacity:1;transform:none}
+
+/* FOOTER */
+footer{background:linear-gradient(160deg,#001e3c,#003166);color:rgba(255,255,255,.6);padding:40px max(24px,calc((100vw - 1200px)/2)) 22px}
+.footer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px}
+.f-logo{display:flex;align-items:center;gap:9px}
+.f-logo-img{width:32px;height:32px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.25)}
+.f-logo-fb{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px}
+.f-word{font-weight:800;font-size:1.05rem;color:#fff}.f-word span{color:#00aaff}
+.f-links{display:flex;gap:16px;flex-wrap:wrap}
+.f-link{font-size:.75rem;color:rgba(255,255,255,.4);transition:.15s}
+.f-link:hover{color:#00aaff}
+.footer-btm{padding-top:18px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:8px}
+.footer-btm strong{color:rgba(255,255,255,.5)}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}.toc{position:static;display:none}.nav-links{display:none}}
+@media(max-width:500px){.sc-points{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" class="nav-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <span class="nav-logo-fb">S</span>
+    <span class="nav-word">Sub<span>Hub</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="faq.html" class="nav-link">FAQ</a>
+    <a href="terms.html" class="nav-link active">Terms</a>
+    <a href="privacy.html" class="nav-link">Privacy</a>
+  </div>
+  <button class="nav-cta" onclick="location.href='sign-up.html'">Get Started Free</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="h-orb1"></div><div class="h-orb2"></div><div class="h-grid"></div>
+  <div class="hero-in">
+    <div class="hero-badge"><i class="fas fa-file-contract"></i>Legal Document</div>
+    <h1>Terms of <span>Service</span></h1>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><i class="fas fa-calendar"></i>Last updated: <strong>April 2026</strong></div>
+      <div class="hero-meta-item"><i class="fas fa-building"></i>Operated by: <strong>Earncial Global</strong></div>
+      <div class="hero-meta-item"><i class="fas fa-map-marker-alt"></i>Jurisdiction: <strong>Federal Republic of Nigeria</strong></div>
+      <div class="hero-meta-item"><i class="fas fa-clock"></i>~12 min read</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- TOC SIDEBAR -->
+  <aside class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <div class="toc-list" id="tocList"></div>
+    <div class="accept-box" style="margin-top:18px">
+      <div class="accept-box-title">By using SubHub</div>
+      <p class="accept-box-p">You automatically agree to these Terms when you create an account or use any SubHub service.</p>
+      <button class="accept-btn" onclick="location.href='signup.html'"><i class="fas fa-check" style="font-size:.72rem;margin-right:5px"></i>I Agree — Sign Up</button>
+      <button class="download-btn" onclick="window.print()"><i class="fas fa-download"></i>Download PDF</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- Last updated bar -->
+    <div class="updated-bar reveal">
+      <div class="updated-bar-left"><i class="fas fa-circle-info"></i>These Terms were last reviewed and updated on <strong>April 30, 2026</strong></div>
+      <span class="updated-bar-version">Version 2.0</span>
+    </div>
+
+    <!-- Plain English Summary -->
+    <div class="summary-card reveal">
+      <div class="sc-in">
+        <div class="sc-title"><i class="fas fa-lightbulb" style="margin-right:5px"></i>Plain English Summary</div>
+        <div class="sc-body">Before you read the full legal terms, here's a quick summary of what matters most. This summary doesn't replace the full Terms — please read everything below.</div>
+        <div class="sc-points">
+          <div class="sc-point"><i class="fas fa-check-circle"></i>SubHub is free to join and use</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>You must be 18+ to register</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>Keep your PIN and password safe</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>We don't share your data with ads</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>Refunds are automatic for failures</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>We can suspend accounts for abuse</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>Nigerian law governs this agreement</div>
+          <div class="sc-point"><i class="fas fa-check-circle"></i>Contact us anytime for disputes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections rendered by JS -->
+    <div id="sectionsWrap"></div>
+
+    <!-- Contact -->
+    <div class="contact-section reveal">
+      <div class="cs-in">
+        <h3>Questions About These Terms?</h3>
+        <p>If you have any questions about our Terms of Service, our legal team and support team are ready to help. We aim to respond within 24 hours.</p>
+        <div class="cs-btns">
+          <button class="cs-btn cs-btn-primary"><i class="fab fa-whatsapp"></i>WhatsApp Support</button>
+          <button class="cs-btn cs-btn-ghost"><i class="fas fa-envelope"></i>legal@subhub.ng</button>
+          <button class="cs-btn cs-btn-ghost"><i class="fas fa-comment-dots"></i>Live Chat</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="f-logo">
+      <img src="logo.png" class="f-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="f-logo-fb">S</span>
+      <span class="f-word">Sub<span>Hub</span></span>
+    </div>
+    <div class="f-links">
+      <a href="index.html" class="f-link">Home</a>
+      <a href="about.html" class="f-link">About</a>
+      <a href="faq.html" class="f-link">FAQ</a>
+      <a href="terms.html" class="f-link">Terms</a>
+      <a href="privacy.html" class="f-link">Privacy</a>
+      <a href="sign-up.html" class="f-link">Sign Up</a>
+    </div>
+  </div>
+  <div class="footer-btm">
+    <span>© 2026 SubHub · Operated by <strong>Earncial Global</strong> · All rights reserved.</span>
+    <span>Made with ❤️ for Nigeria 🇳🇬</span>
+  </div>
+</footer>
+
+<script>
+const SECTIONS = [
+  {
+    title:'Introduction & Acceptance',
+    sub:'Who we are and what you agree to',
+    icon:'fas fa-handshake',
+    body:`
+      <p>Welcome to <strong>SubHub</strong>, a Virtual Top-Up (VTU) and digital services platform owned and operated by <strong>Earncial Global</strong>, a technology company registered in the Federal Republic of Nigeria. By accessing or using SubHub's website, mobile application or any of our services, you agree to be bound by these Terms of Service ("Terms").</p>
+      <p>These Terms constitute a legally binding agreement between you ("User", "you" or "your") and SubHub/Earncial Global ("we", "us" or "our"). If you do not agree to these Terms, please do not use our services.</p>
+      <div class="hl-box info"><i class="fas fa-info-circle hl-ico"></i><div class="hl-text">By creating a SubHub account or using any of our services, you confirm that you have read, understood and agreed to these Terms in full. These Terms apply to all users, visitors and anyone who accesses or uses SubHub.</div></div>
+      <p>We reserve the right to update these Terms at any time. Changes will be communicated via email and/or in-app notification. Continued use of SubHub after such changes constitutes your acceptance of the updated Terms.</p>
+    `
+  },
+  {
+    title:'Eligibility & Account Registration',
+    sub:'Who can use SubHub and how to register',
+    icon:'fas fa-user-check',
+    body:`
+      <p>To use SubHub, you must meet the following eligibility requirements:</p>
+      <ul class="term-list">
+        <li>You must be <strong>at least 10 years of age</strong> or the age of majority in your jurisdiction</li>
+        <li>You must be a <strong>resident of Nigeria</strong> or authorized to transact in Nigeria</li>
+        <li>You must provide <strong>accurate and truthful information</strong> during registration</li>
+        <li>You must not have been previously banned or suspended from SubHub</li>
+        <li>You must have the <strong>legal authority</strong> to enter into this agreement</li>
+      </ul>
+      <p>During registration, you agree to provide your full legal name, a valid email address, a valid Nigerian phone number and to create a secure password. You are responsible for maintaining the confidentiality of your account credentials.</p>
+      <div class="hl-box warn"><i class="fas fa-triangle-exclamation hl-ico"></i><div class="hl-text"><strong>One Account Per Person:</strong> Each user is allowed only one SubHub account. Creating multiple accounts to exploit promotions or circumvent restrictions is strictly prohibited and will result in immediate suspension of all associated accounts.</div></div>
+      <p>SubHub reserves the right to verify your identity at any time and to request additional documentation for KYC (Know Your Customer) compliance purposes. Failure to provide requested verification may result in account limitations or suspension.</p>
+    `
+  },
+  {
+    title:'Services & Permitted Use',
+    sub:'What SubHub offers and how you may use it',
+    icon:'fas fa-grid-2',
+    body:`
+      <p>SubHub provides the following digital services ("Services"):</p>
+      <ul class="term-list">
+        <li><strong>Mobile Data</strong> — Purchase of data bundles for MTN, Airtel, Glo and 9Mobile networks</li>
+        <li><strong>Airtime Top-Up</strong> — Recharge of any Nigerian mobile phone number</li>
+        <li><strong>Cable TV Subscriptions</strong> — DStv, GOtv and StarTimes subscription renewals</li>
+        <li><strong>Electricity Tokens</strong> — Purchase of prepaid/postpaid electricity units for all DISCOs</li>
+        <li><strong>Exam Result Checkers</strong> — WAEC, NECO, NABTEB and JAMB PIN purchases</li>
+        <li><strong>Recharge Cards</strong> — Generation of airtime PIN vouchers</li>
+        <li><strong>Bulk SMS</strong> — Mass SMS delivery service with custom Sender ID</li>
+        <li><strong>Print Data</strong> — Generation of data voucher cards for resale</li>
+        <li><strong>Wallet Services</strong> — Digital wallet for funding and transfers</li>
+      </ul>
+      <div class="hl-box ok"><i class="fas fa-check-circle hl-ico"></i><div class="hl-text">All services are available 24 hours a day, 7 days a week. Service availability may be affected by provider maintenance, network issues or events beyond our control.</div></div>
+      <p>You agree to use SubHub's services <strong>only for lawful purposes</strong> and in accordance with these Terms. You must not use SubHub to engage in fraud, money laundering, unauthorized resale without proper authorization, harassment of other users, or any activity that violates Nigerian law.</p>
+    `
+  },
+  {
+    title:'Wallet, Payments & Transactions',
+    sub:'How your money works on SubHub',
+    icon:'fas fa-wallet',
+    body:`
+      <p>SubHub operates a digital wallet system. You must fund your wallet before purchasing any service. Your wallet balance represents funds held on your behalf by SubHub/Earncial Global.</p>
+      <p><strong>Funding Methods:</strong></p>
+      <ul class="term-list">
+        <li><strong>Virtual Account Transfer</strong> — Each user receives a dedicated virtual bank account. Transfers to this account are credited instantly.</li>
+        <li><strong>Direct Bank Transfer</strong> — Transfer to SubHub's official accounts. Processing may take up to 30 minutes.</li>
+      </ul>
+      <div class="hl-box info"><i class="fas fa-circle-info hl-ico"></i><div class="hl-text"><strong>Transaction PIN:</strong> All wallet transactions require a 4-digit PIN that you set during registration. Never share your PIN with anyone, including SubHub support staff. We will never ask for your PIN.</div></div>
+      <p><strong>Transaction Finality:</strong> Once a service transaction is successfully processed and delivered, it is <strong>final and irreversible</strong>. We cannot cancel airtime delivered to a phone number, data plans activated, or electricity tokens generated.</p>
+      <p><strong>Failed Transactions:</strong> If a transaction fails after your wallet is debited, the amount will be automatically reversed to your wallet within <strong>24 hours</strong>. If reversal does not occur within 24 hours, contact our support team with your transaction reference.</p>
+      <p><strong>Transfer Limits:</strong> SubHub reserves the right to set daily, weekly or monthly transaction limits on accounts. These limits may be adjusted based on your account activity, KYC status and compliance requirements.</p>
+    `
+  },
+  {
+    title:'Pricing & Fees',
+    sub:'Our pricing structure and charges',
+    icon:'fas fa-tags',
+    body:`
+      <p>SubHub is committed to offering the most competitive prices for all services. Our pricing is as follows:</p>
+      <ul class="term-list">
+        <li><strong>No Registration Fee</strong> — Creating a SubHub account is completely free</li>
+        <li><strong>No Monthly Subscription</strong> — There are no ongoing charges for using SubHub</li>
+        <li><strong>No Hidden Fees</strong> — The price displayed is the final price you pay</li>
+        <li><strong>Service Prices</strong> — Prices are displayed before confirmation of each transaction</li>
+        <li><strong>Bulk SMS</strong> — Charged at ₦4 per SMS to any Nigerian number</li>
+      </ul>
+      <div class="hl-box warn"><i class="fas fa-triangle-exclamation hl-ico"></i><div class="hl-text"><strong>Price Changes:</strong> SubHub reserves the right to change service prices at any time without prior notice. Price changes will be reflected on the platform immediately. Transactions in progress at the time of a price change will be processed at the price displayed when the order was placed.</div></div>
+      <p>SubHub earns revenue from the margin between our wholesale purchase price from API providers and the retail price charged to users. This margin is our only source of revenue — we do not charge any additional fees or commissions.</p>
+    `
+  },
+  {
+    title:'Refund Policy',
+    sub:'How refunds work and when they apply',
+    icon:'fas fa-rotate-left',
+    body:`
+      <p>SubHub is committed to fair and prompt refund processing. Our refund policy is as follows:</p>
+      <ul class="term-list">
+        <li><strong>Automatic Refunds</strong> — Failed transactions are automatically reversed instantly</li>
+        <li><strong>Successful Delivery</strong> — Successfully delivered services cannot be refunded (e.g., airtime sent to a number, data activated, cable subscriptions renewed)</li>
+        <li><strong>Wrong Number Purchases</strong> — If you purchase airtime or data for a wrong number, we cannot reverse the transaction. Please double-check all details before confirming.</li>
+        <li><strong>Technical Errors</strong> — If SubHub's system causes an error resulting in double-charging, both transactions will be reversed within 24 hours</li>
+        <li><strong>Provider Failures</strong> — If our API provider fails to deliver a service after your wallet is debited, a full refund is processed automatically</li>
+      </ul>
+      <div class="hl-box info"><i class="fas fa-circle-info hl-ico"></i><div class="hl-text">To request a refund for a transaction not covered by automatic processing, contact our support team within <strong>7 days</strong> of the transaction. Include your transaction reference number and a description of the issue. We process all valid refund requests within 2 business hours.</div></div>
+    `
+  },
+  {
+    title:'User Responsibilities & Prohibited Conduct',
+    sub:'What you must and must not do',
+    icon:'fas fa-shield-halved',
+    body:`
+      <p>As a SubHub user, you agree to the following responsibilities:</p>
+      <ul class="term-list">
+        <li>Maintain the <strong>security of your account credentials</strong> and PIN at all times</li>
+        <li>Immediately notify SubHub of any unauthorized account access</li>
+        <li>Provide <strong>accurate information</strong> in all transactions and communications</li>
+        <li>Use SubHub only for <strong>legitimate personal or business transactions</strong></li>
+        <li>Comply with all applicable <strong>Nigerian laws and regulations</strong></li>
+      </ul>
+      <div class="hl-box danger"><i class="fas fa-ban hl-ico"></i><div class="hl-text"><strong>Strictly Prohibited:</strong> The following activities will result in immediate account suspension and potential legal action: fraud or attempted fraud, money laundering, creating fake accounts, exploiting system vulnerabilities, unauthorized automation/bots, harassment of staff or users, sharing your account with others, and reselling our services without authorization.</div></div>
+      <p>SubHub uses automated fraud detection systems and manual review processes. Accounts flagged for suspicious activity may be temporarily suspended pending investigation. We cooperate fully with Nigerian law enforcement agencies in fraud investigations.</p>
+    `
+  },
+  {
+    title:'Privacy & Data Protection',
+    sub:'How we collect, use and protect your data',
+    icon:'fas fa-lock',
+    body:`
+      <p>Your privacy is important to us. SubHub collects and processes personal data in accordance with the <strong>Nigeria Data Protection Regulation (NDPR)</strong> and our Privacy Policy. Key points:</p>
+      <ul class="term-list">
+        <li>We collect only the <strong>minimum data necessary</strong> to provide our services</li>
+        <li>We do <strong>not sell your personal data</strong> to third parties</li>
+        <li>We do <strong>not use your data for advertising</strong> purposes</li>
+        <li>Transaction data is retained for <strong>7 years</strong> for regulatory compliance</li>
+        <li>You may request deletion of your data subject to legal retention requirements</li>
+        <li>We use <strong>256-bit SSL encryption</strong> to protect all data transmission</li>
+      </ul>
+      <p>For full details on data collection, processing, storage and your rights, please read our <a href="privacy.html">Privacy Policy</a>. By using SubHub, you consent to data processing as described in our Privacy Policy.</p>
+    `
+  },
+  {
+    title:'Intellectual Property',
+    sub:'Ownership of SubHub content and branding',
+    icon:'fas fa-copyright',
+    body:`
+      <p>All intellectual property rights in SubHub including but not limited to the platform name, logo, design, code, content, features and functionality — are owned exclusively by <strong>Earncial Global</strong> and are protected under Nigerian and international intellectual property law.</p>
+      <ul class="term-list">
+        <li>You may not copy, reproduce or distribute SubHub's content without written permission</li>
+        <li>You may not reverse engineer or attempt to extract our source code</li>
+        <li>You may not use SubHub's name or logo without prior written consent</li>
+        <li>You may not create derivative works based on our platform</li>
+      </ul>
+      <p>User-generated content (such as Sender IDs for SMS) remains your property. By submitting content, you grant SubHub a non-exclusive license to use it solely for the purpose of delivering our services to you.</p>
+    `
+  },
+  {
+    title:'Disclaimers & Limitation of Liability',
+    sub:'What we are and are not responsible for',
+    icon:'fas fa-triangle-exclamation',
+    body:`
+      <p>SubHub's services are provided <strong>"as is"</strong> without warranties of any kind, either express or implied. While we strive for 99.9% uptime and instant delivery, we cannot guarantee uninterrupted service availability.</p>
+      <div class="hl-box warn"><i class="fas fa-triangle-exclamation hl-ico"></i><div class="hl-text">SubHub is not liable for: service delivery delays caused by third-party API providers or telecom networks; losses resulting from your sharing of account credentials; transactions made on a wrong phone number or account due to user error; or any indirect, incidental or consequential damages arising from use of our services.</div></div>
+      <p>Our maximum liability to you for any claim arising from your use of SubHub shall not exceed the <strong>total amount transacted in the 30 days</strong> preceding the claim. This limitation applies to all causes of action, whether based in contract, tort, negligence or otherwise.</p>
+      <p>SubHub is not responsible for the availability or quality of services provided by third parties, including telecom networks (MTN, Airtel, Glo, 9Mobile), cable TV providers (DStv, GOtv, StarTimes) or electricity distribution companies (DISCOs). Any service quality issues should be directed to those providers.</p>
+    `
+  },
+  {
+    title:'Account Suspension & Termination',
+    sub:'When and how accounts may be closed',
+    icon:'fas fa-user-slash',
+    body:`
+      <p>SubHub reserves the right to suspend or terminate any account at its sole discretion. Grounds for suspension or termination include:</p>
+      <ul class="term-list">
+        <li>Violation of any provision of these Terms of Service</li>
+        <li>Suspected fraudulent activity or money laundering</li>
+        <li>Providing false or misleading information during registration</li>
+        <li>Non-compliance with KYC/AML requirements</li>
+        <li>Abuse of our support team or other users</li>
+        <li>Extended account inactivity (12+ months)</li>
+        <li>Legal or regulatory requirements</li>
+      </ul>
+      <p>You may close your account at any time by contacting our support team. Upon account closure, any remaining wallet balance will be refunded to your linked bank account within 5 business days, subject to identity verification. SubHub may withhold funds pending investigation of any suspected violations.</p>
+      <div class="hl-box info"><i class="fas fa-circle-info hl-ico"></i><div class="hl-text">If your account is suspended, you will be notified via email and/or SMS with the reason for suspension. You may appeal the decision by contacting legal@subhub.ng within 14 days of the suspension notice.</div></div>
+    `
+  },
+  {
+    title:'Governing Law & Dispute Resolution',
+    sub:'How legal matters are handled',
+    icon:'fas fa-gavel',
+    body:`
+      <p>These Terms of Service are governed by and construed in accordance with the laws of the <strong>Federal Republic of Nigeria</strong>. Any disputes arising from or related to these Terms or your use of SubHub shall be subject to the exclusive jurisdiction of Nigerian courts.</p>
+      <p><strong>Dispute Resolution Process:</strong></p>
+      <ul class="term-list">
+        <li><strong>Step 1 — Contact Support:</strong> First, contact our support team at legal@subhub.ng. Most issues are resolved within 24 hours.</li>
+        <li><strong>Step 2 — Formal Complaint:</strong> If your issue is unresolved, submit a formal written complaint to Earncial Global's legal team.</li>
+        <li><strong>Step 3 — Mediation:</strong> Both parties agree to attempt good-faith mediation before pursuing legal action.</li>
+        <li><strong>Step 4 — Legal Action:</strong> If mediation fails, disputes shall be resolved in courts of competent jurisdiction in Lagos, Nigeria.</li>
+      </ul>
+      <p>Nothing in this clause prevents either party from seeking emergency injunctive relief from a court of competent jurisdiction to prevent irreparable harm.</p>
+    `
+  },
+  {
+    title:'Changes to These Terms',
+    sub:'How and when these terms may be updated',
+    icon:'fas fa-pen-to-square',
+    body:`
+      <p>SubHub/Earncial Global reserves the right to modify these Terms of Service at any time. When we make changes, we will:</p>
+      <ul class="term-list">
+        <li>Update the "Last Updated" date at the top of this document</li>
+        <li>Notify registered users via <strong>email</strong> to their registered address</li>
+        <li>Display a prominent <strong>in-app notification</strong> for at least 7 days</li>
+        <li>For material changes, provide at least <strong>30 days advance notice</strong></li>
+      </ul>
+      <p>Your continued use of SubHub after the effective date of revised Terms constitutes your acceptance of those changes. If you do not agree to the new Terms, you must stop using SubHub and close your account before the effective date.</p>
+      <div class="hl-box ok"><i class="fas fa-check-circle hl-ico"></i><div class="hl-text">We recommend bookmarking this page and reviewing it periodically. The version number and date at the top of this document indicate when it was last updated.</div></div>
+    `
+  },
+  {
+    title:'Contact Information',
+    sub:'How to reach SubHub and Earncial Global',
+    icon:'fas fa-envelope',
+    body:`
+      <p>If you have questions, concerns or feedback regarding these Terms of Service, please contact us:</p>
+      <ul class="term-list">
+        <li><strong>Company Name:</strong> Earncial Global (operating as SubHub)</li>
+        <li><strong>Platform:</strong> SubHub VTU Platform</li>
+        <li><strong>Website:</strong> www.subhub.ng</li>
+        <li><strong>Email:</strong> legal@subhub.ng</li>
+        <li><strong>Support Email:</strong> support@subhub.ng</li>
+        <li><strong>WhatsApp:</strong> Available via the SubHub app and website</li>
+        <li><strong>Live Chat:</strong> Available 24/7 on the SubHub platform</li>
+        <li><strong>Response Time:</strong> Legal inquiries responded to within 24 hours</li>
+      </ul>
+      <p>For urgent matters involving account security or suspected fraud, please contact our support team immediately via WhatsApp for the fastest response.</p>
+      <div class="hl-box info"><i class="fas fa-circle-info hl-ico"></i><div class="hl-text">SubHub and Earncial Global are committed to resolving all user concerns fairly and promptly. We take every inquiry seriously and aim to provide clear, helpful responses to all legal and compliance questions.</div></div>
+    `
+  },
+];
+
+const tocList = document.getElementById('tocList');
+const sectionsWrap = document.getElementById('sectionsWrap');
+
+// Build TOC
+SECTIONS.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'toc-item' + (i === 0 ? ' active' : '');
+  btn.innerHTML = `<span class="toc-num">${i + 1}</span>${s.title}`;
+  btn.addEventListener('click', () => {
+    document.getElementById('sec-' + i)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  tocList.appendChild(btn);
+});
+
+// Build sections
+SECTIONS.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'section reveal';
+  el.id = 'sec-' + i;
+  el.innerHTML = `
+    <div class="sec-header">
+      <div class="sec-num">${i + 1}</div>
+      <div>
+        <div class="sec-title">${s.title}</div>
+        <div class="sec-sub">${s.sub}</div>
+      </div>
+    </div>
+    <div class="sec-body">${s.body}</div>
+    ${i < SECTIONS.length - 1 ? '<div class="sec-divider"></div>' : ''}
+  `;
+  sectionsWrap.appendChild(el);
+});
+
+// Scroll spy
+const secObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = parseInt(e.target.id.replace('sec-', ''));
+      document.querySelectorAll('.toc-item').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+// Reveal
+const revObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('up'); });
+}, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+
+setTimeout(() => {
+  document.querySelectorAll('.section').forEach(el => { secObserver.observe(el); revObserver.observe(el); });
+  document.querySelectorAll('.reveal').forEach(el => revObserver.observe(el));
+}, 100);
+</script>
+</body>
+</html>

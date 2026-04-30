@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FAQs — SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:#fff;color:#001e3c;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+:root{--brand:#00aaff;--brand-d:#0088cc;--ink:#001e3c;--slate:#64748b;--mist:#f0f8ff;--border:#d8edf8}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;padding:0 max(24px,calc((100vw - 1200px)/2));justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo-img{width:34px;height:34px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.2)}
+.nav-logo-fb{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px}
+.nav-word{font-weight:800;font-size:1.15rem;letter-spacing:-.3px;color:var(--ink)}.nav-word span{color:var(--brand)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{padding:7px 14px;border-radius:100px;font-size:.8rem;font-weight:600;color:var(--slate);border:none;background:none;cursor:pointer;transition:.15s}
+.nav-link:hover{color:var(--brand);background:rgba(0,170,255,.07)}
+.nav-link.active{color:var(--brand);background:rgba(0,170,255,.1);font-weight:700}
+.nav-cta{padding:9px 20px;border-radius:100px;font-size:.8rem;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,170,255,.35);transition:.2s;font-family:'Sora',sans-serif}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,170,255,.45)}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#001e3c 0%,#003166 55%,#005cbf 100%);padding:80px max(24px,calc((100vw - 1200px)/2)) 70px;position:relative;overflow:hidden;text-align:center}
+.h-orb1{position:absolute;width:500px;height:500px;border-radius:50%;top:-150px;right:-100px;background:radial-gradient(circle,rgba(0,170,255,.18),transparent 65%)}
+.h-orb2{position:absolute;width:350px;height:350px;border-radius:50%;bottom:-100px;left:-80px;background:radial-gradient(circle,rgba(0,170,255,.1),transparent 65%)}
+.h-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:50px 50px}
+.hero-in{position:relative;z-index:2;max-width:620px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;background:rgba(0,170,255,.15);border:1px solid rgba(0,170,255,.25);font-size:.72rem;font-weight:700;color:rgba(0,170,255,.9);margin-bottom:20px}
+.bdot{width:6px;height:6px;border-radius:50%;background:#00aaff;animation:bdot 2s infinite}
+@keyframes bdot{0%,100%{box-shadow:0 0 0 0 rgba(0,170,255,.7)}50%{box-shadow:0 0 0 5px transparent}}
+.hero-in h1{font-size:clamp(1.9rem,4.5vw,3rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.05em;margin-bottom:16px}
+.hero-in h1 span{background:linear-gradient(90deg,#00aaff,#66d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-in p{font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.75;margin-bottom:28px}
+
+/* SEARCH */
+.hero-search{max-width:480px;margin:0 auto;position:relative}
+.hs-wrap{display:flex;align-items:center;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 6px 6px 18px;backdrop-filter:blur(10px);transition:.2s}
+.hs-wrap:focus-within{background:rgba(255,255,255,.15);border-color:rgba(0,170,255,.6)}
+.hs-wrap i{color:rgba(255,255,255,.5);font-size:.85rem;margin-right:8px;flex-shrink:0}
+.hs-wrap input{flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.85rem;color:#fff;font-weight:500}
+.hs-wrap input::placeholder{color:rgba(255,255,255,.35)}
+.hs-btn{padding:9px 20px;border-radius:100px;background:linear-gradient(135deg,#00aaff,#0088cc);color:#fff;font-size:.8rem;font-weight:800;border:none;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0}
+
+/* MAIN LAYOUT */
+.main{max-width:1200px;margin:0 auto;padding:64px 24px;display:grid;grid-template-columns:240px 1fr;gap:48px;align-items:start}
+
+/* SIDEBAR CATEGORIES */
+.sidebar{position:sticky;top:84px}
+.sidebar-title{font-size:.65rem;font-weight:800;color:rgba(0,170,255,.7);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-left:4px}
+.cat-list{display:flex;flex-direction:column;gap:2px}
+.cat-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:11px;border:none;background:none;
+  font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;
+  color:var(--slate);cursor:pointer;text-align:left;width:100%;
+  transition:.15s;
+}
+.cat-btn:hover{background:rgba(0,170,255,.07);color:var(--brand)}
+.cat-btn.active{background:rgba(0,170,255,.1);color:var(--brand);font-weight:700}
+.cat-btn-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;transition:.15s;background:var(--mist);color:var(--slate)}
+.cat-btn.active .cat-btn-ico{background:rgba(0,170,255,.15);color:var(--brand)}
+.cat-count{margin-left:auto;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--mist);color:var(--slate)}
+.cat-btn.active .cat-count{background:rgba(0,170,255,.15);color:var(--brand)}
+
+/* CONTACT CARD */
+.contact-card{margin-top:24px;background:linear-gradient(145deg,#001e3c,#003166);border-radius:16px;padding:20px;color:#fff}
+.contact-card-title{font-size:.8rem;font-weight:800;margin-bottom:6px}
+.contact-card-p{font-size:.72rem;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:14px}
+.contact-btn{width:100%;padding:9px;border-radius:100px;background:linear-gradient(135deg,#00aaff,#0088cc);color:#fff;font-size:.75rem;font-weight:800;border:none;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.contact-btn:hover{filter:brightness(1.1)}
+
+/* FAQ CONTENT */
+.faq-content{}
+.faq-section{margin-bottom:40px;scroll-margin-top:84px}
+.faq-section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--mist)}
+.faq-section-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.faq-section-title{font-size:1rem;font-weight:800;color:var(--ink);letter-spacing:-.03em}
+.faq-section-count{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;background:var(--mist);color:var(--slate);margin-left:auto}
+
+/* FAQ ITEM */
+.faq-item{border:1.5px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:.2s}
+.faq-item:hover{border-color:rgba(0,170,255,.3)}
+.faq-item.open{border-color:var(--brand);box-shadow:0 4px 20px rgba(0,170,255,.1)}
+.faq-q{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 18px;cursor:pointer;background:#fff;border:none;width:100%;text-align:left;
+  transition:.15s;
+}
+.faq-q:hover{background:#fafeff}
+.faq-item.open .faq-q{background:#fafeff}
+.faq-q-ico{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;background:var(--mist);color:var(--slate);
+  transition:.2s;
+}
+.faq-item.open .faq-q-ico{background:rgba(0,170,255,.12);color:var(--brand)}
+.faq-q-text{font-size:.86rem;font-weight:700;color:var(--ink);flex:1;line-height:1.4}
+.faq-toggle{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--mist);color:var(--slate);font-size:.68rem;
+  transition:.3s cubic-bezier(.34,1.3,.64,1);
+}
+.faq-item.open .faq-toggle{background:var(--brand);color:#fff;transform:rotate(45deg)}
+.faq-ans{max-height:0;overflow:hidden;transition:.38s cubic-bezier(.16,1,.3,1)}
+.faq-item.open .faq-ans{max-height:400px}
+.faq-ans-inner{padding:0 18px 18px 64px;font-size:.82rem;color:var(--slate);line-height:1.8}
+.faq-ans-inner strong{color:var(--ink);font-weight:700}
+.faq-ans-inner a{color:var(--brand);font-weight:600}
+.faq-ans-inner ul{padding-left:18px;margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.faq-ans-inner ul li{font-size:.8rem}
+
+/* NO RESULTS */
+.no-results{text-align:center;padding:60px 20px;color:var(--slate)}
+.no-results i{font-size:2.5rem;opacity:.2;color:var(--brand);display:block;margin-bottom:12px}
+.no-results h3{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:6px}
+.no-results p{font-size:.82rem}
+
+/* STILL NEED HELP */
+.help-section{background:linear-gradient(135deg,#001e3c,#003166);border-radius:24px;padding:40px;text-align:center;margin-top:48px;position:relative;overflow:hidden}
+.help-section::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,170,255,.15),transparent 70%)}
+.help-in{position:relative;z-index:1}
+.help-section h2{font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:-.04em;margin-bottom:10px}
+.help-section h2 span{color:#00aaff}
+.help-section p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.7;max-width:500px;margin:0 auto 28px}
+.help-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.help-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:100px;font-size:.82rem;font-weight:800;border:none;cursor:pointer;transition:.2s;font-family:'Sora',sans-serif}
+.help-btn-primary{background:linear-gradient(135deg,#00aaff,#0088cc);color:#fff;box-shadow:0 6px 18px rgba(0,170,255,.38)}
+.help-btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,170,255,.48)}
+.help-btn-ghost{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}
+.help-btn-ghost:hover{background:rgba(255,255,255,.18)}
+
+/* FOOTER */
+footer{background:linear-gradient(160deg,#001e3c,#003166);color:rgba(255,255,255,.6);padding:40px max(24px,calc((100vw - 1200px)/2)) 22px}
+.footer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px}
+.f-logo{display:flex;align-items:center;gap:9px}
+.f-logo-img{width:32px;height:32px;border-radius:50%;object-fit:contain;border:1.5px solid rgba(0,170,255,.25)}
+.f-logo-fb{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00aaff,#0088cc);display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px}
+.f-word{font-weight:800;font-size:1.05rem;color:#fff}.f-word span{color:#00aaff}
+.f-links{display:flex;gap:18px;flex-wrap:wrap}
+.f-link{font-size:.76rem;color:rgba(255,255,255,.4);transition:.15s}
+.f-link:hover{color:#00aaff}
+.footer-btm{padding-top:18px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:8px}
+.footer-btm strong{color:rgba(255,255,255,.5)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.up{opacity:1;transform:none}
+
+/* RESPONSIVE */
+@media(max-width:860px){.main{grid-template-columns:1fr}.sidebar{position:static;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}.sidebar-title{display:none}.cat-list{flex-direction:row;flex-wrap:wrap}.cat-count{display:none}.contact-card{display:none}}
+@media(max-width:520px){.nav-links{display:none}.faq-ans-inner{padding-left:18px}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" class="nav-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <span class="nav-logo-fb">S</span>
+    <span class="nav-word">Sub<span>Hub</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#services" class="nav-link">Services</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="faq.html" class="nav-link active">FAQ</a>
+    <a href="index.html#pricing" class="nav-link">Pricing</a>
+  </div>
+  <button class="nav-cta" onclick="location.href='signup.html'">Get Started Free</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="h-orb1"></div><div class="h-orb2"></div><div class="h-grid"></div>
+  <div class="hero-in">
+    <div class="hero-badge"><span class="bdot"></span>Help Center</div>
+    <h1>Frequently Asked<br/><span>Questions</span></h1>
+    <p>Everything you need to know about SubHub. Can't find your answer? Our support team is always ready to help.</p>
+    <div class="hero-search">
+      <div class="hs-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search questions… e.g. 'data not delivered'"/>
+        <button class="hs-btn">Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Categories</div>
+    <div class="cat-list" id="catList"></div>
+    <div class="contact-card">
+      <div class="contact-card-title">Still need help?</div>
+      <p class="contact-card-p">Our support team is available 24/7 on WhatsApp and Live Chat.</p>
+      <button class="contact-btn"><i class="fab fa-whatsapp"></i>Chat on WhatsApp</button>
+    </div>
+  </aside>
+
+  <!-- FAQ CONTENT -->
+  <div class="faq-content" id="faqContent"></div>
+
+</div>
+
+<!-- STILL NEED HELP -->
+<div style="padding:0 max(24px,calc((100vw - 1200px)/2)) 64px">
+  <div class="help-section reveal">
+    <div class="help-in">
+      <h2>Still Have <span>Questions?</span></h2>
+      <p>Our friendly support team is available 24 hours a day, 7 days a week. We typically respond within 2 minutes on WhatsApp.</p>
+      <div class="help-btns">
+        <button class="help-btn help-btn-primary"><i class="fab fa-whatsapp"></i>Chat on WhatsApp</button>
+        <button class="help-btn help-btn-ghost"><i class="fas fa-envelope"></i>Send Email</button>
+        <button class="help-btn help-btn-ghost"><i class="fas fa-comment-dots"></i>Live Chat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="f-logo">
+      <img src="logo.png" class="f-logo-img" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="f-logo-fb">S</span>
+      <span class="f-word">Sub<span>Hub</span></span>
+    </div>
+    <div class="f-links">
+      <a href="index.html" class="f-link">Home</a>
+      <a href="about.html" class="f-link">About</a>
+      <a href="signup.html" class="f-link">Sign Up</a>
+      <a href="login.html" class="f-link">Sign In</a>
+      <a href="#" class="f-link">Privacy Policy</a>
+      <a href="#" class="f-link">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-btm">
+    <span>© 2026 SubHub · Operated by <strong>Earncial Global</strong> · All rights reserved.</span>
+    <span>Made with ❤️ for Nigeria 🇳🇬</span>
+  </div>
+</footer>
+
+<script>
+const FAQS = [
+  {
+    cat:'Getting Started',
+    icon:'fas fa-rocket',
+    color:'rgba(0,170,255,.12)',
+    iconColor:'#00aaff',
+    items:[
+      {q:'What is SubHub?',ico:'fas fa-info-circle',a:'<strong>SubHub</strong> is Nigeria\'s smartest VTU (Virtual Top-Up) platform, operated by <strong>Earncial Global</strong>. It allows you to buy data, top up airtime, pay cable TV subscriptions, purchase electricity tokens, buy exam pins, send bulk SMS and more — all instantly and at the best prices in Nigeria.'},
+      {q:'Is SubHub free to join?',ico:'fas fa-gift',a:'Yes! Creating a SubHub account is <strong>completely free</strong>. There are no registration fees, monthly charges or hidden costs. You only pay for the services you buy, and always at the lowest rates available in Nigeria.'},
+      {q:'How do I create an account?',ico:'fas fa-user-plus',a:'Creating an account is simple and takes less than 60 seconds:<ul><li>Visit subhub.ng and click "Get Started"</li><li>Enter your full name, username, email and phone number</li><li>Create a strong password</li><li>Agree to our Terms of Service</li><li>That\'s it! You\'re ready to transact.</li></ul>'},
+      {q:'What information do I need to register?',ico:'fas fa-id-card',a:'To register, you need: your <strong>full name</strong>, a unique <strong>username</strong>, a valid <strong>email address</strong>, your <strong>Nigerian phone number</strong> and a <strong>password</strong>. No ID documents are required to start using SubHub.'},
+      {q:'Is SubHub available across Nigeria?',ico:'fas fa-map-marker-alt',a:'Yes! SubHub works for every Nigerian regardless of location — Lagos, Kano, Abuja, Enugu, Port Harcourt, Sokoto or anywhere in all 36 states and the FCT. Our services cover all Nigerian networks and DISCOs nationwide.'},
+    ]
+  },
+  {
+    cat:'Funding & Wallet',
+    icon:'fas fa-wallet',
+    color:'rgba(16,185,129,.12)',
+    iconColor:'#10b981',
+    items:[
+      {q:'How do I fund my SubHub wallet?',ico:'fas fa-money-bill-wave',a:'You can fund your wallet in several ways:<ul><li><strong>Virtual Account Transfer</strong> — Transfer directly to your unique SubHub virtual bank account (Wema Bank or GTBank). Funds reflect instantly.</li><li><strong>Bank Transfer</strong> — Transfer to our official SubHub account and upload your receipt.</li><li><strong>Debit/Credit Card</strong> — Coming soon via our payment gateway.</li></ul>'},
+      {q:'How long does it take for funds to reflect?',ico:'fas fa-clock',a:'Funds via your <strong>virtual account</strong> reflect <strong>instantly</strong> — usually within seconds of your transfer. For other methods, it may take up to 30 minutes. If funds don\'t reflect after 1 hour, please contact our support team immediately.'},
+      {q:'What is the minimum amount I can fund?',ico:'fas fa-coins',a:'The minimum wallet funding amount is <strong>₦100</strong>. There is no maximum limit. You can add as much as you need at any time.'},
+      {q:'How do I get a virtual account?',ico:'fas fa-building-columns',a:'Log into your SubHub dashboard, swipe to the second wallet card and tap <strong>"Generate Account"</strong>. Your dedicated virtual bank account (Wema Bank) will be created instantly. Use this account number to fund your wallet from any bank in Nigeria.'},
+      {q:'Can I transfer money from my SubHub wallet to another person?',ico:'fas fa-paper-plane',a:'Yes! SubHub supports wallet-to-wallet transfers between SubHub users and bank account transfers. Go to your dashboard, tap <strong>"Transfer"</strong>, select the type and enter the details. A 4-digit PIN is required to confirm all transfers.'},
+      {q:'What happens to my wallet balance if a transaction fails?',ico:'fas fa-rotate-left',a:'Your wallet is <strong>never debited</strong> for a failed transaction. If a deduction occurs before a failure is detected, the amount is automatically reversed to your wallet within <strong>24 hours</strong>. You can also contact our support team for immediate resolution.'},
+    ]
+  },
+  {
+    cat:'Data & Airtime',
+    icon:'fas fa-wifi',
+    color:'rgba(139,92,246,.12)',
+    iconColor:'#8b5cf6',
+    items:[
+      {q:'Which networks does SubHub support?',ico:'fas fa-signal',a:'SubHub supports all four major Nigerian networks: <strong>MTN, Airtel, Glo and 9Mobile</strong>. We offer data and airtime for all networks at the best prices available.'},
+      {q:'What types of data plans are available?',ico:'fas fa-database',a:'We offer multiple plan types depending on your needs:<ul><li><strong>SME Data</strong> — Cheapest rates, great for everyday use</li><li><strong>Gifting Data</strong> — Share data with any number</li><li><strong>Cooperative Data</strong> — Available for Glo users</li></ul>Plans range from 250MB to 50GB with validities from 1 day to 30 days.'},
+      {q:'What is the minimum airtime amount I can buy?',ico:'fas fa-phone',a:'The minimum airtime top-up is <strong>₦50</strong> for all networks. There is no maximum limit. You can top up your own number or any other Nigerian phone number.'},
+      {q:'How fast is data/airtime delivered?',ico:'fas fa-bolt',a:'Data and airtime are delivered in <strong>under 2 seconds</strong> on average. In rare cases of network congestion, delivery may take up to 60 seconds. If your data is not delivered after 5 minutes, please contact our support team.'},
+      {q:'Can I buy data for someone else\'s number?',ico:'fas fa-user-friends',a:'Yes! You can buy data and airtime for <strong>any Nigerian phone number</strong>, not just yours. Simply enter the recipient\'s number when placing your order. This works for all networks and all plan types.'},
+    ]
+  },
+  {
+    cat:'Cable TV & Bills',
+    icon:'fas fa-tv',
+    color:'rgba(245,158,11,.12)',
+    iconColor:'#f59e0b',
+    items:[
+      {q:'Which cable TV providers does SubHub support?',ico:'fas fa-satellite-dish',a:'SubHub currently supports <strong>DStv (MultiChoice), GOtv and StarTimes</strong>. You can renew any bouquet or plan for these providers by entering your smart card or IUC number.'},
+      {q:'How do I pay my cable TV subscription?',ico:'fas fa-tv',a:'Go to the SubHub dashboard, tap <strong>"Cable TV"</strong>, select your provider (DStv, GOtv or StarTimes), choose your plan, enter your smart card/IUC number and confirm with your PIN. Your subscription renews instantly.'},
+      {q:'Which electricity DISCOs does SubHub cover?',ico:'fas fa-bolt',a:'SubHub covers all 10 electricity distribution companies in Nigeria:<ul><li>Ikeja Electric, Eko Electric, Kano Electric</li><li>Port Harcourt (PHED), Jos Electric, Ibadan Electric</li><li>Kaduna Electric, Abuja Electric (AEDC)</li><li>Benin Electric (BEDC), Yola Electric</li></ul>Both prepaid and postpaid meters are supported.'},
+      {q:'How do I receive my electricity token?',ico:'fas fa-key',a:'Your electricity token is sent to your registered phone number via <strong>SMS</strong> immediately after the transaction is confirmed. It also appears on your transaction receipt in the app. Tokens are typically 20-digit numbers that you enter into your prepaid meter.'},
+      {q:'What is the minimum electricity amount?',ico:'fas fa-plug',a:'The minimum electricity token purchase is <strong>₦1,000</strong>. There is no maximum limit. You can purchase larger amounts for businesses and commercial meters.'},
+    ]
+  },
+  {
+    cat:'Exam Pins & Cards',
+    icon:'fas fa-graduation-cap',
+    color:'rgba(249,115,22,.12)',
+    iconColor:'#f97316',
+    items:[
+      {q:'Which exam result checkers does SubHub sell?',ico:'fas fa-scroll',a:'SubHub sells result checker PINs for: <strong>WAEC (₦3,350), NECO (₦2,100), NABTEB (₦855)</strong> and <strong>JAMB Profile Code (₦700)</strong>. You can buy up to 10 pins per order.'},
+      {q:'How are exam pins delivered?',ico:'fas fa-envelope-open',a:'Exam PINs are displayed on your transaction receipt <strong>immediately after payment</strong>. You can also find them in your transaction history at any time. Screenshot or copy your PIN before leaving the receipt page.'},
+      {q:'What is a recharge card and how does it work?',ico:'fas fa-id-card',a:'SubHub generates <strong>physical-style recharge card PINs</strong> for MTN, Airtel, Glo and 9Mobile. You receive the PINs immediately and can print them as professional-looking cards. This feature is popular with resellers who sell airtime to customers.'},
+      {q:'What is Print Data and who is it for?',ico:'fas fa-print',a:'Print Data allows you to generate <strong>printable data voucher cards</strong> for any network. Customers can use these cards to activate data on their phones. This is ideal for data resellers, business owners and anyone who wants to sell data to others.'},
+    ]
+  },
+  {
+    cat:'Security & Account',
+    icon:'fas fa-shield-halved',
+    color:'rgba(239,68,68,.12)',
+    iconColor:'#ef4444',
+    items:[
+      {q:'Is SubHub safe to use?',ico:'fas fa-shield-check',a:'Absolutely. SubHub uses <strong>256-bit SSL encryption</strong> on all connections, a mandatory <strong>4-digit transaction PIN</strong> for all payments, <strong>real-time fraud detection</strong> powered by AI, and <strong>zero storage of card details</strong>. Your funds and personal data are always fully protected.'},
+      {q:'What is the transaction PIN and how do I set it?',ico:'fas fa-key',a:'Your <strong>transaction PIN</strong> is a 4-digit code required to confirm every payment on SubHub. It prevents unauthorized transactions even if someone else has access to your phone. Set or change your PIN in <strong>Settings → Change Transaction PIN</strong>. Never share your PIN with anyone.'},
+      {q:'What do I do if I forget my PIN?',ico:'fas fa-lock-open',a:'If you forget your transaction PIN, go to <strong>Settings → Change Transaction PIN</strong> and follow the reset process. You\'ll need access to your registered email or phone number to verify your identity. Contact support if you need further assistance.'},
+      {q:'Can I change my password?',ico:'fas fa-lock',a:'Yes. Go to <strong>Profile → Settings → Change Password</strong>. You\'ll need to enter your current password and create a new one. We recommend using a strong password with uppercase letters, numbers and special characters.'},
+      {q:'What happens if my account is compromised?',ico:'fas fa-user-shield',a:'If you suspect unauthorized access to your account, <strong>immediately contact our support team</strong> via WhatsApp or live chat. We\'ll temporarily lock your account, investigate the issue and help you regain secure access. Never share your password or PIN with anyone.'},
+      {q:'Does SubHub store my bank account details?',ico:'fas fa-building-columns',a:'No. SubHub <strong>never stores</strong> your bank account login credentials, card PINs or BVN. Virtual account transactions are handled by our banking partners (Wema Bank, GTBank) with full regulatory compliance. We only store the minimum information needed to process your transactions.'},
+    ]
+  },
+  {
+    cat:'Bulk SMS',
+    icon:'fas fa-comment-dots',
+    color:'rgba(236,72,153,.12)',
+    iconColor:'#ec4899',
+    items:[
+      {q:'How does Bulk SMS work on SubHub?',ico:'fas fa-paper-plane',a:'SubHub\'s Bulk SMS feature lets you send SMS messages to multiple phone numbers at once using a custom <strong>Sender ID</strong> (your business name). Simply enter your Sender ID, paste your recipients\' numbers (comma-separated), type your message and confirm. Messages are delivered within seconds.'},
+      {q:'How much does Bulk SMS cost?',ico:'fas fa-tags',a:'Bulk SMS on SubHub costs <strong>₦4 per SMS</strong> to any Nigerian number. There are no setup fees or monthly charges. You only pay for the messages you send.'},
+      {q:'What is a Sender ID?',ico:'fas fa-id-badge',a:'A Sender ID is the name that appears as the sender of your SMS — instead of a phone number, recipients see your business name (e.g. "SubHub" or "MyShop"). It must be 1-11 characters and can contain letters and numbers. Some Sender IDs may require pre-approval by networks.'},
+      {q:'How many recipients can I send to at once?',ico:'fas fa-users',a:'You can send to <strong>unlimited recipients</strong> in a single campaign. Simply separate each phone number with a comma. The cost is ₦4 per recipient regardless of the total number sent.'},
+    ]
+  },
+  {
+    cat:'Payments & Refunds',
+    icon:'fas fa-credit-card',
+    color:'rgba(14,165,233,.12)',
+    iconColor:'#00aaff',
+    items:[
+      {q:'What payment methods does SubHub accept?',ico:'fas fa-money-check',a:'SubHub currently accepts payments via:<ul><li><strong>Wallet funding</strong> — Fund your wallet then use it for all transactions</li><li><strong>Virtual Account Transfer</strong> — Direct bank transfer to your unique SubHub account</li><li><strong>Bank Transfer</strong> — Transfer to SubHub\'s official account</li></ul>We are working on integrating direct card payments very soon.'},
+      {q:'How do I get a refund for a failed transaction?',ico:'fas fa-rotate-left',a:'If a transaction fails and your wallet was debited, <strong>the refund is automatic</strong> within 24 hours. If you don\'t receive your refund after 24 hours, contact our support team with your transaction reference number. We process all refund requests within 2 business hours.'},
+      {q:'Can I get a receipt for my transactions?',ico:'fas fa-receipt',a:'Yes! Every transaction generates a <strong>detailed receipt</strong> that you can view in your transaction history, download as an HTML file or share via WhatsApp. Receipts include the transaction ID, service details, amount, balance before and after, date and status.'},
+      {q:'Are there any hidden fees on SubHub?',ico:'fas fa-eye',a:'<strong>Absolutely not.</strong> SubHub has zero hidden fees. The price you see is the price you pay. There are no processing fees, no service charges and no monthly subscriptions. We generate revenue from the small margin between our wholesale price and the price we charge you.'},
+      {q:'How do I view my transaction history?',ico:'fas fa-list',a:'Tap <strong>"History"</strong> on the bottom navigation bar or go to <strong>Dashboard → View All Transactions</strong>. You can filter by date, service type, status (success/failed) and search by reference number or phone number. Your complete history is always available.'},
+    ]
+  },
+];
+
+/* ── RENDER ── */
+const catList = document.getElementById('catList');
+const faqContent = document.getElementById('faqContent');
+
+function renderCats(active) {
+  catList.innerHTML = '';
+  FAQS.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (i === active ? ' active' : '');
+    btn.innerHTML = `<span class="cat-btn-ico" style="background:${cat.color};color:${cat.iconColor}"><i class="${cat.icon}"></i></span>${cat.cat}<span class="cat-count">${cat.items.length}</span>`;
+    btn.addEventListener('click', () => {
+      document.getElementById('sec-' + i)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    catList.appendChild(btn);
+  });
+}
+
+function renderFAQs(filter = '') {
+  faqContent.innerHTML = '';
+  let totalMatch = 0;
+
+  FAQS.forEach((cat, ci) => {
+    const filtered = filter
+      ? cat.items.filter(item =>
+          item.q.toLowerCase().includes(filter.toLowerCase()) ||
+          item.a.toLowerCase().includes(filter.toLowerCase())
+        )
+      : cat.items;
+
+    if (filtered.length === 0) return;
+    totalMatch += filtered.length;
+
+    const section = document.createElement('div');
+    section.className = 'faq-section reveal';
+    section.id = 'sec-' + ci;
+
+    section.innerHTML = `
+      <div class="faq-section-header">
+        <div class="faq-section-ico" style="background:${cat.color};color:${cat.iconColor}"><i class="${cat.icon}"></i></div>
+        <div class="faq-section-title">${cat.cat}</div>
+        <span class="faq-section-count">${filtered.length} question${filtered.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${filtered.map((item, ii) => `
+        <div class="faq-item" id="faq-${ci}-${ii}">
+          <button class="faq-q" onclick="toggleFAQ('faq-${ci}-${ii}')">
+            <span class="faq-q-ico"><i class="${item.ico}"></i></span>
+            <span class="faq-q-text">${item.q}</span>
+            <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+          </button>
+          <div class="faq-ans"><div class="faq-ans-inner">${item.a}</div></div>
+        </div>
+      `).join('')}
+    `;
+    faqContent.appendChild(section);
+  });
+
+  if (totalMatch === 0 && filter) {
+    faqContent.innerHTML = `<div class="no-results"><i class="fas fa-search"></i><h3>No results found</h3><p>No questions match "<strong>${filter}</strong>". Try different keywords or browse the categories.</p></div>`;
+  }
+
+  // Re-observe for reveal
+  setTimeout(() => {
+    document.querySelectorAll('.faq-section.reveal').forEach(el => revealObserver.observe(el));
+  }, 50);
+}
+
+function toggleFAQ(id) {
+  const item = document.getElementById(id);
+  const wasOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Search
+const searchInput = document.getElementById('searchInput');
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    renderFAQs(searchInput.value.trim());
+    renderCats(-1);
+  }, 280);
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; renderFAQs(); renderCats(0); }
+});
+
+// Scroll spy for active cat
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('up'); });
+}, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+
+const catObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      const idx = parseInt(id.replace('sec-', ''));
+      document.querySelectorAll('.cat-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+// Init
+renderCats(0);
+renderFAQs();
+
+setTimeout(() => {
+  document.querySelectorAll('.faq-section').forEach(el => catObserver.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+}, 100);
+</script>
+</body>
+</html>
