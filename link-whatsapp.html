@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Link WhatsApp — SubHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #00aaff;
+      --brand-dark: #0088cc;
+      --brand-glow: rgba(0,170,255,0.22);
+      --bg: #f0f7ff;
+      --surface: #ffffff;
+      --text: #0a1628;
+      --text-muted: #5a7a9a;
+      --border: rgba(0,170,255,0.15);
+      --success: #00c87a;
+      --error: #ff4060;
+      --shadow: 0 4px 32px rgba(0,120,200,0.10);
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 10%, rgba(0,170,255,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 80%, rgba(0,136,204,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 36px; width: auto; object-fit: contain; }
+    .nav-logo-fallback { display: none; align-items: center; gap: 8px; }
+    .nav-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px; box-shadow: 0 4px 12px var(--brand-glow);
+    }
+    .nav-logo-text { font-size: 1.25rem; font-weight: 700; color: var(--brand); letter-spacing: -0.5px; }
+    .nav-badge {
+      font-size: 0.7rem; font-weight: 600;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: white; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px;
+    }
+
+    /* MAIN */
+    main {
+      position: relative; z-index: 1; flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* HEADER */
+    .header-card {
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      border-radius: 24px; padding: 2.25rem 2rem;
+      color: white; text-align: center; position: relative; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,170,255,0.35);
+    }
+    .header-card::before {
+      content: ''; position: absolute; top: -40%; right: -20%;
+      width: 280px; height: 280px; background: rgba(255,255,255,0.07); border-radius: 50%;
+    }
+    .wa-icon-wrap {
+      position: relative; z-index: 1;
+      width: 68px; height: 68px;
+      background: rgba(255,255,255,0.18);
+      border: 2px solid rgba(255,255,255,0.28);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.1rem; font-size: 1.9rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    .header-card h1 { position: relative; z-index: 1; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.5px; }
+    .header-card p { position: relative; z-index: 1; font-size: 0.88rem; opacity: 0.88; line-height: 1.6; font-weight: 300; }
+
+    /* CARD */
+    .card {
+      background: var(--surface); border-radius: 20px;
+      padding: 1.75rem; border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .card-label {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.25rem;
+    }
+
+    /* FORM */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap i.input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 0.85rem; pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%; padding: 12px 14px 12px 38px;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: 0.9rem; color: var(--text);
+      background: #f7fbff; transition: all 0.2s; outline: none;
+    }
+    .input-wrap input:focus { border-color: var(--brand); background: white; box-shadow: 0 0 0 3px var(--brand-glow); }
+    .toggle-pwd {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--text-muted);
+      font-size: 0.85rem; padding: 4px; transition: color 0.2s;
+    }
+    .toggle-pwd:hover { color: var(--brand); }
+    .field-error { font-size: 0.78rem; color: var(--error); margin-top: 5px; display: none; }
+    .field-error.show { display: block; }
+
+    /* BUTTONS */
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: white; border: none; border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: 0.92rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s; box-shadow: 0 4px 16px var(--brand-glow);
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px var(--brand-glow); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      width: 100%; padding: 12px; margin-top: 0.75rem;
+      background: transparent; color: var(--text-muted);
+      border: 1.5px solid var(--border); border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--brand); color: var(--brand); background: rgba(0,170,255,0.04); }
+
+    /* SPINNER */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* USER INFO ROW */
+    .user-info {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(0,170,255,0.05); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 1.25rem;
+    }
+    .user-avatar {
+      width: 40px; height: 40px; min-width: 40px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1rem; font-weight: 700;
+    }
+    .user-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .user-email { font-size: 0.78rem; color: var(--text-muted); }
+    .btn-logout {
+      margin-left: auto; background: none; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 0.8rem;
+      display: flex; align-items: center; gap: 5px; padding: 6px 10px;
+      border-radius: 8px; transition: all 0.2s; font-family: 'Sora', sans-serif;
+    }
+    .btn-logout:hover { color: var(--error); background: rgba(255,64,96,0.06); }
+
+    /* OTP BOX */
+    .otp-box {
+      background: linear-gradient(135deg, #f0f9ff, #e6f4ff);
+      border: 2px solid rgba(0,170,255,0.25);
+      border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1rem;
+    }
+    .otp-hint { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.75rem; }
+    .otp-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.6rem; font-weight: 700;
+      color: var(--brand-dark); letter-spacing: 10px;
+      display: block; margin-bottom: 0.75rem;
+    }
+    .otp-timer {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--text-muted);
+      background: white; border: 1px solid var(--border);
+      padding: 4px 12px; border-radius: 20px;
+    }
+    .otp-timer i { font-size: 0.72rem; color: var(--brand); }
+    .otp-timer.expiring { color: var(--error); border-color: rgba(255,64,96,0.3); }
+    .otp-timer.expiring i { color: var(--error); }
+    .btn-copy.copied { background: linear-gradient(135deg, var(--success), #00a865) !important; }
+
+    /* INFO CARD */
+    .info-card {
+      background: rgba(0,170,255,0.05); border: 1px solid rgba(0,170,255,0.18);
+      border-radius: 16px; padding: 1.1rem 1.25rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .info-icon {
+      width: 34px; height: 34px; min-width: 34px;
+      background: rgba(0,170,255,0.12); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--brand); font-size: 0.9rem;
+    }
+    .info-text strong { display: block; font-size: 0.83rem; font-weight: 600; margin-bottom: 2px; }
+    .info-text span { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* SECTIONS */
+    #loginSection, #otpSection { display: none; }
+    #loginSection.active, #otpSection.active { display: block; }
+
+    /* TOAST */
+    #toastContainer { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      background: #0a1628; color: white;
+      padding: 12px 16px; border-radius: 14px;
+      font-size: 0.84rem; max-width: 300px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.hiding { animation: slideOut 0.3s ease forwards; }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.error   .toast-icon { color: var(--error); }
+    .toast.info    .toast-icon { color: var(--brand); }
+    .toast-icon svg { width: 18px; height: 18px; stroke-width: 2.5; flex-shrink: 0; }
+    .toast-body { flex: 1; }
+    .toast-title { font-weight: 600; font-size: 0.85rem; }
+    .toast-msg { font-size: 0.78rem; opacity: 0.72; margin-top: 1px; }
+    .toast-close { background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px; flex-shrink: 0; }
+    .toast-close svg { width: 14px; height: 14px; stroke-width: 2.5; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOut { to { opacity: 0; transform: translateX(40px); } }
+
+    /* FOOTER */
+    footer { position: relative; z-index: 1; text-align: center; padding: 1.5rem; font-size: 0.78rem; color: var(--text-muted); }
+    footer a { color: var(--brand); text-decoration: none; font-weight: 500; }
+
+    @media (max-width: 480px) {
+      nav { padding: 0 1.25rem; }
+      main { padding: 1.5rem 1rem; }
+      .otp-digits { font-size: 2rem; letter-spacing: 7px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">
+      <img src="/logo.png" alt="SubHub"
+        onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'"/>
+      <div class="nav-logo-fallback" id="logoFallback">
+        <div class="nav-logo-icon"><i class="fas fa-bolt"></i></div>
+        <span class="nav-logo-text">SubHub</span>
+      </div>
+    </a>
+    <span class="nav-badge"><i class="fab fa-whatsapp" style="margin-right:5px;"></i>LINK BOT</span>
+  </nav>
+
+  <main>
+    <div class="container">
+
+      <!-- Header -->
+      <div class="header-card">
+        <div class="wa-icon-wrap"><i class="fab fa-whatsapp"></i></div>
+        <h1>Link WhatsApp Bot</h1>
+        <p>Connect your SubHub account to our WhatsApp bot for instant data, airtime &amp; bill payments.</p>
+      </div>
+
+      <!-- LOGIN SECTION -->
+      <div id="loginSection">
+        <div class="card">
+          <div class="card-label"><i class="fas fa-lock" style="margin-right:6px;color:var(--brand);"></i>Verify Your Identity</div>
+
+          <div class="form-group">
+            <label for="credential">Email, Username or Phone</label>
+            <div class="input-wrap">
+              <i class="fas fa-user input-icon"></i>
+              <input type="text" id="credential" placeholder="e.g. 07012345678 or user@email.com"/>
+            </div>
+            <div class="field-error" id="credErr">Please enter your email, username or phone</div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="password" placeholder="Enter your password"/>
+              <button class="toggle-pwd" id="togglePwd" type="button">
+                <i class="fas fa-eye" id="eyeShow"></i>
+                <i class="fas fa-eye-slash" id="eyeHide" style="display:none;"></i>
+              </button>
+            </div>
+            <div class="field-error" id="pwdErr">Please enter your password</div>
+          </div>
+
+          <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+            <i class="fas fa-arrow-right-to-bracket"></i> Verify &amp; Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- OTP SECTION -->
+      <div id="otpSection">
+        <div class="card">
+          <div class="card-label"><i class="fas fa-user-check" style="margin-right:6px;color:var(--brand);"></i>Logged In As</div>
+
+          <div class="user-info">
+            <div class="user-avatar" id="userInitial">?</div>
+            <div>
+              <div class="user-name" id="userName">—</div>
+              <div class="user-email" id="userEmail">—</div>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">
+              <i class="fas fa-right-from-bracket"></i> Logout
+            </button>
+          </div>
+
+          <div class="card-label"><i class="fas fa-key" style="margin-right:6px;color:var(--brand);"></i>Your OTP Code</div>
+
+          <div class="otp-box">
+            <div class="otp-hint"><i class="fas fa-shield-halved" style="color:var(--brand);margin-right:5px;"></i>One-time code · Send to WhatsApp bot</div>
+            <span class="otp-digits" id="otpValue">— — — —</span>
+            <div class="otp-timer" id="otpTimer">
+              <i class="fas fa-clock"></i>
+              <span id="timerText">5:00</span>
+            </div>
+          </div>
+
+          <button class="btn-primary btn-copy" id="btnCopy" onclick="copyOTP()" disabled>
+            <i class="fas fa-copy"></i> Copy OTP
+          </button>
+          <button class="btn-secondary" onclick="generateOTP()">
+            <i class="fas fa-rotate-right"></i> Generate New Code
+          </button>
+        </div>
+
+        <!-- How to use -->
+        <div class="card">
+          <div class="card-label">How to use</div>
+          <div style="display:flex;flex-direction:column;gap:0.9rem;">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="min-width:32px;height:32px;background:rgba(0,170,255,0.1);border:1.5px solid rgba(0,170,255,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--brand);">1</div>
+              <div><strong style="font-size:0.87rem;display:block;margin-bottom:2px;">Copy the OTP above</strong><span style="font-size:0.79rem;color:var(--text-muted);">Tap the copy button to copy your 6-digit code.</span></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="min-width:32px;height:32px;background:rgba(0,170,255,0.1);border:1.5px solid rgba(0,170,255,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--brand);">2</div>
+              <div><strong style="font-size:0.87rem;display:block;margin-bottom:2px;">Open WhatsApp Bot</strong><span style="font-size:0.79rem;color:var(--text-muted);">Message the SubHub WhatsApp bot number.</span></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="min-width:32px;height:32px;background:rgba(0,170,255,0.1);border:1.5px solid rgba(0,170,255,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--brand);">3</div>
+              <div><strong style="font-size:0.87rem;display:block;margin-bottom:2px;">Send OTP to Bot</strong><span style="font-size:0.79rem;color:var(--text-muted);">Paste the code in chat — your account links instantly! ✅</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="info-text">
+          <strong>Your account is safe</strong>
+          <span>OTP expires in 5 minutes and can only be used once. Nobody else can access your account.</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toastContainer"></div>
+
+  <footer>
+    &copy; 2026 SubHub &mdash; <a href="terms">Terms of Services</a> &middot; <a href="/support">Support</a>
+  </footer>
+
+<script>
+  const API_BASE  = 'https://api.subhub.com.ng/api'
+  const TOKEN_KEY = 'sh_access_token'
+
+  let currentOTP    = null
+  let timerInterval = null
+  let secondsLeft   = 300
+  let currentUser   = null
+
+  const $ = id => document.getElementById(id)
+
+  /* API */
+  async function apiCall(endpoint, options = {}) {
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        headers: { 'Content-Type': 'application/json', ...options.headers },
+        ...options
+      })
+      return await res.json()
+    } catch {
+      return { success: false, message: 'Network error. Check your connection.' }
+    }
+  }
+
+  /* TOAST */
+  const toastIcons = {
+    success: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    error:   '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+    info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+  }
+
+  function showToast(title, msg, type = 'info', duration = 4000) {
+    const id = 'toast_' + Date.now()
+    const el = document.createElement('div')
+    el.className = `toast ${type}`
+    el.id = id
+    el.innerHTML = `
+      <div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${toastIcons[type]}</svg></div>
+      <div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>
+      <button class="toast-close" onclick="dismissToast('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    `
+    $('toastContainer').appendChild(el)
+    el._t = setTimeout(() => dismissToast(id), duration)
+  }
+
+  function dismissToast(id) {
+    const el = $(id); if (!el) return
+    clearTimeout(el._t)
+    el.classList.add('hiding')
+    setTimeout(() => el.remove(), 300)
+  }
+
+  /* SECTIONS */
+  function showLogin() {
+    $('loginSection').classList.add('active')
+    $('otpSection').classList.remove('active')
+  }
+
+  function showOTPSection() {
+    $('loginSection').classList.remove('active')
+    $('otpSection').classList.add('active')
+  }
+
+  /* LOGIN */
+  async function handleLogin() {
+    const credential = $('credential').value.trim()
+    const password   = $('password').value
+
+    $('credErr').classList.remove('show')
+    $('pwdErr').classList.remove('show')
+
+    if (!credential) { $('credErr').classList.add('show'); return }
+    if (!password)   { $('pwdErr').classList.add('show'); return }
+
+    const btn = $('loginBtn')
+    btn.disabled = true
+    btn.innerHTML = '<div class="spinner"></div> Verifying...'
+
+    const data = await apiCall('/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ credential, password })
+    })
+
+    btn.disabled = false
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Verify &amp; Continue'
+
+    if (!data.success) {
+      $('credErr').textContent = data.message || 'Login failed. Try again.'
+      $('credErr').classList.add('show')
+      showToast('Login Failed', data.message || 'Invalid credentials', 'error')
+      return
+    }
+
+    localStorage.setItem(TOKEN_KEY, data.accessToken)
+    currentUser = data.user || null
+
+    showOTPSection()
+    updateUserInfo()
+    generateOTP()
+    showToast('Verified!', 'Generating your OTP...', 'success', 2500)
+  }
+
+  /* USER INFO */
+  function updateUserInfo() {
+    if (!currentUser) return
+    const name = currentUser.fullName || currentUser.username || 'User'
+    $('userName').textContent  = name
+    $('userEmail').textContent = currentUser.email || ''
+    $('userInitial').textContent = name.charAt(0).toUpperCase()
+  }
+
+  /* LOGOUT */
+  function handleLogout() {
+    localStorage.removeItem(TOKEN_KEY)
+    currentUser = null; currentOTP = null
+    clearInterval(timerInterval)
+    $('credential').value = ''
+    $('password').value   = ''
+    $('otpValue').textContent = '— — — —'
+    $('btnCopy').disabled = true
+    showLogin()
+    showToast('Logged out', 'You have been signed out.', 'info', 2500)
+  }
+
+  /* GENERATE OTP */
+  async function generateOTP() {
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (!token) { showLogin(); return }
+
+    $('otpValue').textContent = '— — — —'
+    $('btnCopy').disabled = true
+    clearInterval(timerInterval)
+
+    const data = await apiCall('/bot/generate-otp', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+
+    if (!data.success) {
+      if (data.message?.toLowerCase().includes('token') || data.message?.toLowerCase().includes('auth') || data.message?.toLowerCase().includes('unauthorized')) {
+        localStorage.removeItem(TOKEN_KEY)
+        showLogin()
+        showToast('Session expired', 'Please login again.', 'error')
+      } else {
+        showToast('Error', data.message || 'Failed to generate OTP.', 'error')
+      }
+      return
+    }
+
+    currentOTP = data.otp
+    $('otpValue').textContent = data.otp
+    $('btnCopy').disabled = false
+    startTimer()
+  }
+
+  /* TIMER */
+  function startTimer() {
+    clearInterval(timerInterval)
+    secondsLeft = 300
+    updateTimerUI()
+    timerInterval = setInterval(() => {
+      secondsLeft--
+      updateTimerUI()
+      if (secondsLeft <= 0) {
+        clearInterval(timerInterval)
+        $('otpValue').textContent = 'EXPIRED'
+        $('btnCopy').disabled = true
+        showToast('OTP Expired', 'Generate a new code.', 'error')
+      }
+    }, 1000)
+  }
+
+  function updateTimerUI() {
+    const m = Math.floor(secondsLeft / 60)
+    const s = secondsLeft % 60
+    $('timerText').textContent = `${m}:${s.toString().padStart(2,'0')}`
+    secondsLeft <= 60
+      ? $('otpTimer').classList.add('expiring')
+      : $('otpTimer').classList.remove('expiring')
+  }
+
+  /* COPY OTP */
+  function copyOTP() {
+    if (!currentOTP) return
+    navigator.clipboard.writeText(currentOTP).then(() => {
+      const btn = $('btnCopy')
+      btn.classList.add('copied')
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!'
+      showToast('Copied!', 'Now paste the OTP in WhatsApp bot.', 'success', 3000)
+      setTimeout(() => {
+        btn.classList.remove('copied')
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy OTP'
+      }, 2500)
+    })
+  }
+
+  /* INIT */
+  document.addEventListener('DOMContentLoaded', () => {
+    $('togglePwd').addEventListener('click', () => {
+      const inp = $('password')
+      const hidden = inp.type === 'password'
+      inp.type = hidden ? 'text' : 'password'
+      $('eyeShow').style.display = hidden ? 'none'  : 'block'
+      $('eyeHide').style.display = hidden ? 'block' : 'none'
+    })
+
+    $('password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin() })
+    $('credential').addEventListener('keydown', e => { if (e.key === 'Enter') $('password').focus() })
+
+    // Already logged in? Skip to OTP
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      showOTPSection()
+      generateOTP()
+    } else {
+      showLogin()
+    }
+  })
+</script>
+
+</body>
+</html>
