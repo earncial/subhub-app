@@ -79,7 +79,7 @@
             </div>
             <div class="wc-sub">Available · Updated just now</div>
           </div>
-          <button id="wc-fund" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);padding:7px 28px;border-radius:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;white-space:nowrap"> + Fund Now</button>
+          <button id="wc-fund" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);padding:7px 28px;border-radius:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;white-space:nowrap"> + Fund Wallet Now</button>
         </div>
         <!-- Card 2: Virtual Account -->
         <div class="wallet-card wc-virtual" id="vcCard">
@@ -490,10 +490,21 @@
         <span style="font-size:.7rem;color:var(--muted);line-height:1.4">Transfer any amount you want. You can include charges. Minimum ₦100.</span>
       </div>
     </div>
+    
     <div id="fundNoVA" style="display:none;text-align:center;padding:8px 0">
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Generate a virtual account to fund your wallet instantly</p>
-      <button class="btn-p" id="fundGenVA"><i class="fas fa-plus"></i><span>Generate Virtual Account</span></button>
-    </div>
+  <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Generate a virtual account to fund your wallet instantly</p>
+  <div style="background:var(--bg);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:14px;text-align:left">
+     <label class="flbl" style="margin-bottom:6px"><i class="fas fa-id-card" style="color:var(--pr);margin-right:5px"></i>Verify Identity <small style="color:var(--muted)">(required by PalmPay)</small></label>
+     <select class="fi" id="kycIdType" style="margin-bottom:8px">
+       <option value="">— Select ID Type —</option>
+       <option value="bvn">BVN</option>
+       <option value="nin">NIN</option>
+     </select>
+     <input type="tel" class="fi" id="kycIdNumber" placeholder="Enter 11-digit number" maxlength="11" inputmode="numeric" />
+  </div>
+  <button class="btn-p" id="fundGenVA"><i class="fas fa-plus"></i><span>Generate Virtual Account</span></button>
+       </div>
+       </div>
   </div>
 </div>
 
