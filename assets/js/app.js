@@ -382,13 +382,7 @@ function renderVirtualCard() {
 async function generateVirtualAccount() {
   const btn = $('vcGenBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating…'; }
-  const idType   = $('kycIdType')?.value?.trim();
-const idNumber = $('kycIdNumber')?.value?.trim();
-if (idType && (!idNumber || idNumber.length !== 11)) {
-  toast('Enter a valid 11-digit ' + idType.toUpperCase(), 'warn'); return;
-}
-const kycBody = idType && idNumber ? { idType, idNumber } : {};
-const data = await apiCall('/wallet/virtual-account', { method: 'POST', body: JSON.stringify(kycBody) });
+  const data = await apiCall('/wallet/virtual-account/xixa', { method: 'POST' });
   if (data?.success) {
     state.virtualAccount = data.virtualAccount;
     renderVirtualCard();
