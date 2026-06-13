@@ -15,13 +15,14 @@ const TX_META={
   sms:           {icon:'comment-dots',   bg:'ico-pnk'},
   wallet_fund:   {icon:'plus-circle',    bg:'ico-grn'},
   wallet_transfer:{icon:'paper-plane',  bg:'ico-sky'},
+  earncial_transfer:{icon:'plus-circle',  bg:'ico-grn'},
   refund:        {icon:'rotate-left',    bg:'ico-pur'},
 };
 
 const TYPE_LABELS={
   data:'Data',airtime:'Airtime',cable:'Cable TV',electricity:'Electricity',
   exam:'Exam Pins',rc:'Recharge Card',sms:'Bulk SMS',
-  wallet_fund:'Wallet Fund',refund:'Refund'
+  wallet_fund:'Wallet Fund',refund:'Refund',earncial_transfer:'Earncial Transfer'
 };
 
 let allTxns=[],filteredTxns=[],shownCount=20;
@@ -63,14 +64,14 @@ async function apiCall(ep,opts={}){
   if(tk)headers['Authorization']='Bearer '+tk;
   try{
     const r=await fetch(API_BASE+ep,{...opts,headers:{...headers,...(opts.headers||{})}});
-    if(r.status===401){location.href='login.html';return null;}
+    if(r.status===401){location.href='/login.html';return null;}
     return await r.json();
   }catch{toast('Network error','red','Error');return null;}
 }
 
 // INIT
 document.addEventListener('DOMContentLoaded',async()=>{
-  if(!localStorage.getItem(TOKEN_KEY)){location.href='login.html';return;}
+  if(!localStorage.getItem(TOKEN_KEY)){location.href='/login.html';return;}
   buildTypeFilters();
   await fetchTxns();
   checkVerified();
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 });
 
 function buildTypeFilters(){
-  const types=['all','data','airtime','cable','electricity','exam','rc','sms','wallet_fund','refund'];
+  const types=['all','data','airtime','cable','electricity','exam','rc','sms','wallet_fund','earncial_transfer','refund'];
   $('typeFilters').innerHTML=types.map(t=>
     '<button class="fchip'+(t==='all'?' on':'')+'" data-type="'+t+'" onclick="setType(\''+t+'\',this)">'+(TYPE_LABELS[t]||'All')+'</button>'
   ).join('');
@@ -177,7 +178,7 @@ function renderList(){
     txs.map(tx=>{
       const m=TX_META[tx.type]||{icon:'circle',bg:'ico-sky'};
       const desc=tx.dataPlan||tx.cablePlan||tx.discoName||tx.examType||TYPE_LABELS[tx.type]||tx.type;
-      const isCr=tx.type==='wallet_fund'||tx.type==='refund';
+      const isCr = tx.type === 'wallet_fund' || tx.type === 'refund' || tx.type === 'earncial_transfer';
       const sub=tx.phone||tx.smartCardNumber||tx.meterNumber||tx.network||'';
       return '<div class="txp" onclick="showTxDetail(\''+tx.requestId+'\')" data-txid="'+tx.requestId+'">'+
         '<div class="txp-ico '+m.bg+'"><i class="fas fa-'+m.icon+'"></i></div>'+
