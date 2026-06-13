@@ -65,6 +65,7 @@ const TX_META = {
   sms:           { icon: 'comment-dots',   bg: 'ico-pnk' },
   wallet_fund:   { icon: 'plus-circle',    bg: 'ico-grn' },
   wallet_transfer:{ icon: 'paper-plane',   bg: 'ico-sky' },
+  earncial_transfer:{ icon: 'paper-plane',   bg: 'ico-sky' },
   refund:        { icon: 'rotate-left',    bg: 'ico-pur' },
 };
 
@@ -338,7 +339,7 @@ function toggleBal() {
 function setBalance(nb) { state.balance = parseFloat(nb); updateWalletUI(); }
 
 /* ============================================================
-   VIRTUAL ACCOUNT — real API only, no demo/localStorage
+   VIRTUAL ACCOUNT — 
 ============================================================ */
 function renderVirtualCard() {
   const va  = state.virtualAccount;
@@ -1522,7 +1523,7 @@ function renderTxns() {
   list.innerHTML = state.txns.slice(0, 6).map(tx => {
     const m    = TX_META[tx.type] || { icon: 'circle', bg: 'ico-sky' };
     const desc = tx.dataPlan || tx.cablePlan || tx.discoName || tx.examType || tx.type;
-    const isCr = tx.type === 'wallet_fund' || tx.type === 'refund';
+    const isCr = tx.type === 'wallet_fund' || tx.type === 'refund' || tx.type === 'earncial_transfer';
     return `
     <div class="tx" data-txid="${tx.requestId}">
       <div class="tx-ico ${m.bg}"><i class="fas fa-${m.icon}"></i></div>
