@@ -65,7 +65,7 @@ const TX_META = {
   sms:           { icon: 'comment-dots',   bg: 'ico-pnk' },
   wallet_fund:   { icon: 'plus-circle',    bg: 'ico-grn' },
   wallet_transfer:{ icon: 'paper-plane',   bg: 'ico-sky' },
-  earncial_transfer:{ icon: 'paper-plane',   bg: 'ico-sky' },
+  earncial_transfer:{ icon: 'plus-circle',   bg: 'ico-grn' },
   refund:        { icon: 'rotate-left',    bg: 'ico-pur' },
 };
 
