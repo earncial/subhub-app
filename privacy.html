@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Privacy Policy | SubHub by Earncial Global</title>
+  <meta name="description" content="SubHub's Privacy Policy. Learn how we collect, use and protect your personal information on Nigeria's leading VTU platform." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://subhub.com.ng/privacy" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #00aaff;
+      --blue-dark: #0088cc;
+      --blue-deep: #003366;
+      --blue-light: #e8f6ff;
+      --white: #ffffff;
+      --text: #0a1628;
+      --muted: #5c6f85;
+      --border: #d4e9f7;
+      --card: #f5fbff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+      background: #f4f8fc;
+      line-height: 1.7;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 62px;
+      box-shadow: 0 1px 12px #00aaff0d;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.1rem; color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      width: 34px; height: 34px;
+      border-radius: 8px; object-fit: contain;
+    }
+
+    .nav-logo-fallback {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--blue);
+      display: none; align-items: center; justify-content: center;
+      color: white; font-weight: 800; font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .nav-cta {
+      background: var(--blue); color: white;
+      padding: 9px 22px; border-radius: 9px;
+      font-weight: 700; font-size: 0.875rem;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { background: var(--blue-dark); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(140deg, #001a35 0%, var(--blue-deep) 60%, #005599 100%);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px;
+      background: #f4f8fc;
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: #00aaff1a; border: 1px solid #00aaff44;
+      color: #66d4ff; font-size: 0.73rem; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 800; color: white;
+      line-height: 1.2; margin-bottom: 12px;
+    }
+
+    .hero-meta {
+      color: #90bcd8; font-size: 0.875rem;
+      display: flex; gap: 20px; justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span::before { content: '· '; }
+    .hero-meta span:first-child::before { content: ''; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      max-width: 1040px; margin: 48px auto 80px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+
+    /* ── TABLE OF CONTENTS ── */
+    .toc {
+      position: sticky; top: 80px;
+      background: white; border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: 0 2px 16px #00aaff06;
+    }
+
+    .toc-title {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 14px;
+    }
+
+    .toc-list { list-style: none; }
+
+    .toc-list li { margin-bottom: 2px; }
+
+    .toc-list a {
+      display: block;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); padding: 6px 10px;
+      border-radius: 7px;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+    }
+
+    .toc-list a:hover {
+      background: var(--blue-light); color: var(--blue);
+      text-decoration: none;
+    }
+
+    .toc-list a.active {
+      background: var(--blue-light); color: var(--blue);
+      font-weight: 700;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      background: white; border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 44px 48px;
+      box-shadow: 0 2px 20px #00aaff08;
+    }
+
+    @media (max-width: 600px) {
+      .content { padding: 28px 22px; }
+    }
+
+    .policy-intro {
+      background: var(--blue-light);
+      border: 1px solid #b8dff7;
+      border-radius: 12px; padding: 18px 20px;
+      margin-bottom: 40px;
+      font-size: 0.9rem; color: var(--muted);
+    }
+
+    .policy-intro strong { color: var(--text); }
+
+    .section-block {
+      margin-bottom: 44px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid #edf4fa;
+    }
+
+    .section-block:last-child {
+      margin-bottom: 0; padding-bottom: 0; border-bottom: none;
+    }
+
+    .section-num {
+      display: inline-block;
+      font-size: 0.7rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--blue);
+      background: var(--blue-light);
+      padding: 3px 10px; border-radius: 100px;
+      margin-bottom: 10px;
+    }
+
+    .section-block h2 {
+      font-size: 1.25rem; font-weight: 800;
+      color: var(--text); margin-bottom: 16px;
+    }
+
+    .section-block p {
+      font-size: 0.93rem; color: var(--muted);
+      margin-bottom: 12px; line-height: 1.8;
+    }
+
+    .section-block p:last-child { margin-bottom: 0; }
+
+    .section-block ul, .section-block ol {
+      padding-left: 0; list-style: none;
+      margin: 12px 0;
+    }
+
+    .section-block ul li, .section-block ol li {
+      font-size: 0.93rem; color: var(--muted);
+      padding: 5px 0 5px 22px;
+      position: relative; line-height: 1.75;
+    }
+
+    .section-block ul li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--blue); font-weight: 700;
+    }
+
+    .section-block ol { counter-reset: ol-counter; }
+    .section-block ol li { counter-increment: ol-counter; }
+    .section-block ol li::before {
+      content: counter(ol-counter) '.';
+      position: absolute; left: 0;
+      color: var(--blue); font-weight: 700; font-size: 0.85rem;
+    }
+
+    .highlight-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.9rem; color: var(--muted);
+    }
+
+    .highlight-box strong { color: var(--text); }
+
+    /* ── CONTACT BOX ── */
+    .contact-box {
+      background: linear-gradient(135deg, #001a35, var(--blue-deep));
+      border-radius: 14px; padding: 28px;
+      color: white; margin-top: 40px;
+    }
+
+    .contact-box h3 {
+      font-size: 1rem; font-weight: 800; margin-bottom: 8px;
+    }
+
+    .contact-box p {
+      font-size: 0.875rem; color: #90bcd8; margin-bottom: 14px;
+    }
+
+    .contact-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.875rem; padding: 8px 0;
+      border-top: 1px solid #ffffff10;
+    }
+
+    .contact-item:first-of-type { border-top: none; }
+    .contact-item a { color: var(--blue); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #001020; color: #4a6a88;
+      text-align: center; padding: 32px 24px;
+      font-size: 0.83rem;
+    }
+    footer a { color: var(--blue); }
+    footer p + p { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://subhub.com.ng" class="nav-logo">
+    <img src="/logo.png" alt="SubHub Logo"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+    <div class="nav-logo-fallback">S</div>
+    SubHub
+  </a>
+  <a href="https://subhub.com.ng/sign-up" class="nav-cta">Get Started Free</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Legal · Earncial Global</div>
+  <h1>Privacy Policy</h1>
+  <div class="hero-meta">
+    <span>Effective: 1 January 2025</span>
+    <span>Last Updated: 20 June 2026</span>
+    <span>Applies to subhub.com.ng</span>
+  </div>
+</section>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- TABLE OF CONTENTS -->
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s1">1. Who We Are</a></li>
+      <li><a href="#s2">2. Information We Collect</a></li>
+      <li><a href="#s3">3. How We Use Your Information</a></li>
+      <li><a href="#s4">4. How We Share Your Information</a></li>
+      <li><a href="#s5">5. Data Security</a></li>
+      <li><a href="#s6">6. Wallet & Financial Data</a></li>
+      <li><a href="#s7">7. Cookies & Tracking</a></li>
+      <li><a href="#s8">8. Your Rights</a></li>
+      <li><a href="#s9">9. Data Retention</a></li>
+      <li><a href="#s10">10. Third-Party Services</a></li>
+      <li><a href="#s11">11. Children's Privacy</a></li>
+      <li><a href="#s12">12. Changes to This Policy</a></li>
+      <li><a href="#s13">13. Contact Us</a></li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <div class="policy-intro">
+      <strong>Your privacy matters to us.</strong> This Privacy Policy explains how SubHub, operated by Earncial Global, collects, uses, stores and protects your personal information when you use our platform at <a href="https://subhub.com.ng">subhub.com.ng</a>. Please read it carefully. By using SubHub, you agree to the practices described here.
+    </div>
+
+    <!-- 1 -->
+    <div class="section-block" id="s1">
+      <div class="section-num">Section 01</div>
+      <h2>Who We Are</h2>
+      <p>SubHub is a Virtual Top-Up (VTU) platform operated by <strong>Earncial Global</strong>, a Nigerian technology company. We provide services including mobile data purchases, airtime top-up, cable TV subscriptions, electricity token payments and related digital services for Nigerians.</p>
+      <p>Our platform is accessible at <a href="https://subhub.com.ng">https://subhub.com.ng</a>. For all privacy-related matters, Earncial Global acts as the data controller responsible for your personal information.</p>
+      <div class="highlight-box">
+        <strong>Company:</strong> Earncial Global<br />
+        <strong>Platform:</strong> SubHub (subhub.com.ng)<br />
+        <strong>Country of Operation:</strong> Nigeria<br />
+        <strong>Contact:</strong> <a href="https://wa.me/2347040495661">WhatsApp Support</a>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="section-block" id="s2">
+      <div class="section-num">Section 02</div>
+      <h2>Information We Collect</h2>
+      <p>We collect information you provide directly to us, as well as information generated automatically when you use SubHub.</p>
+
+      <p><strong>Information you provide:</strong></p>
+      <ul>
+        <li>Full name and phone number when creating an account</li>
+        <li>Email address for account registration and notifications</li>
+        <li>Transaction details including recipient phone numbers, service type and amount</li>
+        <li>Wallet funding details and payment references</li>
+        <li>Communications you send us via WhatsApp or our support channels</li>
+        <li>Any other information you choose to provide</li>
+      </ul>
+
+      <p><strong>Information collected automatically:</strong></p>
+      <ul>
+        <li>IP address and approximate location</li>
+        <li>Browser type and device information</li>
+        <li>Pages visited and time spent on the platform</li>
+        <li>Transaction history and activity logs</li>
+        <li>Cookies and similar tracking technologies (see Section 7)</li>
+      </ul>
+    </div>
+
+    <!-- 3 -->
+    <div class="section-block" id="s3">
+      <div class="section-num">Section 03</div>
+      <h2>How We Use Your Information</h2>
+      <p>We use the information we collect for the following purposes:</p>
+      <ul>
+        <li>To create and manage your SubHub account</li>
+        <li>To process your transactions — airtime, data, bills and other services</li>
+        <li>To credit your wallet and process payments from your virtual account</li>
+        <li>To send transaction receipts, confirmations and important account notices</li>
+        <li>To detect, prevent and investigate fraud or unauthorized activity</li>
+        <li>To improve our platform, fix bugs and develop new features</li>
+        <li>To respond to your support requests and inquiries</li>
+        <li>To comply with applicable Nigerian laws and regulations</li>
+        <li>To send you service updates or promotional information (you can opt out at any time)</li>
+      </ul>
+      <p>We do not use your information for any purpose that is not listed above without your consent.</p>
+    </div>
+
+    <!-- 4 -->
+    <div class="section-block" id="s4">
+      <div class="section-num">Section 04</div>
+      <h2>How We Share Your Information</h2>
+      <p>We do not sell, rent or trade your personal information to third parties. We only share your information in the following limited circumstances:</p>
+      <ul>
+        <li><strong>VTU API Providers:</strong> We share the recipient phone number and service details with our VTU data and airtime providers to complete your transaction. These providers do not receive your full account profile.</li>
+        <li><strong>Payment Processors:</strong> When you fund your wallet, your payment details are handled by our payment partners (such as Palmpay and Flutterwave/Opay). We receive only the transaction reference and amount — we do not store your bank card details.</li>
+        <li><strong>Legal Requirements:</strong> We may disclose your information if required to do so by Nigerian law, court order, or valid regulatory request from a government authority.</li>
+        <li><strong>Fraud Prevention:</strong> In cases of suspected fraud or abuse, we may share relevant account information with law enforcement or regulatory bodies.</li>
+        <li><strong>Business Transfer:</strong> If Earncial Global is acquired, merged or its assets are transferred, your information may be transferred as part of that transaction. We will notify you beforehand.</li>
+      </ul>
+    </div>
+
+    <!-- 5 -->
+    <div class="section-block" id="s5">
+      <div class="section-num">Section 05</div>
+      <h2>Data Security</h2>
+      <p>We take the security of your personal information seriously. SubHub implements the following measures to protect your data:</p>
+      <ul>
+        <li>HTTPS encryption on all pages and API connections</li>
+        <li>Transaction PIN confirmation required for every wallet debit</li>
+        <li>Hashed and salted password storage — we cannot read your password</li>
+        <li>Server-side validation on all financial transactions</li>
+        <li>Activity logging to detect suspicious or unusual behavior</li>
+        <li>Regular security reviews and vulnerability patching</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>Important:</strong> While we work hard to protect your information, no internet platform can guarantee absolute security. You are responsible for keeping your account password and transaction PIN confidential. Do not share them with anyone.
+      </div>
+      <p>If you suspect unauthorized access to your account, contact us immediately via WhatsApp at <a href="https://wa.me/2347040495661">+234 704 049 5661</a>.</p>
+    </div>
+
+    <!-- 6 -->
+    <div class="section-block" id="s6">
+      <div class="section-num">Section 06</div>
+      <h2>Wallet & Financial Data</h2>
+      <p>Your SubHub wallet balance and transaction history are stored securely on our servers. The following applies to your financial data:</p>
+      <ul>
+        <li>We store your wallet balance and transaction records to maintain accurate account history</li>
+        <li>We do not store your bank account numbers, BVN or card details — these are handled exclusively by our payment partners</li>
+        <li>Your transaction history is accessible only to you (via your account) and authorized SubHub administrators</li>
+        <li>Wallet funds are held in our operational accounts and used to fulfill your purchase requests</li>
+        <li>In the event of a failed transaction, any deducted amount is reversed to your wallet within 24 hours</li>
+      </ul>
+    </div>
+
+    <!-- 7 -->
+    <div class="section-block" id="s7">
+      <div class="section-num">Section 07</div>
+      <h2>Cookies & Tracking</h2>
+      <p>SubHub uses cookies and similar technologies to improve your experience on our platform. Cookies are small text files stored in your browser.</p>
+      <p><strong>We use cookies for:</strong></p>
+      <ul>
+        <li>Keeping you logged in to your account (session cookies)</li>
+        <li>Remembering your preferences and settings</li>
+        <li>Understanding how users navigate and use our platform (analytics)</li>
+        <li>Detecting and preventing fraud</li>
+      </ul>
+      <p>You can control or disable cookies through your browser settings. Note that disabling cookies may affect your ability to log in or use certain features of SubHub.</p>
+      <p>We do not use cookies to serve advertising to third parties or sell your browsing data.</p>
+    </div>
+
+    <!-- 8 -->
+    <div class="section-block" id="s8">
+      <div class="section-num">Section 08</div>
+      <h2>Your Rights</h2>
+      <p>As a user of SubHub, you have the following rights regarding your personal information:</p>
+      <ul>
+        <li><strong>Access:</strong> You can view your account information and transaction history at any time from your SubHub dashboard.</li>
+        <li><strong>Correction:</strong> You can update your name, email and phone number from your profile settings. Contact us if you need help correcting any information.</li>
+        <li><strong>Deletion:</strong> You may request deletion of your account and associated data. Note that we may retain certain records for legal, fraud prevention or regulatory compliance purposes.</li>
+        <li><strong>Opt-out:</strong> You can opt out of promotional messages by contacting us. You cannot opt out of transactional messages (receipts, security alerts) as these are essential to your account.</li>
+        <li><strong>Portability:</strong> You may request a copy of your transaction history in a readable format by contacting our support team.</li>
+      </ul>
+      <p>To exercise any of these rights, contact us via WhatsApp at <a href="https://wa.me/2347040495661">+234 704 049 5661</a> or visit our <a href="https://subhub.com.ng/faq">Help Center</a>.</p>
+    </div>
+
+    <!-- 9 -->
+    <div class="section-block" id="s9">
+      <div class="section-num">Section 09</div>
+      <h2>Data Retention</h2>
+      <p>We retain your personal information for as long as your account is active or as needed to provide you with our services.</p>
+      <ul>
+        <li>Account information is retained for the lifetime of your active account</li>
+        <li>Transaction records are retained for a minimum of 5 years for financial and legal compliance purposes</li>
+        <li>If you request account deletion, we will delete or anonymize your personal data within 30 days, except where retention is required by law</li>
+        <li>Inactive accounts (no login for 24 months) may be subject to data minimization — we will notify you before taking any action</li>
+      </ul>
+    </div>
+
+    <!-- 10 -->
+    <div class="section-block" id="s10">
+      <div class="section-num">Section 10</div>
+      <h2>Third-Party Services</h2>
+      <p>SubHub integrates with the following categories of third-party services to operate our platform:</p>
+      <ul>
+        <li><strong>Payment Processors:</strong> Palmpay, Flutterwave, Opay — for wallet funding and virtual account generation</li>
+        <li><strong>VTU Providers:</strong> Our upstream data and airtime API providers — for transaction fulfillment</li>
+        <li><strong>Hosting & Infrastructure:</strong> Our web hosting and server providers</li>
+        <li><strong>Analytics:</strong> We may use tools like Google Analytics to understand platform usage</li>
+      </ul>
+      <p>Each third-party service has its own privacy policy and is responsible for its own data practices. We encourage you to review the privacy policies of our payment partners for information on how they handle your payment data.</p>
+      <p>SubHub is not responsible for the privacy practices of external websites linked from our platform.</p>
+    </div>
+
+    <!-- 11 -->
+    <div class="section-block" id="s11">
+      <div class="section-num">Section 11</div>
+      <h2>Children's Privacy</h2>
+      <p>SubHub is not intended for use by children under the age of 13. We do not knowingly collect personal information from children under 13.</p>
+      <p>If you are a parent or guardian and believe your child has provided us with personal information without your consent, please contact us immediately and we will delete that information from our records.</p>
+    </div>
+
+    <!-- 12 -->
+    <div class="section-block" id="s12">
+      <div class="section-num">Section 12</div>
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time to reflect changes in our practices, technology or legal requirements. When we make significant changes, we will:</p>
+      <ul>
+        <li>Update the "Last Updated" date at the top of this page</li>
+        <li>Notify you via email or a notice on your SubHub dashboard</li>
+        <li>Give you at least 7 days' notice before changes take effect for material updates</li>
+      </ul>
+      <p>Your continued use of SubHub after a policy update constitutes your acceptance of the revised policy. If you do not agree with the changes, you may close your account before they take effect.</p>
+    </div>
+
+    <!-- 13 -->
+    <div class="section-block" id="s13">
+      <div class="section-num">Section 13</div>
+      <h2>Contact Us</h2>
+      <p>If you have any questions, concerns or requests regarding this Privacy Policy or how we handle your personal data, please reach out to us through any of the following channels:</p>
+
+      <div class="contact-box">
+        <h3>SubHub Privacy & Support</h3>
+        <p>We aim to respond to all privacy inquiries within 48 hours.</p>
+        <div class="contact-item">
+          <span>💬</span>
+          <span>WhatsApp: <a href="https://wa.me/2347040495661">+234 704 049 5661</a></span>
+        </div>
+        <div class="contact-item">
+          <span>🌐</span>
+          <span>Website: <a href="https://subhub.com.ng">subhub.com.ng</a></span>
+        </div>
+        <div class="contact-item">
+          <span>🏢</span>
+          <span>Operated by: Earncial Global, Nigeria</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <a href="https://subhub.com.ng">SubHub</a> by Earncial Global · Nigeria's Smartest VTU Platform</p>
+  <p>
+    <a href="https://subhub.com.ng/privacy">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="https://subhub.com.ng/terms">Terms of Use</a> &nbsp;·&nbsp;
+    <a href="https://subhub.com.ng/faq">FAQ</a> &nbsp;·&nbsp;
+    <a href="https://wa.me/2347040495661">WhatsApp Support</a>
+  </p>
+</footer>
+
+<script>
+  // Highlight active TOC item on scroll
+  const sections = document.querySelectorAll('.section-block');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
