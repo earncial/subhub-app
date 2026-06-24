@@ -574,7 +574,7 @@ function onSelDataNet(n) {
   state.selNet     = n.id;
   state.selNetName = n.name;
   state.selPlan    = null;
-  state.shownN     = 10;
+  state.shownN     = 20;
   fetchDataPlans(n.id, n.name);
 }
 
