@@ -1,5 +1,6 @@
 const API_BASE='https://api.subhub.com.ng/api';
 const TOKEN_KEY='sh_access_token';
+const REFRESH_KEY='sh_refresh_token';
 const $=id=>document.getElementById(id);
 const fmt=n=>parseFloat(n||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtDate=d=>new Date(d).toLocaleDateString('en-NG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
@@ -64,9 +65,39 @@ async function apiCall(ep,opts={}){
   if(tk)headers['Authorization']='Bearer '+tk;
   try{
     const r=await fetch(API_BASE+ep,{...opts,headers:{...headers,...(opts.headers||{})}});
-    if(r.status===401){location.href='/login.html';return null;}
+    if(r.status===401){
+      const body=await r.json().catch(()=>null);
+      if(body?.code==='ACCESS_TOKEN_EXPIRED'){
+        const refreshed=await refreshToken();
+        if(refreshed)return apiCall(ep,opts);
+        return null;
+      }
+      location.replace('/login.html');
+      return null;
+    }
     return await r.json();
   }catch{toast('Network error','red','Error');return null;}
+}
+
+async function refreshToken(){
+  const rt=localStorage.getItem(REFRESH_KEY);
+  if(!rt)return false;
+  try{
+    const res=await fetch(`${API_BASE}/auth/refresh-token`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({refreshToken:rt}),
+    });
+    const data=await res.json();
+    if(data?.success){localStorage.setItem(TOKEN_KEY,data.accessToken);return true;}
+    if(data?.code==='REFRESH_TOKEN_EXPIRED'||data?.code==='INVALID_TOKEN'){
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_KEY);
+      toast('Session expired, please login again','red','Session Expired');
+      setTimeout(()=>window.location.replace('/login.html'),2000);
+    }
+    return false;
+  }catch{return false;}
 }
 
 // INIT

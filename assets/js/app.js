@@ -181,8 +181,7 @@ async function apiCall(endpoint, options = {}) {
     if (res.status === 401) {
       // Try to get body first — backend may send error message (e.g. PIN locked)
       const body = await res.json().catch(() => null);
-      // If it's a real auth error (no token/expired), try refresh
-      if (!body || !body.message || body.message.toLowerCase().includes('token') || body.message.toLowerCase().includes('unauthorized') || body.message.toLowerCase().includes('auth')) {
+      // if (!body || body.code === 'ACCESS_TOKEN_EXPIRED') {
         const refreshed = await refreshToken();
         if (refreshed) return apiCall(endpoint, options);
         return null;
@@ -192,7 +191,7 @@ async function apiCall(endpoint, options = {}) {
     }
     return await res.json();
   } catch {
-    toast('Network error — please check connection', 'red', 'Error');
+    toast('Network error, please check connection', 'red', 'Error');
     return null;
   }
 }
@@ -208,9 +207,16 @@ async function refreshToken() {
     });
     const data = await res.json();
     if (data?.success) { localStorage.setItem(TOKEN_KEY, data.accessToken); return true; }
+    if (data?.code === 'REFRESH_TOKEN_EXPIRED' || data?.code === 'INVALID_TOKEN') {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_KEY);
+      toast('Session expired, please login again', 'red', 'Session Expired');
+      setTimeout(() => window.location.replace('/login.html'), 3000);
+    }
     return false;
   } catch { return false; }
 }
+
 
 /* ============================================================
    LOAD USER DATA — no logout on network/server error
