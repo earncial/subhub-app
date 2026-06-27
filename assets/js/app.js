@@ -179,16 +179,14 @@ async function apiCall(endpoint, options = {}) {
       headers: { ...headers, ...(options.headers || {}) },
     });
     if (res.status === 401) {
-      // Try to get body first — backend may send error message (e.g. PIN locked)
-      const body = await res.json().catch(() => null);
-      // if (!body || body.code === 'ACCESS_TOKEN_EXPIRED') {
-        const refreshed = await refreshToken();
-        if (refreshed) return apiCall(endpoint, options);
-        return null;
-      }
-      // Otherwise return the body with the actual error message (e.g. PIN locked)
-      return body;
-    }
+  const body = await res.json().catch(() => null);
+  if (!body || body.code === 'ACCESS_TOKEN_EXPIRED' || body.code === 'INVALID_TOKEN') {
+  const refreshed = await refreshToken();
+  if (refreshed) return apiCall(endpoint, options);
+  return null;
+}
+  return body;
+}
     return await res.json();
   } catch {
     toast('Network error, please check connection', 'red', 'Error');
@@ -216,7 +214,6 @@ async function refreshToken() {
     return false;
   } catch { return false; }
 }
-
 
 /* ============================================================
    LOAD USER DATA — no logout on network/server error

@@ -67,14 +67,16 @@ async function apiCall(ep,opts={}){
     const r=await fetch(API_BASE+ep,{...opts,headers:{...headers,...(opts.headers||{})}});
     if(r.status===401){
       const body=await r.json().catch(()=>null);
-      if(body?.code==='ACCESS_TOKEN_EXPIRED'){
-        const refreshed=await refreshToken();
-        if(refreshed)return apiCall(ep,opts);
+      if(r.status===401){
+        const body=await r.json().catch(()=>null);
+        if(body?.code==='ACCESS_TOKEN_EXPIRED'||body?.code==='INVALID_TOKEN'){
+          const refreshed=await refreshToken();
+          if(refreshed)return apiCall(ep,opts);
+          return null;
+        }
+        window.location.replace('/login.html');
         return null;
       }
-      location.replace('/login.html');
-      return null;
-    }
     return await r.json();
   }catch{toast('Network error','red','Error');return null;}
 }
