@@ -31,7 +31,7 @@ let curType='all',curStatus='all',searchQ='';
 let receiptData=null;
 
 // DARK MODE
-function applyDark(on){document.documentElement.setAttribute('data-theme',on?'light':'dark');const i=$('dmIco');if(i)i.className='fas fa-'+(on?'sun':'moon');}
+function applyDark(on){document.documentElement.setAttribute('data-theme',on?'light':'light');const i=$('dmIco');if(i)i.className='fas fa-'+(on?'sun':'moon');}
 const isDark=()=>localStorage.getItem('sh_dark')==='1';
 applyDark(isDark());
 $('dmBtn')?.addEventListener('click',()=>{const nd=!isDark();localStorage.setItem('sh_dark',nd?'1':'0');applyDark(nd);});
