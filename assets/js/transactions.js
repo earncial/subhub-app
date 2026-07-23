@@ -17,13 +17,14 @@ const TX_META={
   wallet_fund:   {icon:'plus-circle',    bg:'ico-grn'},
   wallet_transfer:{icon:'paper-plane',  bg:'ico-sky'},
   earncial_transfer:{icon:'plus-circle',  bg:'ico-grn'},
+  referral_bonus:   {icon:'plus-circle',    bg:'ico-grn'},
   refund:        {icon:'rotate-left',    bg:'ico-pur'},
 };
 
 const TYPE_LABELS={
   data:'Data',airtime:'Airtime',cable:'Cable TV',electricity:'Electricity',
   exam:'Exam Pins',rc:'Recharge Card',sms:'Bulk SMS',
-  wallet_fund:'Wallet Fund',refund:'Refund',earncial_transfer:'Earncial Transfer'
+  wallet_fund:'Wallet Fund',refund:'Refund',earncial_transfer:'Earncial Transfer',referral_bonus:'Referral Bonus'
 };
 
 let allTxns=[],filteredTxns=[],shownCount=20;

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referrals | SubHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  :root {
+    --pr: #00aaff;
+    --pr-dark: #0088cc;
+    --bg: #eaf4fb;
+    --card: #ffffff;
+    --text: #1a2332;
+    --muted: #6b7a8d;
+    --success: #16a34a;
+    --success-bg: #dcfce7;
+    --warning: #d97706;
+    --warning-bg: #fef3c7;
+    --border: #e5edf3;
+    --border2: #d3e1ec;
+    --r: 14px;
+    --r-lg: 16px;
+    --r-xl: 20px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0f1620;
+    --card: #1a2430;
+    --text: #eef2f7;
+    --muted: #93a3b5;
+    --success-bg: #113322;
+    --warning-bg: #3a2f10;
+    --border: #26313f;
+    --border2: #33404f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 90px;
+    transition: background .2s, color .2s;
+  }
+
+  /* NAVBAR */
+  .navbar {
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nav-btn {
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: .18s;
+  }
+  .nav-btn:hover { border-color: var(--border2); }
+  .nav-brand { display: flex; align-items: center; gap: 8px; }
+  .nav-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: contain; }
+  .nav-logo-fb { display: none; width: 26px; height: 26px; border-radius: 50%; background: var(--pr); color: #fff; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+  .nav-brand-name { font-size: 23px; font-weight: 800; letter-spacing: -.2px; }
+  .nav-brand-name span { color: var(--pr); }
+
+  .container { padding: 18px; }
+
+  /* SHARE / INVITE CARD */
+  .ref-share-card {
+    background: linear-gradient(135deg, var(--pr), var(--pr-dark));
+    border-radius: var(--r-xl);
+    padding: 22px 20px;
+    color: #fff;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ref-share-card::after {
+    content: '';
+    position: absolute;
+    right: -30px; top: -30px;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,.08);
+    border-radius: 50%;
+  }
+  .rsc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .rsc-ico {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .rsc-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -.2px; }
+  .rsc-sub { font-size: .76rem; opacity: .92; line-height: 1.55; margin-bottom: 18px; }
+  .rsc-code-box {
+    background: rgba(255,255,255,.15);
+    border: 1.5px dashed rgba(255,255,255,.5);
+    border-radius: var(--r-lg);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .rsc-code-box span { font-family: 'JetBrains Mono', monospace; font-size: .85rem; font-weight: 700; letter-spacing: .3px; }
+  .rsc-copy-btn {
+    background: #fff;
+    color: var(--pr-dark);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .72rem;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: .18s;
+  }
+  .rsc-copy-btn:hover { opacity: .9; }
+  .rsc-copy-btn:active { transform: scale(.96); }
+  .rsc-share-btn {
+    width: 100%;
+    background: rgba(255,255,255,.2);
+    border: 1.5px solid rgba(255,255,255,.4);
+    color: #fff;
+    padding: 12px;
+    border-radius: var(--r-lg);
+    font-weight: 700;
+    font-size: .82rem;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: .18s;
+  }
+  .rsc-share-btn:hover { background: rgba(255,255,255,.28); }
+  .rsc-share-btn:active { transform: scale(.98); }
+
+  /* STATS ROW */
+  .ref-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .rst-card {
+    background: var(--card);
+    border-radius: var(--r);
+    border: 1px solid var(--border);
+    padding: 14px 8px;
+    text-align: center;
+    transition: .18s;
+  }
+  .rst-val { font-size: 1rem; font-weight: 800; letter-spacing: -.3px; margin-bottom: 2px; }
+  .rst-lbl { font-size: .58rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+
+  /* HOW IT WORKS */
+  .how-it-works { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px; margin-bottom: 16px; }
+  .hiw-step { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
+  .hiw-step:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .hiw-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(0,170,255,.1);
+    color: var(--pr);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .hiw-text { font-size: .74rem; font-weight: 600; color: var(--text); line-height: 1.5; padding-top: 3px; }
+
+  /* SECTION TITLE */
+  .ref-section-title { font-size: .82rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+  .ref-section-title i { color: var(--pr); font-size: .78rem; }
+
+  /* REFERRAL LIST */
+  .ref-list { display: flex; flex-direction: column; gap: 8px; }
+  .ref-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--card);
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    padding: 13px;
+    transition: .18s;
+  }
+  .ref-item:hover { border-color: rgba(0,170,255,.2); transform: translateY(-1px); }
+  .ref-item .left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .ref-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0,170,255,.1);
+    color: var(--pr);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .85rem;
+    flex-shrink: 0;
+  }
+  .ref-info .username { font-weight: 700; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ref-info .date { font-size: .64rem; color: var(--muted); margin-top: 2px; }
+  .ref-right { text-align: right; flex-shrink: 0; }
+  .ref-bonus { font-size: .82rem; font-weight: 800; letter-spacing: -.2px; margin-bottom: 4px; }
+  .ref-bonus.earned { color: var(--success); }
+  .ref-bonus.pending { color: var(--muted); }
+  .ref-status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: .6rem; font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .ref-status-badge.completed { background: var(--success-bg); color: var(--success); }
+  .ref-status-badge.pending { background: var(--warning-bg); color: var(--warning); }
+  .ref-status-badge.ineligible { background: var(--border); color: var(--muted); }
+
+  /* EMPTY STATE */
+  .ref-empty { text-align: center; padding: 44px 20px; color: var(--muted); }
+  .ref-empty i { font-size: 2.2rem; opacity: .18; display: block; margin-bottom: 10px; color: var(--pr); }
+  .ref-empty p { font-size: .8rem; font-weight: 600; line-height: 1.6; }
+
+  /* TOAST */
+  .toast-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .toast {
+    background: #1a2332;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: .78rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all .25s ease;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* BOTTOM NAV */
+  .bnav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 14px;
+    border-top: 1px solid var(--border);
+    z-index: 10;
+  }
+  .bnav-i {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px;
+    font-size: .64rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+  .bnav-i i { font-size: 1rem; }
+  .bnav-i.active { color: var(--pr); }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-btn" href="/app/index.html"><i class="fas fa-chevron-left"></i></a>
+  <div class="nav-brand">
+    <img src="logo.png" class="nav-logo" id="logoImg" alt="SubHub" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
+    <div class="nav-logo-fb" id="logoFb">S</div>
+    <div class="nav-brand-name">Sub<span>Hub</span></div>
+  </div>
+  <button class="nav-btn" id="dmBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="dmIco"></i></button>
+</nav>
+
+<div class="container">
+
+  <!-- SHARE / INVITE CARD -->
+  <div class="ref-share-card">
+    <div class="rsc-top">
+      <div class="rsc-ico"><i class="fas fa-gift"></i></div>
+      <div class="rsc-title">Invite &amp; Earn <span id="bonusAmountText">₦50</span></div>
+    </div>
+    <div class="rsc-sub">Share your code. When your friend signs up and completes their first successful transaction, you get paid instantly.</div>
+    <div class="rsc-code-box">
+      <span id="referralCode">Loading…</span>
+      <button class="rsc-copy-btn" onclick="copyCode()"><i class="fas fa-copy"></i>Copy</button>
+    </div>
+    <button class="rsc-share-btn" onclick="shareCode()"><i class="fas fa-share-nodes"></i>Share Invite Link</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="ref-stats-row">
+    <div class="rst-card"><div class="rst-val" id="totalReferrals" style="color:var(--pr)">—</div><div class="rst-lbl">Total</div></div>
+    <div class="rst-card"><div class="rst-val" id="successfulReferrals" style="color:var(--success)">—</div><div class="rst-lbl">Successful</div></div>
+    <div class="rst-card"><div class="rst-val" id="totalEarned" style="color:var(--warning)">—</div><div class="rst-lbl">Earned</div></div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-it-works">
+    <div class="hiw-step">
+      <div class="hiw-num">1</div>
+      <div class="hiw-text">Share your unique referral code or invite link with friends</div>
+    </div>
+    <div class="hiw-step">
+      <div class="hiw-num">2</div>
+      <div class="hiw-text">Your friend signs up on SubHub using your code</div>
+    </div>
+    <div class="hiw-step">
+      <div class="hiw-num">3</div>
+      <div class="hiw-text">Once they complete their first successful "data" transaction, your bonus is credited instantly</div>
+    </div>
+  </div>
+
+  <div class="ref-section-title"><i class="fas fa-users"></i>Your Referrals</div>
+
+  <div class="ref-list" id="referralList">
+    <div class="ref-empty"><i class="fas fa-circle-notch fa-spin" style="opacity:1"></i><p>Loading referrals…</p></div>
+  </div>
+
+  <div class="ref-empty" id="emptyState" style="display:none">
+    <i class="fas fa-user-group"></i>
+    <p>No referrals yet.<br>Share your link above to start earning.</p>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a class="bnav-i" href="/app/index.html"><i class="fas fa-home"></i><span>Home</span></a>
+  <a class="bnav-i" href="/app/transactions.html"><i class="fas fa-receipt"></i><span>History</span></a>
+  <a class="bnav-i active" href="/app/referral.html"><i class="fas fa-user-plus"></i><span>Referral</span></a>
+  <a class="bnav-i" href="/app/profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+</nav>
+
+<script>
+  const API_BASE = 'https://api.subhub.com.ng/api/auth';
+  const token = localStorage.getItem('sh_access_token');
+
+  function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    container.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2000);
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    document.getElementById('dmIco').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+  }
+
+  // Restore theme
+  (function initTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('dmIco').className = 'fas fa-sun';
+    }
+  })();
+
+  let myUsername = '';
+
+  function copyCode() {
+    navigator.clipboard.writeText('https://subhub.com.ng/sign-up?ref=' + myUsername).then(() => showToast('Referral link copied!'));
+  }
+
+  function shareCode() {
+    const link = `https://subhub.com.ng/sign-up?ref=${myUsername}`;
+    const text = `Join SubHub and get the cheapest data & airtime deals! Use my code ${myUsername} when you sign up: ${link}`;
+    if (navigator.share) {
+      navigator.share({ title: 'Join SubHub', text, url: link });
+    } else {
+      navigator.clipboard.writeText(text);
+      showToast('Invite link copied!');
+    }
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function naira(amount) {
+    return `₦${Number(amount).toLocaleString('en-NG')}`;
+  }
+
+  function renderReferrals(referrals) {
+    const list = document.getElementById('referralList');
+    const emptyState = document.getElementById('emptyState');
+
+    if (!referrals || referrals.length === 0) {
+      list.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'flex';
+    emptyState.style.display = 'none';
+
+    list.innerHTML = referrals.map(ref => {
+      const initial = ref.username?.charAt(0).toUpperCase() || '?';
+      const isCompleted = ref.status === 'completed';
+      const statusClass = isCompleted ? 'completed' : 'pending';
+      const statusIcon = isCompleted ? 'fa-circle-check' : 'fa-clock';
+      const statusText = isCompleted ? 'Completed' : 'Pending';
+      const bonusClass = isCompleted ? 'earned' : 'pending';
+      const bonusText = isCompleted ? `+${naira(ref.bonus)}` : naira(0);
+
+      return `
+        <div class="ref-item">
+          <div class="left">
+            <div class="ref-avatar">${initial}</div>
+            <div class="ref-info">
+              <div class="username">@${ref.username}</div>
+              <div class="date">Joined ${formatDate(ref.dateJoined)}</div>
+            </div>
+          </div>
+          <div class="ref-right">
+            <div class="ref-bonus ${bonusClass}">${bonusText}</div>
+            <span class="ref-status-badge ${statusClass}"><i class="fas ${statusIcon}" style="font-size:.56rem"></i>${statusText}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadReferrals() {
+    try {
+      const res = await fetch(`${API_BASE}/referrals`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        showToast(data.message || 'Failed to load referrals');
+        return;
+      }
+
+      myUsername = data.username || myUsername;
+      document.getElementById('referralCode').textContent = myUsername || '---';
+      document.getElementById('totalReferrals').textContent = data.stats.totalReferrals;
+      document.getElementById('successfulReferrals').textContent = data.stats.successfulReferrals;
+      document.getElementById('totalEarned').textContent = naira(data.stats.totalEarned);
+      if (data.bonusAmount) {
+        document.getElementById('bonusAmountText').textContent = naira(data.bonusAmount);
+      }
+
+      renderReferrals(data.referrals);
+
+    } catch (err) {
+      console.error('Load referrals error:', err);
+      showToast('Something went wrong, please try again');
+    }
+  }
+
+  loadReferrals();
+</script>
+
+</body>
+</html>

@@ -66,6 +66,7 @@ const TX_META = {
   wallet_fund:   { icon: 'plus-circle',    bg: 'ico-grn' },
   wallet_transfer:{ icon: 'paper-plane',   bg: 'ico-sky' },
   earncial_transfer:{ icon: 'plus-circle',   bg: 'ico-grn' },
+  referral_bonus:   { icon: 'plus-circle',    bg: 'ico-grn' },
   refund:        { icon: 'rotate-left',    bg: 'ico-pur' },
 };
 
