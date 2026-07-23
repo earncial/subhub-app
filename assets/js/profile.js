@@ -140,7 +140,7 @@ function renderPage(){
   '<div class="prof-username">@'+u.username+'</div>'+
   '<div class="prof-badges">'+
   '<span class="pb active"><i class="fas fa-circle-check"></i>Active</span>'+
-  '<span class="pb '+(isVerified?'verified':'unverified')+'"><i class="fas fa-'+(isVerified?'shield-check':'shield-xmark')+'"></i>'+(isVerified?'Email Verified':'Not Verified')+'</span>'+
+  '<span class="pb '+(isVerified?'verified':'unverified')+'"><i class="fas fa-'+(isVerified?'shield-check':'shield-xmark')+'"></i>'+(isVerified?'Email Verified':'Email Not Verified')+'</span>'+
   '</div></div>'+
 
   // FIX: Email verification banner — only shows if not verified
@@ -182,7 +182,7 @@ function renderPage(){
   '<div class="info-sec">'+
   '<div class="info-sec-title"><i class="fas fa-user"></i>Personal Information</div>'+
   ir('fa-user','Full Name',u.fullName)+
-  ir('fa-at','Username','@'+u.username)+
+  ir('fa-at','Username',u.username)+
   ir('fa-envelope','Email',u.email)+
   ir('fa-phone','Phone',u.phone||'—')+
   ir('fa-calendar','Member Since',fmtD(u.createdAt))+
