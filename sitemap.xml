@@ -30,24 +30,38 @@
   </url>
 
   <url>
+    <loc>https://subhub.com.ng/download</loc>
+   <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+  <loc>https://subhub.com.ng/data-profit-calculator</loc>
+  <lastmod>2026-07-23</lastmod>
+  <changefreq>morthly</changefreq>
+  <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://subhub.com.ng/about</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://subhub.com.ng/terms</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://subhub.com.ng/privacy</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
 </urlset>
