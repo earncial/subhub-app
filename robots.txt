@@ -3,6 +3,10 @@ Allow: /
 Allow: /sign-up
 Allow: /login
 Allow: /about
+Allow: /download
+Allow: /cheap-data-nigeria
+Allow: /data-profit-calculator
+Allow: /faq
 Allow: /terms
 Allow: /privacy
 
