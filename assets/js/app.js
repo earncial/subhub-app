@@ -1702,7 +1702,7 @@ function bindEvents() {
   $('bn-home')?.addEventListener('click',    () => setActiveNav('bn-home'));
   $('bn-history')?.addEventListener('click', () => { location.href = '/app/transactions.html'; });
   $('bn-fund')?.addEventListener('click',    () => openModal('fundModal'));
-  $('bn-referral')?.addEventListener('click', () => { location.href = '/app/profile.html'; });
+  $('bn-referral')?.addEventListener('click', () => { location.href = '/app/referrals.html'; });
   $('bn-profile')?.addEventListener('click', () => { location.href = '/app/profile.html'; });
 
   $('viewAllBtn')?.addEventListener('click',  () => { location.href = '/app/transactions.html'; });
