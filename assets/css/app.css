@@ -27,7 +27,7 @@ button { font-family: 'Sora', sans-serif; }
 /* ===== NAVBAR ===== */
 .navbar { height: var(--nav-h); background: var(--card); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 200; }
 .nav-brand { display: flex; align-items: center; gap: 9px; }
-.nav-logo { width: 45px; height: 45px; object-fit: contain; border-radius: 8px; display: block; }
+.nav-logo { width: 45px; height: 45px; object-fit: contain; border-radius: 50px; display: block; }
 .nav-logo-fb { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--pr), var(--pr-d)); display: none; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; }
 .nav-brand-name { font-weight: 800; font-size: 1.3rem; letter-spacing: -.5px; }
 .nav-brand-name span { color: var(--pr); }
