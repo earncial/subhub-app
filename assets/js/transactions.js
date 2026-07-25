@@ -24,8 +24,7 @@ const TX_META={
 const TYPE_LABELS={
   data:'Data',airtime:'Airtime',cable:'Cable TV',electricity:'Electricity',
   exam:'Exam Pins',rc:'Recharge Card',sms:'Bulk SMS',
-  wallet_fund:'Wallet Fund',refund:'Refund',earncial_transfer:'Earncial Transfer',referral_bonus:'Referral Bonus'
-};
+  wallet_fund:'Wallet Fund',refund:'Refund',earncial_transfer:'Earncial Transfer',referral_bonus:'Referral Bonus',other: 'Other'};
 
 let allTxns=[],filteredTxns=[],shownCount=20;
 let curType='all',curStatus='all',searchQ='';
@@ -210,7 +209,7 @@ function renderList(){
     txs.map(tx=>{
       const m=TX_META[tx.type]||{icon:'circle',bg:'ico-sky'};
       const desc=tx.dataPlan||tx.cablePlan||tx.discoName||tx.examType||TYPE_LABELS[tx.type]||tx.type;
-      const isCr = tx.type === 'wallet_fund' || tx.type === 'refund' || tx.type === 'earncial_transfer';
+      const isCr = tx.type === 'wallet_fund' || tx.type === 'refund' || tx.type === 'earncial_transfer' || tx.type === 'referral_bonus';
       const sub=tx.phone||tx.smartCardNumber||tx.meterNumber||tx.network||'';
       return '<div class="txp" onclick="showTxDetail(\''+tx.requestId+'\')" data-txid="'+tx.requestId+'">'+
         '<div class="txp-ico '+m.bg+'"><i class="fas fa-'+m.icon+'"></i></div>'+
