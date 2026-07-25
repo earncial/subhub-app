@@ -290,7 +290,7 @@ fullnameInp.addEventListener('blur',   validateFullname);
 const RESERVED_USERNAMES = [
   'admin','administrator','test','user','subhub','support','earncial',
   'demo','root','system','moderator','help','info','contact','webmaster',
-  'noreply','no-reply','abuse','security'
+  'noreply','no-reply','abuse','security','studio','reseller','data','airtime','nigeria','company','subhubng','subhub.ng','subhub.com.ng'
 ];
 
 let usernameTimer;
