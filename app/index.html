@@ -77,7 +77,7 @@
             <div class="wc-bal" id="walletDisp">
               <span class="wc-bal-sym">₦</span><span id="walletNum">0.00</span>
             </div>
-            <div class="wc-sub">Available · Updated just now</div>
+            <div class="wc-sub">Available Balance · Updated just now</div>
           </div>
           <button id="wc-fund" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);padding:7px 28px;border-radius:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s;white-space:nowrap"> + Fund Wallet Now</button>
         </div>
@@ -98,19 +98,19 @@
   <div class="stats-row">
     <div class="sc">
       <div class="sc-lbl"><i class="fas fa-arrow-down" style="color:var(--danger)"></i>Spent</div>
-      <div class="sc-val spend">₦<span id="statSpent">0</span></div>
+      <div class="sc-val spend">₦<span id="statSpent">-</span></div>
     </div>
     <div class="sc">
       <div class="sc-lbl"><i class="fas fa-arrow-up" style="color:var(--success)"></i>Funds</div>
-      <div class="sc-val fund">₦<span id="statFunds">0</span></div>
+      <div class="sc-val fund">₦<span id="statFunds">-</span></div>
     </div>
     <div class="sc">
       <div class="sc-lbl"><i class="fas fa-receipt" style="color:var(--pr)"></i>TX</div>
-      <div class="sc-val blue" id="statTx">0</div>
+      <div class="sc-val blue" id="statTx">-</div>
     </div>
     <div class="sc">
       <div class="sc-lbl"><i class="fas fa-check-circle" style="color:var(--success)"></i>Done</div>
-      <div class="sc-val green" id="statSuc">0</div>
+      <div class="sc-val green" id="statSuc">-</div>
     </div>
   </div>
 
@@ -125,7 +125,7 @@
 
   <!-- SERVICES -->
   <div class="sec-hd">
-    <div class="sec-t"><i class="fas fa-th-large"></i>Services</div>
+    <div class="sec-t"><i class="fas fa-th-large"></i>Our Services</div>
   </div>
   <div class="svc-grid" id="svcGrid"></div>
 
@@ -245,7 +245,7 @@
       <div class="plans-wrap" id="plansWrap"></div>
       <button class="load-more" id="loadMoreBtn" style="display:none"><i class="fas fa-chevron-down"></i> Load More Plans</button>
       <div class="fg" style="margin-top:13px">
-        <label class="flbl">Phone Number <small>— who receives data</small></label>
+        <label class="flbl">Phone Number <small> • who receives data?</small></label>
         <input type="tel" class="fi" id="dataPhone" placeholder="e.g. 08012345678" maxlength="11"/>
       </div>
     </div>
@@ -275,7 +275,7 @@
         <button class="qa-btn" data-sv="atAmt:1000">₦1K</button>
         <button class="qa-btn" data-sv="atAmt:2000">₦2k</button>
       </div>
-      <input type="number" class="fi" id="atAmt" placeholder="or enter amount"/>
+      <input type="number" class="fi" id="atAmt" placeholder="select or enter amount"/>
     </div>
     <button class="btn-p" id="atSubmit"><span>Continue</span></button>
   </div>
@@ -655,6 +655,7 @@
 <script src="/assets/js/app.js"></script>
 <script src="/assets/js/fcm-banner.js"></script>
 <!--<script src="/assets/js/support.js"></script>-->
+<script src="/assets/js/whatsapp-banner.js"></script>
 
 </body>
 </html>

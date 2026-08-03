@@ -16,5 +16,6 @@ Disallow: /verify-email
 Disallow: /reset-password
 Disallow: /404
 Disallow: /api/
+Disallow: /app/index
 
 Sitemap: https://subhub.com.ng/sitemap.xml

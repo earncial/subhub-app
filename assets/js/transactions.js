@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 });
 
 function buildTypeFilters(){
-  const types=['all','data','airtime','cable','electricity','exam','rc','sms','wallet_fund','earncial_transfer','refund'];
+  const types=['all','data','airtime','cable','electricity','exam','rc','sms','wallet_fund','earncial_transfer','referral_bonus','refund'];
   $('typeFilters').innerHTML=types.map(t=>
     '<button class="fchip'+(t==='all'?' on':'')+'" data-type="'+t+'" onclick="setType(\''+t+'\',this)">'+(TYPE_LABELS[t]||'All')+'</button>'
   ).join('');
