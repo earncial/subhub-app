@@ -620,10 +620,7 @@ function renderPlans() {
   const wrap = $('plansWrap');
 
   if (!shown.length) {
-    wrap.innerHTML = '<div class="empty" style="padding:12px"><i class="fas fa-box-open"></i><p>
-      Plans for this network are temporarily unavailable.<br>
-      For more details or assistance, please contact us on WhatsApp at <strong>07040495661</strong>.
-    </p></div>';
+    wrap.innerHTML = '<div class="empty" style="padding:12px"><i class="fas fa-box-open"></i><p>Plans for this network are temporarily unavailable.<br> For more details or assistance, please contact us on WhatsApp at <strong>07040495661</strong>.</p></div>';
     $('loadMoreBtn').style.display = 'none';
     return;
   }
