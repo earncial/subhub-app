@@ -387,7 +387,7 @@ function renderVirtualCard() {
 async function generateVirtualAccount() {
   const btn = $('vcGenBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating…'; }
-  const data = await apiCall('/wallet/virtual-account/xixa', { method: 'POST' });
+  const data = await apiCall('/wallet/virtual-account', { method: 'POST' });
   if (data?.success) {
     state.virtualAccount = data.virtualAccount;
     renderVirtualCard();
