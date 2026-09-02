@@ -150,8 +150,8 @@ const PRICING_DATA = {
   data: [
     {
       name:'Starter Data',
-      amount:'₦420',period:'per 1GB',
-      desc:'Best for casual users — fast, reliable SME data.',
+      amount:'₦300',period:'per 1GB',
+      desc:'Best for casual users fast, reliable SME data.',
       popular:false,
       features:[
         {text:'MTN / Airtel / Glo / 9Mobile',yes:true},
@@ -164,7 +164,7 @@ const PRICING_DATA = {
     },
     {
       name:'Popular Bundle',
-      amount:'₦840',period:'per 2GB',
+      amount:'₦550',period:'per 2GB',
       desc:'Best value — most popular among SubHub users.',
       popular:true,
       features:[
@@ -178,7 +178,7 @@ const PRICING_DATA = {
     },
     {
       name:'Power Bundle',
-      amount:'₦1,800',period:'per 5GB',
+      amount:'₦1,300',period:'per 5GB',
       desc:'For heavy users and resellers who need more.',
       popular:false,
       features:[
@@ -283,8 +283,10 @@ const FAQS=[
   {q:'How do I fund my wallet?',a:'You can fund your SubHub wallet via bank transfer (we issue you a unique virtual account number), debit/credit card, USSD, or through a direct bank transfer to our official account. Funds reflect instantly.'},
   {q:'Can I use SubHub for my reselling business?',a:'Yes! SubHub has dedicated features for resellers including bulk data purchase, print data voucher cards, recharge card generation, and bulk SMS sending. Many Nigerians run profitable businesses using SubHub.'},
   {q:'What networks does SubHub support?',a:'SubHub supports MTN, Airtel, Glo and 9Mobile for data and airtime. For cable TV, we support DStv, GOtv and StarTimes. For electricity, we cover all 10 DISCOs in Nigeria including AEDC, IKEDC, EKEDC, Kano, PHED and more.'},
-  {q:'Is there a minimum amount to buy?',a:'For airtime, the minimum is ₦50. For electricity, the minimum is ₦1,000. Data plans start from just ₦190 (500MB Glo). There is no minimum for cable TV — you just select your plan.'},
-  {q:'Is SubHub available on all devices?',a:'Yes! SubHub works perfectly as a web app on any device — phone, tablet or computer. Just visit the website on your browser and you can use all features. A dedicated mobile app is coming soon!'},
+  {q:'Is there a minimum amount to buy?',a:'For airtime, the minimum is ₦50. For electricity, the minimum is ₦1,000. Data plans start from just ₦190 (500MB Glo). There is no minimum for cable TV you just select your plan.'},
+  {q:'Is SubHub available on all devices?',a:'Yes! SubHub works perfectly as a web app on any device phone, tablet or computer. Just visit the website on your browser and you can use all features.'},
+  {q:'Does SubHub have an app?',a:'Yes! SubHub has an Android app available on the Google Play Store. Simply search for "SubHub" and download the official app.'},
+  {q:'Is SubHub available on iPhone?',a:'Yes! iPhone users can access SubHub through any web browser. The iOS app is coming soon.'},
 ];
 const faqWrap=document.getElementById('faqWrap');
 if(faqWrap){
