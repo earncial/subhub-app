@@ -102,7 +102,7 @@ function skrow(){return '<div class="sk-row"><div class="sk sk-ico"></div><div c
 
 // INIT
 document.addEventListener('DOMContentLoaded',async()=>{
-  if(!localStorage.getItem(TOKEN_KEY)){location.href='login.html';return;}
+  if(!localStorage.getItem(TOKEN_KEY)){location.href='/login.html';return;}
   showSkeleton();
   const d=await apiCall('/auth/me');
   if(!d){toast('Could not load profile, please try again','red','Error');return;}
