@@ -1,261 +1,203 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <!-- <meta name="theme-color" content="#00aaff" />-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    <!-- Primary Meta -->
-    <title>Log In • SubHub</title>
-    <meta name="Login to your SubHub account to buy cheap data, airtime, and pay bills instantly in Nigeria." />
-    <meta name="robots" content="index, follow" />
+  <!-- Apply saved theme before first paint (no flash) -->
+  <script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('sh_dark') === '1' ? 'dark' : 'light'); } catch (e) {}</script>
 
-    <!-- Canonical -->
-    <link rel="canonical" href="https://subhub.com.ng/login" />
+  <!-- Primary Meta -->
+  <title>Log In • SubHub</title>
+  <meta name="description" content="Login to your SubHub account to buy cheap data, airtime, and pay bills instantly in Nigeria." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://subhub.com.ng/login" />
 
-    <!-- Open Graph (WhatsApp / social previews) -->
-    <meta property="og:title" content="Log In • SubHub" />
-    <meta property="og:description" content="Log in to your SubHub account. Buy cheap data, airtime, and pay bills instantly." />
-    <meta property="og:url" content="https://subhub.com.ng/login" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://subhub.com.ng/logo.png" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Log In • SubHub" />
+  <meta property="og:description" content="Log in to your SubHub account. Buy cheap data, airtime, and pay bills instantly." />
+  <meta property="og:url" content="https://subhub.com.ng/login" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://subhub.com.ng/logo.png" />
 
-    <!-- Schema.org -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": "SubHub Login",
-        "description": "Log in to your SubHub account to buy data, airtime, and pay bills instantly.",
-        "url": "https://subhub.com.ng/login",
-        "provider": {
-            "@type": "Organization",
-            "name": "SubHub",
-            "url": "https://subhub.com.ng"
-        }
-    }
-    </script>
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "SubHub Login",
+    "description": "Log in to your SubHub account to buy data, airtime, and pay bills instantly.",
+    "url": "https://subhub.com.ng/login",
+    "provider": { "@type": "Organization", "name": "SubHub", "url": "https://subhub.com.ng" }
+  }
+  </script>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
 
-    <!-- Sora Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="assets/css/sign-in.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/assets/css/sign-in.css?v=8" />
 </head>
-
 <body>
 
-    <!-- ============================================================
-    NAVBAR
-    ============================================================ -->
-    <nav class="navbar">
-        <a href="/" class="nav-brand">
-            <img src="/logo.png" alt="SubHub" class="nav-logo"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-            <div class="nav-logo-fb">S</div>
-            <span class="nav-brand-name">Sub<span>Hub</span></span>
-        </a>
-        <div class="nav-right">
-            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <i class="fas fa-moon" id="iconMoon"></i>
+    <i class="fas fa-sun" id="iconSun" hidden></i>
+  </button>
 
-    <!-- ============================================================
-    SIDEBAR
-    ============================================================ -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-top">
-            <span class="sidebar-brand">Sub<span>Hub</span></span>
-            <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
-                <i class="fas fa-xmark"></i>
-            </button>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
-            <a href="/faq" class="sidebar-item"><i class="fas fa-circle-question"></i> FAQ</a>
-            <a href="/privacy" class="sidebar-item"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
-            <a href="/terms" class="sidebar-item"><i class="fas fa-file-lines"></i> Terms of Service</a>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-actions">
-                <a href="/sign-up" class="sidebar-btn primary"><i class="fas fa-user-plus"></i> Sign Up</a>
-                <a href="/login" class="sidebar-btn outline"><i class="fas fa-arrow-right-to-bracket"></i> Log In</a>
-            </div>
-        </nav>
-    </aside>
+  <main class="shell">
 
-    <!-- ============================================================
-    HERO
-    ============================================================ -->
-    <section class="hero">
-        <div class="hero-badge"><i class="fas fa-arrow-right-to-bracket"></i> &nbsp;Welcome Back</div>
-        <h1>Log in to your SubHub account</h1>
-        <p>Access your wallet, buy airtime, data, and manage your subscriptions.</p>
+    <a href="/" class="brand" aria-label="SubHub home">
+      <img src="/logo.png" alt="" class="brand-logo" id="brandLogo" />
+      <span class="brand-mark" id="brandMark" hidden>S</span>
+      <span class="brand-text">
+        <span class="brand-name">Sub<span>Hub</span></span>
+        <span class="brand-tag">All your digital services in one place!</span>
+      </span>
+    </a>
+
+    <section class="card enter" id="card" data-mode="first">
+
+      <div class="head" data-show="first bio pw">
+        <h1 class="title" id="title">Welcome back</h1>
+        <div class="subtitle" id="subtitle"></div>
+      </div>
+
+      <!-- Fingerprint screen (Android app only) -->
+      <div class="bio" data-show="bio">
+        <button type="button" class="fp-btn" id="fpBtn" aria-label="Log in with fingerprint">
+          <span class="fp-ring"></span><span class="fp-ring r2"></span>
+          <i class="fas fa-fingerprint" aria-hidden="true"></i>
+        </button>
+        <p class="fp-hint" id="fpHint" aria-live="polite">Touch the sensor to log in</p>
+        <button type="button" class="link" id="usePwBtn">Use password instead</button>
+      </div>
+
+      <!-- Password / full form -->
+      <form id="loginForm" novalidate data-show="first pw">
+
+        <div class="identity" id="identity">
+          <span class="avatar" id="avatar">A</span>
+          <span class="identity-text"><small>Logging in as</small><strong id="identityText"></strong></span>
+          <button type="button" class="link" id="changeIdBtn">Change</button>
+        </div>
+
+        <div class="field" id="credentialGroup">
+          <label for="credential">Username, email or phone</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fas fa-user"></i></span>
+            <input class="input" type="text" id="credential" placeholder="e.g. abdulmalik_ahm" autocomplete="username" autocapitalize="none" spellcheck="false" />
+          </div>
+          <div class="error-text" id="credentialError">Enter your username, email, or phone number.</div>
+        </div>
+
+        <div class="field" id="passwordGroup">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <input class="input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password" />
+            <button type="button" class="eye" id="togglePwd" aria-label="Show password"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="error-text" id="passwordError">Enter your password.</div>
+        </div>
+
+        <div class="form-row">
+          <label class="remember" id="rememberWrap" data-show="first">
+            <input type="checkbox" id="rememberMe" /> <span>Remember me</span>
+          </label>
+          <button type="button" class="link" id="forgotBtn">Forgot password?</button>
+        </div>
+
+        <div class="form-error" id="formError" role="alert"></div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          <span class="spinner"></span><span class="btn-label">Log in</span>
+        </button>
+
+        <button type="button" class="btn btn-ghost bio-btn" id="bioBtn" hidden>
+          <i class="fas fa-fingerprint"></i> <span id="bioBtnLabel">Log in with fingerprint</span>
+        </button>
+
+        <div class="signup" data-show="first">New to SubHub? <a href="/sign-up">Create an account</a></div>
+      </form>
+
     </section>
 
-    <!-- ============================================================
-    LAYOUT & LOGIN CARD
-    ============================================================ -->
-    <div class="layout">
-        <div class="login-card">
-
-            <div class="card-title">Welcome back</div>
-            <div class="card-sub">Don't have an account? <a href="/sign-up">Create one</a></div>
-
-            <form id="loginForm" novalidate>
-
-                <!-- Username / Email / Phone -->
-                <div class="form-group" id="identifierGroup">
-                    <label for="identifier">Username, email or phone <span class="required">*</span></label>
-                    <div class="input-wrap">
-                        <span class="input-icon"><i class="fas fa-user"></i></span>
-                        <input type="text" id="identifier" placeholder="e.g. abdulmalik_ahm, you@example.com, 08012345678" required autocomplete="username" />
-                    </div>
-                    <div class="error-text" id="identifierError">Please enter your username, email, or phone number.</div>
-                </div>
-
-                <!-- Password -->
-                <div class="form-group" id="passwordGroup">
-                    <label for="password">Password <span class="required">*</span></label>
-                    <div class="input-wrap">
-                        <span class="input-icon"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
-                        <button type="button" class="toggle-pw" id="togglePassword" aria-label="Toggle password visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-text" id="passwordError">Please enter your password.</div>
-                </div>
-
-                <!-- Remember me + Forgot password -->
-                <div class="form-row">
-                    <label class="remember-me">
-                        <input type="checkbox" id="rememberMe" />
-                        <span>Remember me</span>
-                    </label>
-                    <button type="button" class="forgot-link" id="forgotPasswordBtn">
-                        Forgot password?
-                    </button>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <span class="spinner-btn"></span>
-                    <span class="btn-text">Log in</span>
-                    <i class="fas fa-arrow-right btn-icon"></i>
-                </button>
-
-                <div class="divider"><span>or</span></div>
-
-                <div class="signup-link">
-                    New to SubHub? <a href="/sign-up">Create an account</a>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-
-    <!-- ============================================================
-    FORGOT PASSWORD MODAL
-    ============================================================ -->
-    <div class="modal-overlay" id="forgotModal">
-        <div class="modal-box">
-            <div class="modal-top">
-                <div class="modal-title"><i class="fas fa-key"></i> Forgot Password</div>
-                <button class="modal-close" id="forgotModalClose"><i class="fas fa-xmark"></i></button>
-            </div>
-
-            <!-- Default state -->
-            <div id="fpDefault">
-                <div class="modal-desc">
-                    Enter the email address associated with your SubHub account. We'll send you a link to reset your password.
-                </div>
-                <div class="modal-form">
-                    <div class="form-group" id="fpEmailGroup">
-                        <label for="fpEmail">Email address <span class="required">*</span></label>
-                        <div class="input-wrap">
-                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
-                            <input type="email" id="fpEmail" placeholder="you@example.com" required />
-                        </div>
-                        <div class="error-text" id="fpEmailError">Please enter a valid email address.</div>
-                    </div>
-                    <button type="button" class="modal-btn" id="fpSubmitBtn">
-                        <span class="spinner-btn"></span>
-                        <span class="btn-text">Send reset link</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Success state -->
-            <div class="fp-success" id="fpSuccess">
-                <div class="icon-wrap">
-                    <i class="fas fa-envelope-circle-check"></i>
-                </div>
-                <h4>Check your inbox</h4>
-                <p>
-                    We've sent a password reset link to <strong id="fpSentEmail"></strong>.
-                    Please check your email and follow the instructions to reset your password.
-                </p>
-                <button class="btn-close-modal" id="fpSuccessClose">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================
-    PROCESSING OVERLAY (Login loading)
-    ============================================================ -->
-    <div class="proc-overlay" id="procOverlay">
-        <div class="proc-box" id="procBox">
-            <div class="proc-logo-wrap" id="procLogoWrap">
-                <img src="/logo.png" alt="SubHub" id="procLogo" onerror="this.style.display='none';" />
-            </div>
-            <div class="proc-status-icon" id="procStatusIcon"></div>
-            <div class="proc-title" id="procTitle">Logging you in...</div>
-            <div class="proc-sub" id="procSub">Please wait while we verify your credentials.</div>
-            <div class="proc-dots" id="procDots">
-                <span class="proc-dot"></span>
-                <span class="proc-dot"></span>
-                <span class="proc-dot"></span>
-                <span class="proc-dot"></span>
-                <span class="proc-dot"></span>
-            </div>
-            <button class="proc-btn-done" id="procBtnDone">Continue to dashboard</button>
-        </div>
-    </div>
-
-    <!-- ============================================================
-    TOAST CONTAINER
-    ============================================================ -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- ============================================================
-    FOOTER
-    ============================================================ -->
-    <footer>
-        <p>© 2026 <a href="/">SubHub</a> by Earncial Global · All right reserved</p>
-        <p>
-            <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp;
-            <a href="/terms">Terms of Use</a> &nbsp;·&nbsp;
-            <a href="/faq">FAQ</a> &nbsp;·&nbsp;
-            <a href="https://wa.me/2347040495661">WhatsApp Support</a>
-        </p>
+    <footer class="foot">
+      <p>&copy; 2026 <a href="/">SubHub</a> by Earncial Global</p>
+      <p><a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a> &middot; <a href="/faq">FAQ</a> &middot; <a href="https://wa.me/2347040495661">WhatsApp support</a></p>
     </footer>
+  </main>
 
+  <!-- Forgot password -->
+  <div class="sheet-ov" id="forgotModal" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="fpTitle">
+      <button type="button" class="sheet-close" id="forgotClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
 
-<script src="assets/js/sign-in.js"></script>
-<script src="/assets/js/support.js" data-position="right"></script>
-<!--<script src="/assets/js/playstore-banner.js"></script>-->
+      <div id="fpForm">
+        <h2 id="fpTitle">Forgot password</h2>
+        <p>Enter the email on your SubHub account. We'll send you a link to reset your password.</p>
+        <div class="field">
+          <label for="fpEmail">Email address</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+            <input class="input" type="email" id="fpEmail" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="error-text" id="fpErr"></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="fpSubmit">
+          <span class="spinner"></span><span class="btn-label">Send reset link</span>
+        </button>
+      </div>
+
+      <div id="fpSuccess" class="fp-success" hidden>
+        <div class="done-icon"><i class="fas fa-envelope-circle-check"></i></div>
+        <h2>Check your inbox</h2>
+        <p>If <strong id="fpSentEmail"></strong> has a SubHub account, a reset link is on its way.</p>
+        <button type="button" class="btn btn-ghost" id="fpDone">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading (centre of page) + result sheet (success / error) -->
+  <div class="proc-ov" id="procOverlay" hidden>
+
+    <div class="loader" id="procLoader" role="status" aria-live="polite">
+      <div class="loader-orb">
+        <span class="loader-ripple"></span>
+        <span class="loader-spin"></span>
+        <span class="loader-logo-wrap">
+          <img class="loader-logo" src="/logo.png" alt="" id="procLogo" />
+          <span class="proc-fb" id="procFb" hidden>S</span>
+        </span>
+      </div>
+      <div class="loader-text">
+        <strong id="procLoadTitle">Logging you in...</strong>
+        <span id="procLoadSub">Please wait while we verify your credentials.</span>
+      </div>
+    </div>
+
+    <div class="proc-sheet" id="procBox" data-state="error" role="alert" hidden>
+      <span class="proc-handle"></span>
+      <div class="orb">
+        <span class="orb-ring o1"></span>
+        <span class="orb-ring o2"></span>
+        <span class="orb-ripple"></span>
+        <span class="orb-core"><i class="fas fa-lock" id="procIcon"></i></span>
+      </div>
+      <div class="proc-title" id="procTitle"></div>
+      <div class="proc-sub" id="procSub"></div>
+      <button type="button" class="btn btn-primary proc-btn" id="procBtn" hidden>Try again</button>
+    </div>
+
+  </div>
+
+  <div class="toasts" id="toastContainer" aria-live="polite"></div>
+
+  <script src="/assets/js/sign-in.js?v=8"></script>
+  <script src="/assets/js/support.js" data-position="right"></script>
 </body>
 </html>

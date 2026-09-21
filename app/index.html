@@ -6,6 +6,7 @@
 <title>SubHub | Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="stylesheet" href="/assets/css/app.css"/>
 </head>
@@ -560,7 +561,70 @@
   </div>
 </div>
 
+
 <!-- RECEIPT MODAL -->
+<div class="ov" id="receiptModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+
+    <div class="rcpt-scroll">
+      <div class="rcpt" id="receiptCard">
+        <div class="rcpt-paper">
+          <div class="rcpt-bar"></div>
+
+          <!-- brand -->
+          <div class="rcpt-head">
+            <img class="rcpt-logo" src="/logo.png" alt="SubHub" crossorigin="anonymous" onerror="this.style.display='none'" />
+            <div class="rcpt-brand">
+              <div class="rcpt-name">Sub<span>Hub</span></div>
+              <div class="rcpt-tag">All your digital services in one place!</div>
+            </div>
+            <div class="rcpt-pill">RECEIPT</div>
+          </div>
+          <div class="rcpt-divider"></div>
+
+          <!-- status -->
+          <div class="rcpt-status">
+            <div class="rcpt-orb ok" id="recRing"><span id="recRingIco"></span></div>
+            <div class="rcpt-amt" id="recAmt">₦0.00</div>
+            <div class="rcpt-stat ok" id="recStat">Transaction Successful</div>
+            <div class="rcpt-date" id="recDate"></div>
+          </div>
+
+          <div class="rcpt-ticket"></div>
+
+          <!-- details -->
+          <div class="rcpt-sec">TRANSACTION DETAILS</div>
+          <div class="rcpt-rows" id="recRows"></div>
+
+          <div class="rcpt-bal" id="recBal" hidden>
+            <div id="recBalB"><span>BALANCE BEFORE</span><b id="recBalBefore"></b></div>
+            <i class="rcpt-arrow" id="recBalArrow">&rsaquo;</i>
+            <div id="recBalA"><span>BALANCE AFTER</span><b id="recBalAfter"></b></div>
+          </div>
+
+          <!-- footer -->
+          <div class="rcpt-foot">
+            <div class="rcpt-thanks">Thank you for choosing SubHub!</div>
+            <div class="rcpt-help">Need help? Chat with us on WhatsApp</div>
+            <div class="rcpt-wa">+234 704 049 5661</div>
+            <div class="rcpt-web">www.subhub.com.ng</div>
+            <div class="rcpt-legal">This is a computer-generated receipt and is valid without a signature. Please keep it for your records.</div>
+            <div class="rcpt-co">SubHub by Earncial Global &middot; &copy; <span id="recYear">2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rec-acts">
+      <button class="ra-done" data-close="receiptModal"><i class="fas fa-home"></i>Done</button>
+      <button class="ra-dl" id="dlBtn"><i class="fas fa-download"></i>Download</button>
+      <button class="ra-sh" id="shareBtn"><i class="fas fa-share-nodes"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL --
 <div class="ov" id="receiptModal">
   <div class="modal">
     <div class="modal-drag"><div class="drag-pill"></div></div>
@@ -576,7 +640,7 @@
       <button class="ra-sh" id="shareBtn"><i class="fas fa-share-nodes"></i></button>
     </div>
   </div>
-</div>
+</div>-->
 
 <!-- CHANGE PIN MODAL -->
 <div class="ov" id="cpModal">

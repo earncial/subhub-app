@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SubHub receipt</title>
+
+<!-- Fonts + icons: your dashboard already loads these (needed here only for the demo) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+/* ============================================================
+   1) CSS
+============================================================ */
+/* ===== RECEIPT CARD (light paper, same in light and dark theme) ===== */
+.rcpt-scroll { max-height: 64vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 16px; margin: 4px 0 12px; }
+
+.rcpt {
+  --r-brand: #00aaff; --r-brand2: #0070cc; --r-ok: #00c07a; --r-bad: #e8334a; --r-warn: #f59e0b;
+  --r-text: #0d1a2e; --r-sub: #5b6f8d; --r-muted: #8ea0bb; --r-line: #e5edf7; --r-outer: #eaf3ff;
+  background: var(--r-outer); color: var(--r-text); font-family: inherit;
+  padding: 16px 16px 30px; -webkit-text-size-adjust: 100%;
+}
+.rcpt-paper {
+  position: relative; background: #fff; border-radius: 22px 22px 0 0;
+  padding: 30px 20px 26px; box-shadow: 0 12px 34px rgba(0,60,140,.16);
+}
+/* torn zig-zag edge at the bottom */
+.rcpt-paper::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10'%3E%3Cpolygon points='0,0 20,0 10,10' fill='%23fff'/%3E%3C/svg%3E") repeat-x;
+  background-size: 20px 10px;
+}
+.rcpt-bar { position: absolute; left: 0; right: 0; top: 0; height: 7px; border-radius: 22px 22px 0 0; background: linear-gradient(90deg, var(--r-brand), var(--r-brand2)); }
+
+/* brand */
+.rcpt-head { display: flex; align-items: center; gap: 12px; }
+.rcpt-logo { display: block; height: 52px; width: auto; max-width: 84px; object-fit: contain; flex-shrink: 0; }
+.rcpt-brand { flex: 1; min-width: 0; }
+.rcpt-name { font-size: 1.5rem; font-weight: 800; letter-spacing: -.5px; line-height: 1; }
+.rcpt-name span { color: var(--r-brand); }
+.rcpt-tag { margin-top: 5px; font-size: .62rem; font-weight: 500; line-height: 1.3; color: var(--r-muted); }
+.rcpt-pill { flex-shrink: 0; align-self: flex-start; margin-top: 2px; padding: 5px 10px; border-radius: 999px; background: rgba(0,170,255,.09); color: var(--r-brand); font-size: .6rem; font-weight: 700; letter-spacing: 1.6px; }
+.rcpt-divider { height: 2px; margin: 16px 0 6px; background: linear-gradient(90deg, var(--r-brand), rgba(0,170,255,0)); }
+
+/* status */
+.rcpt-status { text-align: center; padding: 30px 0 8px; }
+.rcpt-orb {
+  --st: var(--r-ok); --st-a: rgba(0,192,122,.20); --st-b: rgba(0,192,122,.09);
+  width: 60px; height: 60px; margin: 0 auto 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--st); box-shadow: 0 0 0 12px var(--st-a), 0 0 0 26px var(--st-b);
+}
+.rcpt-orb.fail    { --st: var(--r-bad);  --st-a: rgba(232,51,74,.18);  --st-b: rgba(232,51,74,.08); }
+.rcpt-orb.pending { --st: var(--r-warn); --st-a: rgba(245,158,11,.20); --st-b: rgba(245,158,11,.09); }
+.rcpt-orb svg { display: block; width: 28px; height: 28px; }
+.rcpt-amt { font-size: 2.05rem; font-weight: 800; letter-spacing: -1px; line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.rcpt-stat { margin-top: 8px; font-size: .9rem; font-weight: 700; }
+.rcpt-stat.ok { color: var(--r-ok); } .rcpt-stat.fail { color: var(--r-bad); } .rcpt-stat.pending { color: var(--r-warn); }
+.rcpt-date { margin-top: 5px; font-size: .74rem; font-weight: 500; color: var(--r-muted); }
+
+/* ticket divider with side notches */
+.rcpt-ticket { position: relative; margin: 22px -20px 20px; border-top: 2px dashed var(--r-line); }
+.rcpt-ticket::before, .rcpt-ticket::after { content: ''; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--r-outer); }
+.rcpt-ticket::before { left: -11px; }
+.rcpt-ticket::after  { right: -11px; }
+
+/* details */
+.rcpt-sec { font-size: .64rem; font-weight: 700; letter-spacing: 1.6px; color: var(--r-muted); }
+.rcpt-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--r-line); }
+.rcpt-row:last-child { border-bottom: 0; }
+.rcpt-l { flex-shrink: 0; font-size: .8rem; font-weight: 500; color: var(--r-sub); }
+.rcpt-v { min-width: 0; font-size: .82rem; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.rcpt-v.mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .7rem; font-weight: 600; color: var(--r-brand); }
+.rcpt-badge { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+.rcpt-badge.ok      { background: rgba(0,192,122,.12);  color: var(--r-ok); }
+.rcpt-badge.fail    { background: rgba(232,51,74,.10);  color: var(--r-bad); }
+.rcpt-badge.pending { background: rgba(245,158,11,.14); color: var(--r-warn); }
+
+/* wallet summary */
+.rcpt-bal { display: flex; align-items: center; justify-content: space-around; gap: 8px; margin-top: 16px; padding: 16px 10px; border-radius: 16px; background: rgba(0,170,255,.07); border: 1.5px solid rgba(0,170,255,.22); }
+.rcpt-bal > div { flex: 1; min-width: 0; text-align: center; }
+.rcpt-bal span { display: block; font-size: .58rem; font-weight: 700; letter-spacing: 1px; color: var(--r-muted); }
+.rcpt-bal b { display: block; margin-top: 5px; font-size: 1.05rem; font-weight: 800; }
+.rcpt-bal > div:last-child b { color: var(--r-brand); }
+.rcpt-arrow { font-style: normal; font-size: 1.4rem; line-height: 1; color: var(--r-muted); }
+
+/* footer */
+.rcpt-foot { margin-top: 22px; padding-top: 20px; border-top: 2px dashed var(--r-line); text-align: center; }
+.rcpt-thanks { font-size: 1rem; font-weight: 800; }
+.rcpt-help { margin-top: 6px; font-size: .74rem; color: var(--r-sub); }
+.rcpt-wa { margin-top: 3px; font-size: .86rem; font-weight: 700; color: var(--r-brand); }
+.rcpt-web { margin-top: 3px; font-size: .74rem; font-weight: 600; color: var(--r-muted); }
+.rcpt-legal { margin-top: 16px; font-size: .62rem; line-height: 1.5; color: var(--r-muted); }
+.rcpt-co { margin-top: 6px; font-size: .62rem; font-weight: 600; color: var(--r-muted); }
+
+/* make the hidden attribute win over the display rules above */
+.rcpt [hidden] { display: none !important; }
+
+/* ===== DEMO ONLY: stand-ins for your dashboard's modal styles.
+   Everything here is scoped to body.rcpt-demo, so it never touches your real pages. Safe to delete. ===== */
+body.rcpt-demo { margin: 0; min-height: 100vh; background: #f3f8ff; font-family: 'Sora', system-ui, sans-serif; color: #0d1a2e; }
+body.rcpt-demo .rcpt-demobar { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 16px; }
+body.rcpt-demo .rcpt-demobar button { padding: 10px 16px; border-radius: 999px; border: 1.5px solid #cfe0f5; background: #fff; font-family: inherit; font-weight: 700; font-size: .8rem; color: #0d1a2e; cursor: pointer; }
+body.rcpt-demo .ov { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; display: none; align-items: flex-end; justify-content: center; background: rgba(8,20,40,.5); }
+body.rcpt-demo .ov.open { display: flex; }
+body.rcpt-demo .modal { width: 100%; max-width: 440px; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-radius: 26px 26px 0 0; }
+body.rcpt-demo .modal-drag { display: flex; justify-content: center; padding: 4px 0 10px; }
+body.rcpt-demo .drag-pill { width: 40px; height: 5px; border-radius: 3px; background: #cfd8e6; }
+body.rcpt-demo .rec-acts { display: flex; gap: 8px; }
+body.rcpt-demo .rec-acts button { flex: 1; padding: 12px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: .8rem; cursor: pointer; }
+body.rcpt-demo .ra-done { border: 0; color: #fff; background: linear-gradient(135deg, #00aaff, #0070cc); }
+body.rcpt-demo .ra-dl, body.rcpt-demo .ra-sh { border: 1.5px solid #dbe6f5; background: #f3f8ff; color: #0d1a2e; }
+body.rcpt-demo .ra-sh { flex: 0 0 46px; padding: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     2) HTML: RECEIPT MODAL (the printable card is #receiptCard)
+============================================================ -->
+<div class="ov" id="receiptModal">
+  <div class="modal">
+    <div class="modal-drag"><div class="drag-pill"></div></div>
+
+    <div class="rcpt-scroll">
+      <div class="rcpt" id="receiptCard">
+        <div class="rcpt-paper">
+          <div class="rcpt-bar"></div>
+
+          <!-- brand -->
+          <div class="rcpt-head">
+            <img class="rcpt-logo" src="/logo.png" alt="SubHub" crossorigin="anonymous" onerror="this.style.display='none'" />
+            <div class="rcpt-brand">
+              <div class="rcpt-name">Sub<span>Hub</span></div>
+              <div class="rcpt-tag">All your digital services in one place!</div>
+            </div>
+            <div class="rcpt-pill">RECEIPT</div>
+          </div>
+          <div class="rcpt-divider"></div>
+
+          <!-- status -->
+          <div class="rcpt-status">
+            <div class="rcpt-orb ok" id="recRing"><span id="recRingIco"></span></div>
+            <div class="rcpt-amt" id="recAmt">₦0.00</div>
+            <div class="rcpt-stat ok" id="recStat">Transaction Successful</div>
+            <div class="rcpt-date" id="recDate"></div>
+          </div>
+
+          <div class="rcpt-ticket"></div>
+
+          <!-- details -->
+          <div class="rcpt-sec">TRANSACTION DETAILS</div>
+          <div class="rcpt-rows" id="recRows"></div>
+
+          <div class="rcpt-bal" id="recBal" hidden>
+            <div id="recBalB"><span>BALANCE BEFORE</span><b id="recBalBefore"></b></div>
+            <i class="rcpt-arrow" id="recBalArrow">&rsaquo;</i>
+            <div id="recBalA"><span>BALANCE AFTER</span><b id="recBalAfter"></b></div>
+          </div>
+
+          <!-- footer -->
+          <div class="rcpt-foot">
+            <div class="rcpt-thanks">Thank you for choosing SubHub!</div>
+            <div class="rcpt-help">Need help? Chat with us on WhatsApp</div>
+            <div class="rcpt-wa">+234 704 049 5661</div>
+            <div class="rcpt-web">www.subhub.com.ng</div>
+            <div class="rcpt-legal">This is a computer-generated receipt and is valid without a signature. Please keep it for your records.</div>
+            <div class="rcpt-co">SubHub by Earncial Global &middot; &copy; <span id="recYear">2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rec-acts">
+      <button class="ra-done" data-close="receiptModal"><i class="fas fa-home"></i>Done</button>
+      <button class="ra-dl" id="dlBtn"><i class="fas fa-download"></i>Download</button>
+      <button class="ra-sh" id="shareBtn"><i class="fas fa-share-nodes"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   3) JAVASCRIPT
+   Replaces the OLD showReceipt(). Leave downloadReceipt() / shareReceipt() alone.
+   Uses your existing helpers: $, fmt, state, openModal.
+
+   Same call as before:
+     showReceipt({ txId, service, amt, status, details, balBefore, balAfter })
+   Optional extra fields (shown only when you pass them):
+     date (Date or ISO string; default = now), fee, method (default "SubHub Wallet"), customer
+============================================================ */
+const RCPT_ICONS = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"/></svg>',
+  fail:    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>',
+  pending: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polyline points="12 7.5 12 12 15.5 14"/></svg>',
+};
+
+// "<b>MTN</b>" -> "MTN" (values are shown as plain text, never as HTML)
+function rcptText(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  if (!/[<&]/.test(s)) return s.trim();
+  return (new DOMParser().parseFromString(s, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function rcptRow(label, value, extraClass) {
+  const row = document.createElement('div'); row.className = 'rcpt-row';
+  const l = document.createElement('span');  l.className = 'rcpt-l'; l.textContent = label;
+  const v = document.createElement('span');  v.className = 'rcpt-v' + (extraClass ? ' ' + extraClass : '');
+  v.textContent = value;
+  row.appendChild(l); row.appendChild(v);
+  return row;
+}
+
+function showReceipt({ txId, service, amt, status, details = {}, balBefore, balAfter, date, fee, method, customer }) {
+  state.receipt = { txId, service, amt, status, details, balBefore, balAfter, date, fee, method, customer };
+
+  const s = String(status || '').toLowerCase();
+  const kind = s === 'success' ? 'success' : /pend|process/.test(s) ? 'pending' : 'fail';
+  const cls  = kind === 'success' ? 'ok' : kind;      // ok | fail | pending
+  const word = kind === 'success' ? 'Successful' : kind === 'pending' ? 'Pending' : 'Failed';
+
+  $('recRing').className = 'rcpt-orb ' + cls;
+  $('recRingIco').innerHTML = RCPT_ICONS[kind];       // static markup only
+  $('recAmt').textContent = `₦${fmt(amt)}`;
+  $('recStat').className = 'rcpt-stat ' + cls;
+  $('recStat').textContent = 'Transaction ' + word;
+
+  const when = date ? new Date(date) : new Date();
+  $('recDate').textContent = isNaN(when) ? '' : when.toLocaleString('en-NG', {
+    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+
+  const rows = $('recRows');
+  rows.textContent = '';
+  if (customer) rows.appendChild(rcptRow('Account name', rcptText(customer)));
+  rows.appendChild(rcptRow('Service', rcptText(service)));
+  Object.entries(details || {}).forEach(([k, v]) => { const t = rcptText(v); if (t) rows.appendChild(rcptRow(k, t)); });
+  rows.appendChild(rcptRow('Payment method', method || 'SubHub Wallet'));
+  if (fee !== undefined && fee !== null) rows.appendChild(rcptRow('Fee', `₦${fmt(fee)}`));
+  rows.appendChild(rcptRow('Reference', rcptText(txId), 'mono'));
+
+  const st = document.createElement('div'); st.className = 'rcpt-row';
+  const stl = document.createElement('span'); stl.className = 'rcpt-l'; stl.textContent = 'Status';
+  const stv = document.createElement('span'); stv.className = 'rcpt-v';
+  const badge = document.createElement('span'); badge.className = 'rcpt-badge ' + cls; badge.textContent = word;
+  stv.appendChild(badge); st.appendChild(stl); st.appendChild(stv);
+  rows.appendChild(st);
+
+  const hasB = balBefore !== undefined && balBefore !== null;
+  const hasA = balAfter  !== undefined && balAfter  !== null;
+  $('recBal').hidden = !(hasB || hasA);
+  $('recBalB').hidden = !hasB;
+  $('recBalA').hidden = !hasA;
+  $('recBalArrow').hidden = !(hasB && hasA);
+  if (hasB) $('recBalBefore').textContent = `₦${fmt(balBefore)}`;
+  if (hasA) $('recBalAfter').textContent  = `₦${fmt(balAfter)}`;
+
+  $('recYear').textContent = new Date().getFullYear();
+
+  openModal('receiptModal');
+}
+
+/* ===== DEMO ONLY: delete from here to the end of this script when you paste into your dashboard =====
+   It does nothing inside your dashboard (it only runs when openModal() does not exist). */
+(function () {
+  if (typeof openModal !== 'undefined') return;
+  document.body.classList.add('rcpt-demo');
+  window.$ = id => document.getElementById(id);
+  window.fmt = n => Number(n).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+  window.state = {};
+  window.openModal = id => $(id).classList.add('open');
+  const close = id => $(id).classList.remove('open');
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => close(b.dataset.close)));
+  $('receiptModal').addEventListener('click', e => { if (e.target.id === 'receiptModal') close('receiptModal'); });
+  $('dlBtn').addEventListener('click', () => alert('Download (PNG / JPG / PDF) is added by the Android side.'));
+  $('shareBtn').addEventListener('click', () => alert('Share is added by the Android side.'));
+
+  const samples = {
+    'Successful': { txId: 'SH-20260921-8F3A9C2D1B7E4A6F', service: 'MTN Data', amt: 1250, status: 'success',
+      details: { Phone: '08012345678', Network: 'MTN', Plan: '2GB SME (30 days)' }, balBefore: 5000, balAfter: 3750, customer: 'Abdulmalik Ahmad', fee: 0 },
+    'Failed': { txId: 'SH-20260921-11D2C0FFEE12', service: 'Electricity (IKEDC)', amt: 15000, status: 'failed',
+      details: { Meter: '45012345678', Type: 'Prepaid' }, balBefore: 20000, balAfter: 20000 },
+    'Pending': { txId: 'SH-20260921-77AB33CD9E01', service: 'Airtime', amt: 500, status: 'pending',
+      details: { Phone: '08098765432', Network: 'Airtel' }, balBefore: 3750, balAfter: 3250 },
+  };
+  const bar = document.createElement('div'); bar.className = 'rcpt-demobar';
+  Object.keys(samples).forEach(name => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = name + ' receipt';
+    b.addEventListener('click', () => showReceipt(samples[name]));
+    bar.appendChild(b);
+  });
+  document.body.insertBefore(bar, document.body.firstChild);
+  showReceipt(samples['Successful']);
+})();
+</script>
+</body>
+</html>

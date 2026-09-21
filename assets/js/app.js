@@ -1472,7 +1472,123 @@ function updateCPSteps() {
 /* ============================================================
    RECEIPT
 ============================================================ */
-function showReceipt({ txId, service, amt, status, details, balBefore, balAfter }) {
+const RCPT_ICONS = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"/></svg>',
+  fail:    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>',
+  pending: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polyline points="12 7.5 12 12 15.5 14"/></svg>',
+};
+
+// "<b>MTN</b>" -> "MTN" (values are shown as plain text, never as HTML)
+function rcptText(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  if (!/[<&]/.test(s)) return s.trim();
+  return (new DOMParser().parseFromString(s, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function rcptRow(label, value, extraClass) {
+  const row = document.createElement('div'); row.className = 'rcpt-row';
+  const l = document.createElement('span');  l.className = 'rcpt-l'; l.textContent = label;
+  const v = document.createElement('span');  v.className = 'rcpt-v' + (extraClass ? ' ' + extraClass : '');
+  v.textContent = value;
+  row.appendChild(l); row.appendChild(v);
+  return row;
+}
+
+function showReceipt({ txId, service, amt, status, details = {}, balBefore, balAfter, date, fee, method, customer }) {
+  state.receipt = { txId, service, amt, status, details, balBefore, balAfter, date, fee, method, customer };
+
+  const s = String(status || '').toLowerCase();
+  const kind = s === 'success' ? 'success' : /pend|process/.test(s) ? 'pending' : 'fail';
+  const cls  = kind === 'success' ? 'ok' : kind;
+  const word = kind === 'success' ? 'Successful' : kind === 'pending' ? 'Pending' : 'Failed';
+
+  $('recRing').className = 'rcpt-orb ' + cls;
+  $('recRingIco').innerHTML = RCPT_ICONS[kind];
+  $('recAmt').textContent = `₦${fmt(amt)}`;
+  $('recStat').className = 'rcpt-stat ' + cls;
+  $('recStat').textContent = 'Transaction ' + word;
+
+  const when = date ? new Date(date) : new Date();
+  $('recDate').textContent = isNaN(when) ? '' : when.toLocaleString('en-NG', {
+    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+
+  const rows = $('recRows');
+  rows.textContent = '';
+  if (customer) rows.appendChild(rcptRow('Account name', rcptText(customer)));
+  rows.appendChild(rcptRow('Service', rcptText(service)));
+  Object.entries(details || {}).forEach(([k, v]) => { const t = rcptText(v); if (t) rows.appendChild(rcptRow(k, t)); });
+  rows.appendChild(rcptRow('Payment method', method || 'SubHub Wallet'));
+  if (fee !== undefined && fee !== null) rows.appendChild(rcptRow('Fee', `₦${fmt(fee)}`));
+  rows.appendChild(rcptRow('Reference', rcptText(txId), 'mono'));
+
+  const st = document.createElement('div'); st.className = 'rcpt-row';
+  const stl = document.createElement('span'); stl.className = 'rcpt-l'; stl.textContent = 'Status';
+  const stv = document.createElement('span'); stv.className = 'rcpt-v';
+  const badge = document.createElement('span'); badge.className = 'rcpt-badge ' + cls; badge.textContent = word;
+  stv.appendChild(badge); st.appendChild(stl); st.appendChild(stv);
+  rows.appendChild(st);
+
+  const hasB = balBefore !== undefined && balBefore !== null;
+  const hasA = balAfter  !== undefined && balAfter  !== null;
+  $('recBal').hidden = !(hasB || hasA);
+  $('recBalB').hidden = !hasB;
+  $('recBalA').hidden = !hasA;
+  $('recBalArrow').hidden = !(hasB && hasA);
+  if (hasB) $('recBalBefore').textContent = `₦${fmt(balBefore)}`;
+  if (hasA) $('recBalAfter').textContent  = `₦${fmt(balAfter)}`;
+
+  $('recYear').textContent = new Date().getFullYear();
+
+  openModal('receiptModal');
+}
+
+async function captureReceiptImage() {
+  const canvas = await html2canvas(document.getElementById('receiptCard'), {
+    backgroundColor: '#ffffff', scale: 2, useCORS: true,
+  });
+  return canvas.toDataURL('image/png');
+}
+
+async function downloadReceipt() {
+  if (!state.receipt) return;
+  try {
+    const dataUrl = await captureReceiptImage();
+    const fileName = `SubHub_Receipt_${state.receipt.txId}.png`;
+    if (window.AndroidDownload && window.AndroidDownload.saveFile) {
+      window.AndroidDownload.saveFile(dataUrl.split(',')[1], fileName, 'image/png');
+    } else {
+      const a = document.createElement('a');
+      a.href = dataUrl; a.download = fileName;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      toast('Receipt downloaded!', 'green');
+    }
+  } catch (e) {
+    toast('Could not create receipt image', 'red');
+  }
+}
+
+async function shareReceipt() {
+  if (!state.receipt) return;
+  try {
+    const dataUrl = await captureReceiptImage();
+    const fileName = `SubHub_Receipt_${state.receipt.txId}.png`;
+    if (window.AndroidShare && window.AndroidShare.shareImage) {
+      window.AndroidShare.shareImage(dataUrl.split(',')[1], fileName);
+    } else if (navigator.share) {
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], fileName, { type: 'image/png' });
+      await navigator.share({ files: [file], title: 'SubHub Receipt' });
+    } else {
+      toast('Sharing is not supported here. Use Download.', 'red');
+    }
+  } catch (e) {
+    if (e && e.name !== 'AbortError') toast('Could not share receipt', 'red');
+  }
+}
+
+/*function showReceipt({ txId, service, amt, status, details, balBefore, balAfter }) {
   state.receipt = { txId, service, amt, status, details, balBefore, balAfter };
   if ($('recAmt')) $('recAmt').textContent = `₦${fmt(amt)}`;
   const ok = status === 'success';
@@ -1513,7 +1629,7 @@ function shareReceipt() {
   const text = `SubHub Receipt\n\nService: ${r.service}\nAmount: ₦${fmt(r.amt)}\nRef: ${r.txId}\nStatus: ${r.status}\nBalance After: ₦${fmt(r.balAfter || state.balance)}\nDate: ${fmtDate(new Date())}`;
   if (navigator.share) navigator.share({ title: 'SubHub Receipt', text });
   else { navigator.clipboard?.writeText(text); toast('Receipt copied!', 'green'); }
-}
+}*/
 
 /* ============================================================
    TRANSACTIONS
