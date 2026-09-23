@@ -440,7 +440,8 @@ async function handleSignIn(e) {
     localStorage.removeItem(BIO_SETUP_KEY);
     if (yes) {
       localStorage.setItem(BIO_OWNER_KEY, credential);
-      await enableBio(data.refreshToken);
+      enableBio(data.refreshToken);
+      await waitForBioEnabled();
     } else {
       localStorage.setItem(BIO_DECLINED_KEY, '1');
     }
@@ -449,6 +450,17 @@ async function handleSignIn(e) {
   welcomeAndRedirect();
 }
 
+function waitForBioEnabled(timeoutMs = 15000) {
+  return new Promise(resolve => {
+    const start = Date.now();
+    const check = () => {
+      if (hasBio()) return resolve(true);
+      if (Date.now() - start > timeoutMs) return resolve(false);
+      setTimeout(check, 300);
+    };
+    check();
+  });
+}
 /* ============================================================
    FORGOT PASSWORD
 ============================================================ */
