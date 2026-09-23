@@ -8,10 +8,10 @@ const REMEMBER_KEY = 'subhub_login_creds';     // same key + format as before: {
 const BIO_OWNER_KEY    = 'sh_bio_owner';       // which account the fingerprint belongs to
 const BIO_DECLINED_KEY = 'sh_bio_declined';    // user tapped "Not now" on the fingerprint offer
 const BIO_SETUP_KEY    = 'sh_bio_setup';       // user tapped "Set up fingerprint" -> enable right after the next login
-const HOME_URL     = '/app/index.html';
+const HOME_URL     = 'app/index.html';
 
 // ASSUMPTION: confirm these against your backend refresh route
-const REFRESH_ENDPOINT = '/auth/refresh';      // POST { refreshToken } -> { success, accessToken, refreshToken? }
+const REFRESH_ENDPOINT = '/auth/refresh-token';      // POST { refreshToken } -> { success, accessToken, refreshToken? }
 
 /* ============================================================
    UTILS
