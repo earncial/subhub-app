@@ -230,7 +230,132 @@ function renderList(){
   }).join('');
 }
 
+const RCPT_ICONS = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"/></svg>',
+  fail:    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>',
+  pending: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polyline points="12 7.5 12 12 15.5 14"/></svg>',
+};
+
+function rcptRow(label, value, extraClass) {
+  const row = document.createElement('div'); row.className = 'rcpt-row';
+  const l = document.createElement('span');  l.className = 'rcpt-l'; l.textContent = label;
+  const v = document.createElement('span');  v.className = 'rcpt-v' + (extraClass ? ' ' + extraClass : '');
+  v.textContent = value;
+  row.appendChild(l); row.appendChild(v);
+  return row;
+}
+
 function showTxDetail(requestId){
+  const tx=allTxns.find(t=>t.requestId===requestId);if(!tx)return;
+
+  receiptData={
+    txId:tx.requestId, service:TYPE_LABELS[tx.type]||tx.type, amt:tx.amount, status:tx.status,
+    details:{
+      ...(tx.phone   ?{Phone:tx.phone}:{}),
+      ...(tx.network ?{Network:tx.network}:{}),
+      ...(tx.dataPlan?{Plan:tx.dataPlan}:{}),
+      ...(tx.cablePlan?{'Cable Plan':tx.cablePlan}:{}),
+      ...(tx.discoName?{DISCO:tx.discoName}:{}),
+      ...(tx.meterNumber?{'Meter':tx.meterNumber}:{}),
+      ...(tx.smartCardNumber?{'Smart Card':tx.smartCardNumber}:{}),
+      ...(tx.token?{'Token':tx.token}:{}),
+    },
+    balBefore:tx.oldBalance, balAfter:tx.newBalance, date:tx.createdAt,
+  };
+
+  const s = String(tx.status||'').toLowerCase();
+  const kind = s === 'success' ? 'success' : /pend|process/.test(s) ? 'pending' : 'fail';
+  const cls  = kind === 'success' ? 'ok' : kind;
+  const word = kind === 'success' ? 'Successful' : kind === 'pending' ? 'Pending' : 'Failed';
+
+  $('recRing').className = 'rcpt-orb ' + cls;
+  $('recRingIco').innerHTML = RCPT_ICONS[kind];
+  $('recAmt').textContent = '₦' + fmt(tx.amount);
+  $('recStat').className = 'rcpt-stat ' + cls;
+  $('recStat').textContent = 'Transaction ' + word;
+  $('recDate').textContent = fmtDate(tx.createdAt);
+
+  const rows = $('recRows');
+  rows.textContent = '';
+  rows.appendChild(rcptRow('Service', TYPE_LABELS[tx.type]||tx.type));
+  Object.entries(receiptData.details).forEach(([k, v]) => { if (v) rows.appendChild(rcptRow(k, String(v))); });
+  rows.appendChild(rcptRow('Payment method', 'SubHub Wallet'));
+  rows.appendChild(rcptRow('Reference', tx.requestId, 'mono'));
+
+  const st = document.createElement('div'); st.className = 'rcpt-row';
+  const stl = document.createElement('span'); stl.className = 'rcpt-l'; stl.textContent = 'Status';
+  const stv = document.createElement('span'); stv.className = 'rcpt-v';
+  const badge = document.createElement('span'); badge.className = 'rcpt-badge ' + cls; badge.textContent = word;
+  stv.appendChild(badge); st.appendChild(stl); st.appendChild(stv);
+  rows.appendChild(st);
+
+  const hasB = tx.oldBalance !== undefined && tx.oldBalance !== null;
+  const hasA = tx.newBalance !== undefined && tx.newBalance !== null;
+  $('recBal').hidden = !(hasB || hasA);
+  $('recBalB').hidden = !hasB;
+  $('recBalA').hidden = !hasA;
+  $('recBalArrow').hidden = !(hasB && hasA);
+  if (hasB) $('recBalBefore').textContent = '₦' + fmt(tx.oldBalance);
+  if (hasA) $('recBalAfter').textContent  = '₦' + fmt(tx.newBalance);
+
+  if ($('recYear')) $('recYear').textContent = new Date().getFullYear();
+
+  openModal('receiptModal');
+}
+
+async function captureReceiptImage() {
+  const canvas = await html2canvas(document.getElementById('receiptCard'), {
+    backgroundColor: '#ffffff', scale: 2, useCORS: true,
+  });
+  return canvas.toDataURL('image/png');
+}
+
+async function downloadReceipt(){
+  if(!receiptData)return;
+  const btn = $('dlBtn');
+  btn?.classList.add('loading');
+  try {
+    const dataUrl = await captureReceiptImage();
+    const fileName = `SubHub_Receipt_${receiptData.txId}.png`;
+    if (window.AndroidDownload && window.AndroidDownload.saveFile) {
+      window.AndroidDownload.saveFile(dataUrl.split(',')[1], fileName, 'image/png');
+    } else {
+      const a = document.createElement('a');
+      a.href = dataUrl; a.download = fileName;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      toast('Receipt downloaded!', 'green');
+    }
+  } catch (e) {
+    toast('Could not create receipt image', 'red');
+  } finally {
+    btn?.classList.remove('loading');
+  }
+}
+
+async function shareReceipt(){
+  if(!receiptData)return;
+  const btn = $('shareBtn');
+  btn?.classList.add('loading');
+  try {
+    const dataUrl = await captureReceiptImage();
+    const fileName = `SubHub_Receipt_${receiptData.txId}.png`;
+    if (window.AndroidShare && window.AndroidShare.shareImage) {
+      window.AndroidShare.shareImage(dataUrl.split(',')[1], fileName);
+    } else if (navigator.share) {
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], fileName, { type: 'image/png' });
+      await navigator.share({ files: [file], title: 'SubHub Receipt' });
+    } else {
+      toast('Sharing is not supported here. Use Download.', 'red');
+    }
+  } catch (e) {
+    if (e && e.name !== 'AbortError') toast('Could not share receipt', 'red');
+  } finally {
+    btn?.classList.remove('loading');
+  }
+}
+
+/*function showTxDetail(requestId){
   const tx=allTxns.find(t=>t.requestId===requestId);if(!tx)return;
   const fmt2=n=>parseFloat(n||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
   receiptData={txId:tx.requestId,service:tx.type,amt:tx.amount,status:tx.status,
@@ -273,7 +398,7 @@ function downloadReceipt(){
   const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SubHub Receipt</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#f0f7ff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}.card{background:#fff;border-radius:20px;padding:28px;max-width:380px;width:100%;border:1px solid #e0eaf5}.logo{text-align:center;margin-bottom:18px}.logo h1{color:#00aaff;font-size:1.3rem;font-weight:800}.ring{width:58px;height:58px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;background:'+(r.status==='success'?'#10b981':'#ef4444')+'}.amt{text-align:center;font-size:1.9rem;font-weight:800}.stat{text-align:center;font-size:.78rem;font-weight:700;color:'+(r.status==='success'?'#10b981':'#ef4444')+';margin:3px 0 14px}table{width:100%;border-collapse:collapse}td{padding:8px 5px;border-bottom:1px solid #e0eaf5;font-size:.78rem}td:first-child{color:#64748b;font-weight:600}td:last-child{text-align:right;font-weight:700}.footer{text-align:center;margin-top:16px;font-size:.66rem;color:#94a3b8}</style></head><body><div class="card"><div class="logo"><h1>SubHub</h1><p style="color:#64748b;font-size:.72rem">Official Receipt</p></div><div class="ring">'+(r.status==='success'?'✓':'✗')+'</div><div class="amt">₦'+fmt2(r.amt)+'</div><div class="stat">'+(r.status==='success'?'Transaction Successful':'Transaction Failed')+'</div><table>'+Object.entries(r.details).map(([k,v])=>'<tr><td>'+k+'</td><td>'+v+'</td></tr>').join('')+(r.balBefore!==undefined?'<tr><td>Balance Before</td><td>₦'+fmt2(r.balBefore)+'</td></tr><tr><td>Balance After</td><td>₦'+fmt2(r.balAfter)+'</td></tr>':'')+'<tr><td>Reference</td><td style="font-family:monospace;font-size:.68rem">'+r.txId+'</td></tr></table><div class="footer">SubHub VTU Platform · Thank you!</div></div></body></html>';
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='SubHub-'+r.txId+'.html';document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('Receipt downloaded!','green');
-}
+}*/
 
 async function openFundModal(){
   const d=await apiCall('/auth/me');
@@ -314,14 +439,14 @@ function copyFundVA(){
   navigator.clipboard?.writeText(num).then(()=>toast('Account number copied!','green','Copied!'));
 }
 
-function shareReceipt(){
+/*function shareReceipt(){
   if(!receiptData)return;
   const r=receiptData;
   const fmt2=n=>parseFloat(n||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
   const text='SubHub Receipt\n\nService: '+(TYPE_LABELS[r.service]||r.service)+'\nAmount: ₦'+fmt2(r.amt)+'\nRef: '+r.txId+'\nStatus: '+r.status+'\nDate: '+new Date().toLocaleString('en-NG');
   if(navigator.share)navigator.share({title:'SubHub Receipt',text});
   else{navigator.clipboard?.writeText(text);toast('Receipt copied!','green');}
-}
+}*/
 
 // VERIFY BANNER
 let resendCooldown=0,resendTimer=null;

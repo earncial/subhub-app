@@ -1553,6 +1553,8 @@ async function captureReceiptImage() {
 
 async function downloadReceipt() {
   if (!state.receipt) return;
+  const btn = $('dlBtn');
+  btn.classList.add('loading');
   try {
     const dataUrl = await captureReceiptImage();
     const fileName = `SubHub_Receipt_${state.receipt.txId}.png`;
@@ -1566,11 +1568,15 @@ async function downloadReceipt() {
     }
   } catch (e) {
     toast('Could not create receipt image', 'red');
+  } finally {
+    btn.classList.remove('loading');
   }
 }
 
 async function shareReceipt() {
   if (!state.receipt) return;
+  const btn = $('shareBtn');
+  btn.classList.add('loading');
   try {
     const dataUrl = await captureReceiptImage();
     const fileName = `SubHub_Receipt_${state.receipt.txId}.png`;
@@ -1585,6 +1591,8 @@ async function shareReceipt() {
     }
   } catch (e) {
     if (e && e.name !== 'AbortError') toast('Could not share receipt', 'red');
+  } finally {
+    btn.classList.remove('loading');
   }
 }
 

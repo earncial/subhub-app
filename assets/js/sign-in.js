@@ -2,13 +2,13 @@
    CONFIG
 ============================================================ */
 const API_BASE     = 'https://api.subhub.com.ng/api';
-const TOKEN_KEY    = 'sh_access_token';
-const REFRESH_KEY  = 'sh_refresh_token';
+const ACCESS_TOKEN    = 'sh_access_token';
+const REFRESH_TOKEN  = 'sh_refresh_token';
 const REMEMBER_KEY = 'subhub_login_creds';     // same key + format as before: {"identifier":"..."}
 const BIO_OWNER_KEY    = 'sh_bio_owner';       // which account the fingerprint belongs to
 const BIO_DECLINED_KEY = 'sh_bio_declined';    // user tapped "Not now" on the fingerprint offer
 const BIO_SETUP_KEY    = 'sh_bio_setup';       // user tapped "Set up fingerprint" -> enable right after the next login
-const HOME_URL     = 'app/index.html';
+const HOME_URL     = '/app/index.html';
 
 // ASSUMPTION: confirm these against your backend refresh route
 const REFRESH_ENDPOINT = '/auth/refresh-token';      // POST { refreshToken } -> { success, accessToken, refreshToken? }
@@ -328,8 +328,8 @@ async function refreshSession(refreshToken) {
     body: JSON.stringify({ refreshToken }),
   });
   if (data && data.success && data.accessToken) {
-    localStorage.setItem(TOKEN_KEY, data.accessToken);
-    if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken);
+    localStorage.setItem(ACCESS_TOKEN, data.accessToken);
+    if (data.refreshToken) localStorage.setItem(REFRESH_TOKEN, data.refreshToken);
     return true;
   }
   return false;
@@ -414,8 +414,8 @@ async function handleSignIn(e) {
   }
 
   // Save tokens
-  localStorage.setItem(TOKEN_KEY,   data.accessToken);
-  localStorage.setItem(REFRESH_KEY, data.refreshToken);
+  localStorage.setItem(ACCESS_TOKEN,   data.accessToken);
+  localStorage.setItem(REFRESH_TOKEN, data.refreshToken);
 
   // Remember me: first visit follows the checkbox, returning users keep their saved account
   if (state.mode === 'first') {
