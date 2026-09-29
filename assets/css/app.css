@@ -672,3 +672,36 @@ select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg x
 .rcpt-scroll {
   border-radius: 14px !important;
 }
+
+
+/* ===== RECEIPT: v2 — much more compact, targeting ~1:1.2 ratio ===== */
+.rcpt-paper { padding: 10px 16px 10px !important; }
+.rcpt-logo  { height: 34px !important; }
+.rcpt-tag   { margin-top: 2px !important; font-size: .54rem !important; }
+.rcpt-divider { margin: 8px 0 3px !important; }
+
+.rcpt-status { padding: 4px 0 0 !important; }
+.rcpt-orb   { width: 36px !important; height: 36px !important; margin: 0 auto 6px !important; }
+.rcpt-orb svg { width: 16px !important; height: 16px !important; }
+.rcpt-amt   { font-size: 1.35rem !important; }
+.rcpt-stat  { margin-top: 2px !important; font-size: .72rem !important; }
+.rcpt-date  { margin-top: 2px !important; font-size: .62rem !important; }
+
+.rcpt-ticket { margin: 6px -16px 6px !important; }
+.rcpt-sec    { font-size: .58rem !important; }
+
+.rcpt-row   { padding: 4px 0 !important; }
+.rcpt-l     { font-size: .7rem !important; }
+.rcpt-v     { font-size: .7rem !important; }
+
+.rcpt-bal   { margin-top: 4px !important; padding: 6px 6px !important; }
+.rcpt-bal b { font-size: .82rem !important; margin-top: 2px !important; }
+.rcpt-bal span { font-size: .48rem !important; }
+
+.rcpt-foot   { margin-top: 6px !important; padding-top: 6px !important; }
+.rcpt-thanks { font-size: .78rem !important; }
+.rcpt-help   { margin-top: 2px !important; font-size: .6rem !important; }
+.rcpt-wa     { margin-top: 2px !important; font-size: .7rem !important; }
+.rcpt-web    { margin-top: 2px !important; font-size: .6rem !important; }
+.rcpt-legal  { margin-top: 6px !important; font-size: .5rem !important; line-height: 1.25 !important; }
+.rcpt-co     { margin-top: 2px !important; font-size: .5rem !important; }
