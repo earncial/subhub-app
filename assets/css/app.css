@@ -656,3 +656,19 @@ select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg x
   margin-top: 14px !important;
   padding-top: 14px !important;
 }
+
+/* ===== RECEIPT: fill edge-to-edge like Opay, no outer padding, no torn edge ===== */
+.rcpt {
+  background: #fff !important;
+  padding: 0 !important;
+}
+.rcpt-paper {
+  border-radius: 14px 14px 0 0 !important;
+  box-shadow: none !important;
+}
+.rcpt-paper::after {
+  display: none !important;
+}
+.rcpt-scroll {
+  border-radius: 14px !important;
+}

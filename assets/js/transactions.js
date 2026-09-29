@@ -130,7 +130,7 @@ let currentUser=null;
 
 async function fetchTxns(){
   const [txRes,meRes]=await Promise.all([
-    apiCall('/transactions?limit=200'),
+    apiCall('/transactions?limit=1000'),
     apiCall('/auth/me')
   ]);
   if(!txRes||!txRes.success){$('txPageList').innerHTML='<div class="tx-empty"><i class="fas fa-exclamation-triangle"></i><p>Failed to load</p><small>Pull down to retry</small></div>';return;}
