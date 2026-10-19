@@ -1,7 +1,7 @@
 /* ============================================================
    CONFIG
 ============================================================ */
-const API_BASE     = 'https://api.subhub.com.ng/api';
+const API_BASE     = 'https://subhub-sandbox.onrender.com/api';
 const ACCESS_TOKEN    = 'sh_access_token';
 const REFRESH_TOKEN  = 'sh_refresh_token';
 const REMEMBER_KEY = 'subhub_login_creds';     // same key + format as before: {"identifier":"..."}
