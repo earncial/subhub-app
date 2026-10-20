@@ -1,4 +1,4 @@
-const API_BASE='https://api.subhub.com.ng/api';
+const API_BASE='https://subhub-sandbox.onrender.com/api';
 const TOKEN_KEY='sh_access_token';
 const REFRESH_KEY='sh_refresh_token';
 const $=id=>document.getElementById(id);

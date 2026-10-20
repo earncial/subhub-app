@@ -1,910 +1,334 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-<!-- ── Primary SEO ── -->
-<title>SubHub • Buy Cheap Data, Airtime & Pay Bills in Nigeria</title>
-<meta name="description" content="Buy data, airtime, pay bills, cable TV, electricity and more at the cheapest rates in Nigeria. Fast, secure and reliable VTU services on SubHub."/>
-<meta name="keywords" content="VTU Nigeria, buy data Nigeria, cheap airtime, pay DSTV, pay electricity bill, MTN data, Airtel data, Glo data, 9mobile data, SubHub"/>
-<meta name="author" content="SubHub"/>
-<meta name="robots" content="index, follow"/>
-<!--<meta name="theme-color" content="#00aaff"/>-->
-<link rel="canonical" href="https://subhub.com.ng/"/>
+  <!-- Apply saved theme before first paint (no flash) -->
+  <script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('sh_dark') === '1' ? 'dark' : 'light'); } catch (e) {}</script>
 
-<!-- ── Open Graph (Facebook, WhatsApp) ── -->
-<meta property="og:type" content="website"/>
-<meta property="og:url" content="https://subhub.com.ng/"/>
-<meta property="og:title" content="SubHub • Nigeria's Smartest VTU Platform"/>
-<meta property="og:description" content="Buy data, airtime, pay bills, cable TV and electricity at the cheapest rates in Nigeria. Fast and secure VTU services."/>
-<meta property="og:image" content="https://subhub.com.ng/favicon/web-app-manifest-512x512.png"/>
-<meta property="og:image:width" content="512"/>
-<meta property="og:image:height" content="512"/>
-<meta property="og:site_name" content="SubHub"/>
-<meta property="og:locale" content="en_NG"/>
+  <!-- Primary Meta -->
+  <title>Log In • SubHub</title>
+  <meta name="description" content="Login to your SubHub account to buy cheap data, airtime, and pay bills instantly in Nigeria." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://subhub.com.ng/" />
 
-<!-- ── Twitter Card ── -->
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:url" content="https://subhub.com.ng/"/>
-<meta name="twitter:title" content="SubHub — Nigeria's Smartest VTU Platform"/>
-<meta name="twitter:description" content="Buy data, airtime, pay bills, cable TV and electricity at the cheapest rates in Nigeria."/>
-<meta name="twitter:image" content="https://subhub.com.ng/favicon/web-app-manifest-512x512.png"/>
+  <!-- Open Graph -->
+  <meta property="og:title" content="Log In • SubHub" />
+  <meta property="og:description" content="Log in to your SubHub account. Buy cheap data, airtime, and pay bills instantly." />
+  <meta property="og:url" content="https://subhub.com.ng/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://subhub.com.ng/logo.png" />
 
-<!-- ── Schema.org Structured Data ── -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "SubHub",
-  "url": "https://subhub.com.ng",
-  "description": "Nigeria's Smartest VTU Platform — Buy data, airtime, pay bills at the cheapest rates.",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://subhub.com.ng/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "SubHub Login",
+    "description": "Log in to your SubHub account to buy data, airtime, and pay bills instantly.",
+    "url": "https://subhub.com.ng/",
+    "provider": { "@type": "Organization", "name": "SubHub", "url": "https://subhub.com.ng" }
   }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "SubHub",
-  "url": "https://subhub.com.ng",
-  "logo": "https://subhub.com.ng/favicon/web-app-manifest-512x512.png",
-  "sameAs": [],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer support",
-    "availableLanguage": ["English"]
-  }
-}
-</script>
+  </script>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "SubHub",
-  "alternateName": "SubHub Nigeria",
-  "url": "https://subhub.com.ng"
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "SubHub",
-  "url": "https://subhub.com.ng",
-  "parentOrganization": {
-    "@type": "Organization",
-    "name": "Earncial Global",
-    "url": "https://earncial.com"
-  }
-}
-</script>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
 
-<!-- ── Favicons ── -->
-<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96"/>
-<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg"/>
-<link rel="shortcut icon" href="/favicon/favicon.ico"/>
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png"/>
-<meta name="apple-mobile-web-app-title" content="SubHub"/>
-<link rel="manifest" href="/manifest.json"/>
-
-<!-- ── Fonts ── -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/><script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "SubHub",
-  "url": "https://subhub.com.ng",
-  "logo": {
-    "@type": "ImageObject",
-    "url": "https://subhub.com.ng/favicon/web-app-manifest-512x512.png",
-    "width": 512,
-    "height": 512
-  }
-}
-</script>
-<link rel="stylesheet" href="assets/css/main.css">
-<script>
-  (function() {
-    const TOKEN_KEY = 'sh_access_token';
-    if (localStorage.getItem(TOKEN_KEY)) {
-      window.location.replace('/app/index.html');
-    }
-  })();
-</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/css/index.css" />
 </head>
 <body>
 
-<!-- CURSOR -->
-<div class="cursor-ring" id="cursorRing"></div>
-<div class="cursor-dot" id="cursorDot"></div>
+  <!-- Offline SVG icons (no Font Awesome needed) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+ <symbol id="i-userplus" viewBox="0 0 24 24">
+  <circle cx="9" cy="8" r="4" />
+  <path d="M2 21v-1a7 7 0 0 1 14 0v1" />
+  <path d="M19 8v6" />
+  <path d="M16 11h6" />
+</symbol>
+  <symbol id="i-at" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.5 6.8C3.6 8.6 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 4-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"/></symbol>
+  <symbol id="i-checkcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3 10.6 15 16 9.3"/></symbol>
+  <symbol id="i-xcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-finger" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m16 9-5 6M11 9l5 6"/></symbol>
+</svg>
 
-<!-- FLOATING CTA -->
-<a href="sign-up.html"><button class="floating-cta" id="floatingCta">
-  <i class="fas fa-bolt"></i>Get Started Free
-</button></a>
+  <button type="button" class="round-btn" id="themeToggle" aria-label="Toggle dark mode">
+  <svg class="i" id="iconMoon"><use href="#i-moon"/></svg>
+  <svg class="i" id="iconSun" hidden><use href="#i-sun"/></svg>
+</button>
 
-<!-- ═══════════════ NAV ═══════════════ -->
-<nav class="nav" id="mainNav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <div class="nav-logomark">
-        <img src="logo.png" alt="SubHub" id="navLogoImg" onerror="this.style.display='none';document.getElementById('navLogoFb').style.display='flex'"/>
-        <span class="nav-logomark-fallback" id="navLogoFb">S</span>
+  <!-- Login + Signup (one page, two sections) -->
+  <main class="shell">
+
+  <a href="/" class="brand" aria-label="SubHub home">
+    <img src="/logo.png" alt="" class="brand-logo" id="brandLogo">
+    <span class="brand-mark" id="brandMark" hidden>S</span>
+    <span class="brand-text">
+      <span class="brand-name">Sub<span>Hub</span></span>
+      <span class="brand-tag">All your digital services in one place!</span>
+    </span>
+  </a>
+
+  <section class="card enter" id="card" data-mode="first">
+
+    <button type="button" class="back-btn" id="backBtn" aria-label="Back" hidden><svg class="i"><use href="#i-back"/></svg></button>
+
+    <!-- Fingerprint screen: who is logging in -->
+    <div class="who" data-show="bio">
+      <span class="avatar avatar-lg" id="whoAvatar">A</span>
+      <small>Welcome back</small>
+      <strong id="whoName"></strong>
+      <span class="handle" id="whoUser"></span>
+    </div>
+
+    <div class="head" data-show="first pw signup pin">
+      <h1 class="title" id="title">Welcome back</h1>
+      <div class="subtitle" id="subtitle"></div>
+    </div>
+
+    <!-- Fingerprint screen (only on phones that have it, for the account that enabled it) -->
+    <div class="bio" data-show="bio">
+      <button type="button" class="fp-btn" id="fpBtn" aria-label="Log in with fingerprint">
+        <span class="fp-ring"></span><span class="fp-ring r2"></span>
+        <svg class="i"><use href="#i-finger"/></svg>
+      </button>
+      <p class="fp-hint" id="fpHint" aria-live="polite">Touch the sensor to log in</p>
+      <button type="button" class="link" id="usePwBtn">Use password instead</button>
+      <button type="button" class="link link-muted" id="switchAccBtn">Not you? <b>Use another account</b></button>
+    </div>
+
+    <!-- Login form -->
+    <form id="loginForm" novalidate data-show="first pw">
+      <div class="identity" id="identity">
+        <span class="avatar" id="avatar">A</span>
+        <span class="identity-text"><small>Logging in as</small><strong id="identityName"></strong><span class="handle" id="identityHandle"></span></span>
+        <button type="button" class="link" id="changeIdBtn">Change</button>
       </div>
-      <span class="nav-wordmark">Sub<span>Hub</span></span>
-    </a>
 
-    <div class="nav-links" id="navLinks">
-      <button class="nav-link" onclick="scrollToSection('about')">About</button>
-      <button class="nav-link" onclick="scrollToSection('services')">Services</button>
-      <button class="nav-link" onclick="scrollToSection('how')">How It Works</button>
-      <button class="nav-link" onclick="scrollToSection('features')">Features</button>
-      <button class="nav-link" onclick="scrollToSection('pricing')">Pricing</button>
-      <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
-    </div>
-
-    <div class="nav-ctas">
-      <a href="login.html"><button class="btn-nav-ghost">Sign In</button></a>
-     <a href="sign-up.html"> <button class="btn-nav-solid">Get Started <i class="fas fa-arrow-right" style="font-size:.7rem;margin-left:3px"></i></button></a>
-    </div>
-
-    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</nav>
-
-<!-- MOBILE OVERLAY -->
-<div class="mob-overlay" id="mobOverlay"></div>
-
-<!-- MOBILE NAV SIDEBAR -->
-<div class="nav-mobile" id="mobileNav">
-  <!-- Header -->
-  <div class="nm-header">
-    <div class="nm-brand">
-      <div class="nm-logomark">
-        <img src="logo.png" alt="S" onerror="this.style.display='none'"/>
+      <div class="field" id="credentialGroup">
+        <label for="credential">Username, email or phone</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-user"/></svg></span>
+          <input class="input" type="text" id="credential" placeholder="e.g. abdul or 08012345..." autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+        <div class="error-text" id="credentialError">Enter your username, email, or phone number.</div>
       </div>
-      <span class="nm-wordmark">Sub<span>Hub</span></span>
+
+      <div class="field" id="passwordGroup">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-lock"/></svg></span>
+          <input class="input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+          <button type="button" class="eye" data-eye="password" aria-label="Show password"><svg class="i"><use href="#i-eye"/></svg></button>
+        </div>
+        <div class="error-text" id="passwordError">Enter your password.</div>
+      </div>
+
+      <div class="form-row">
+        <label class="remember" data-show="first"><input type="checkbox" id="rememberMe"> <span>Remember me</span></label>
+        <button type="button" class="link" id="forgotBtn">Forgot password?</button>
+      </div>
+
+      <div class="form-error" id="formError" role="alert"></div>
+
+      <button type="submit" class="btn btn-primary" id="loginBtn"><span class="spinner"></span><span class="btn-label">Log in</span></button>
+
+      <button type="button" class="btn btn-ghost bio-btn" id="bioBtn" hidden>
+        <svg class="i"><use href="#i-finger"/></svg> <span id="bioBtnLabel">Log in with fingerprint</span>
+      </button>
+
+      <div class="switch" data-show="first pw">New to SubHub? <button type="button" class="link" data-go="signup">Create new account</button></div>
+    </form>
+
+    <!-- Signup form (section of the same page) -->
+    <form id="signupForm" novalidate data-show="signup">
+
+      <div class="field" id="suNameGroup">
+        <label for="suName">Full name</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-user"/></svg></span>
+          <input class="input" type="text" id="suName" placeholder="e.g. Abdulmalik Salisu" autocomplete="name">
+        </div>
+        <div class="error-text" id="suNameErr"></div>
+      </div>
+
+      <div class="field">
+        <label for="suUser">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-at"/></svg></span>
+          <input class="input" type="text" id="suUser" placeholder="e.g. abdulmalik" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20">
+          <span class="status" id="suUserStatus"></span>
+        </div>
+        <div class="error-text" id="suUserErr"></div>
+      </div>
+
+      <div class="field">
+        <label for="suEmail">Email address</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-mail"/></svg></span>
+          <input class="input" type="email" id="suEmail" placeholder="you@example.com" autocomplete="email" autocapitalize="none">
+        </div>
+        <div class="error-text" id="suEmailErr"></div>
+      </div>
+
+      <div class="field">
+        <label for="suPhone">Phone number</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-phone"/></svg></span>
+          <input class="input" type="tel" inputmode="numeric" id="suPhone" placeholder="08012345678" autocomplete="tel" maxlength="11">
+        </div>
+        <div class="error-text" id="suPhoneErr"></div>
+      </div>
+
+      <div class="field">
+        <label for="suPass">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-lock"/></svg></span>
+          <input class="input" type="password" id="suPass" placeholder="Min. 8 characters" autocomplete="new-password">
+          <button type="button" class="eye" data-eye="suPass" aria-label="Show password"><svg class="i"><use href="#i-eye"/></svg></button>
+        </div>
+        <div class="strength" id="suStrength" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="strength-label" id="suStrengthLabel"></div>
+        <div class="error-text" id="suPassErr"></div>
+      </div>
+
+      <div class="field">
+        <label for="suConfirm">Confirm password</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-lock"/></svg></span>
+          <input class="input" type="password" id="suConfirm" placeholder="Re-enter your password" autocomplete="new-password">
+          <button type="button" class="eye" data-eye="suConfirm" aria-label="Show password"><svg class="i"><use href="#i-eye"/></svg></button>
+        </div>
+        <div class="error-text" id="suConfirmErr"></div>
+      </div>
+
+      <div class="field" id="suRefGroup">
+        <label for="suRef">Referred by (option)</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-userplus"/></svg></span>
+          <input class="input" type="text" id="suRef" placeholder="Enter referrer's username">
+        </div>
+      </div>
+
+      <label class="terms">
+        <input type="checkbox" id="suTerms">
+        <span>I agree to SubHub's <a href="/terms" rel="noopener">Terms of Use</a> and <a href="/privacy" rel="noopener">Privacy Policy</a>.</span>
+      </label>
+      <div class="error-text" id="suTermsErr">You must agree to the terms to continue.</div>
+
+      <div class="form-error" id="suFormError" role="alert"></div>
+
+      <button type="submit" class="btn btn-primary" id="suBtn"><span class="spinner"></span><span class="btn-label">Create account</span></button>
+
+      <div class="switch">Already on SubHub? <button type="button" class="link" data-go="login">Log in</button></div>
+    </form>
+
+    <!-- PIN section: shown after login ONLY when transactionPinSet is false. Step 1 = create, step 2 = confirm -->
+    <form id="pinForm" novalidate data-show="pin">
+      <div class="pin-badge"><svg class="i"><use href="#i-lock"/></svg></div>
+      <div class="pin-steps" aria-hidden="true"><span class="on" id="pinDot1"></span><span id="pinDot2"></span></div>
+
+      <div class="pin-boxes" id="pinBoxes" aria-live="polite">
+        <span class="pin-box"></span><span class="pin-box"></span><span class="pin-box"></span><span class="pin-box"></span>
+      </div>
+      <div class="error-text" id="pinError" role="alert"></div>
+
+      <div class="keypad" id="keypad">
+        <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button><button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button><button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button>
+        <button type="button" class="key key-icon" id="keyEye" aria-label="Show PIN"><svg class="i"><use href="#i-eye"/></svg></button>
+        <button type="button" class="key" data-k="0">0</button>
+        <button type="button" class="key key-icon" id="keyDel" aria-label="Delete"><svg class="i"><use href="#i-backspace"/></svg></button>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="pinBtn" hidden disabled><span class="spinner"></span><span class="btn-label">Set PIN</span></button>
+      <p class="pin-note">Never share your PIN with anyone, including <b>SubHub</b> staff.</p>
+    </form>
+
+  </section>
+
+  <footer class="foot">
+    <p>&copy; 2026 <a href="#">SubHub</a> by <b>Earncial Global</b></p>
+    <p><a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a> &middot; <a href="/faq">FAQ</a> &middot; <a href="https://wa.me/2347040495661">WhatsApp support</a></p>
+  </footer>
+</main>
+
+  <!-- ============ Forgot password ============ -->
+<div class="sheet-ov" id="forgotModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="fpTitle">
+    <button type="button" class="sheet-close" id="forgotClose" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button>
+    <div id="fpForm">
+      <h2 id="fpTitle">Forgot password?</h2>
+      <p>Don't worry, it happens! Enter the email address associated with your <b>SubHub</b> account, and we'll send you a secure link to reset your password.</p>
+      <div class="field">
+        <label for="fpEmail">Email address</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg class="i"><use href="#i-mail"/></svg></span>
+          <input class="input" type="email" id="fpEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="error-text" id="fpErr"></div>
+      </div>
+      <button type="button" class="btn btn-primary" id="fpSubmit"><span class="spinner"></span><span class="btn-label">Send reset link</span></button>
     </div>
-    <button class="nm-close" id="nmClose" aria-label="Close menu">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-
-  <!-- Body links -->
-  <div class="nm-body">
-    <div class="nm-section-label">Navigation</div>
-    <button class="nm-link" onclick="scrollToSection('about');closeMobileNav()">
-      <i class="fas fa-info-circle"></i>About SubHub
-    </button>
-    <button class="nm-link" onclick="scrollToSection('services');closeMobileNav()">
-      <i class="fas fa-grid-2"></i>Services
-    </button>
-    <button class="nm-link" onclick="scrollToSection('how');closeMobileNav()">
-      <i class="fas fa-map-signs"></i>How It Works
-    </button>
-    <button class="nm-link" onclick="scrollToSection('features');closeMobileNav()">
-      <i class="fas fa-sparkles"></i>Features
-    </button>
-    <button class="nm-link" onclick="scrollToSection('pricing');closeMobileNav()">
-      <i class="fas fa-tags"></i>Pricing
-    </button>
-   <a href="faq.html"> <button class="nm-link">
-      <i class="fas fa-circle-question"></i>FAQ
-    </button></a>
-        <div class="nm-divider"></div>
-    <div class="nm-section-label">Quick Links</div>
-    <button class="nm-link">
-      <i class="fas fa-headset"></i>Support
-    </button>
-    <button class="nm-link">
-      <i class="fas fa-blog"></i>Blog
-    </button>
-  </div>
-
-  <!-- Footer CTA -->
-  <div class="nm-footer">
-    <a href='/login'><button class="nm-btn-ghost">Sign In</button></a>
-   <a href='/sign-up'><button class="nm-btn-solid"><i class="fas fa-rocket" style="margin-right:6px;font-size:.78rem"></i>Get Started Free</button></a>
-    <div class="nm-copy">© 2026 SubHub by Earncial Global</div>
+    <div id="fpSuccess" class="fp-success" hidden>
+      <div class="done-icon"><svg class="i"><use href="#i-mail"/></svg></div>
+      <h2>Check your inbox</h2>
+      <p> If an account exists for <strong id="fpSentEmail"></strong>, we've sent a password reset link to this address. Please check your inbox and spam folder.</p>
+      <button type="button" class="btn btn-ghost" id="fpDone">Close</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══════════════ HERO ═══════════════ -->
-<section class="hero" id="hero">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="hero-grid"></div>
-
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        <span>Nigeria’s Leading VTU Platform • 2026</span>
-        <i class="fas fa-star" style="color:var(--amber);font-size:.65rem"></i>
-      </div>
-
-      <h1 class="hero-h1">
-        Nigeria's Leading<br/>
-        Way to <span class="sky">Top Up,</span><br/>
-        Pay &amp; Resell Smarter.
-      </h1>
-
-      <p class="hero-p">
-        The one platform every Nigerian needs! buy data, send airtime, pay electricity, subscribe to cable TV and more. <strong>Instant delivery. Lowest prices. Zero wahala.</strong> Trusted by 50,000+ Nigerians daily.
-      </p>
-
-      <div class="hero-ctas">
-       <a href='/sign-up'> <button class="btn-hero-primary">
-          <i class="fas fa-rocket"></i>Start for Free
-        </button></a>
-        <button class="btn-hero-ghost" onclick="scrollToSection('how')">
-          <i class="fas fa-play-circle" style="color:var(--sky)"></i>See How It Works
-        </button>
-      </div>
-
-      <div class="hero-trust">
-        <div class="hero-trust-avatars">
-          <div class="trust-av">AK</div>
-          <div class="trust-av">FM</div>
-          <div class="trust-av">TO</div>
-          <div class="trust-av">AI</div>
-          <div class="trust-av">+</div>
-        </div>
-        <div class="hero-trust-text">
-          <div class="hero-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-          <strong>50,000+</strong> happy customers · <strong>4.9/5</strong> rated
-        </div>
-      </div>
+  <!-- ============ Loader (fingerprint login + create account) + error sheet ============ -->
+<div class="proc-ov" id="procOverlay" hidden>
+  <div class="loader" id="procLoader" role="status" aria-live="polite" hidden>
+    <div class="loader-orb">
+      <span class="loader-spin"></span>
+      <span class="loader-logo-wrap">
+        <img class="loader-logo" src="/logo.png" alt="" id="procLogo">
+        <span class="proc-fb" id="procFb" hidden>S</span>
+      </span>
     </div>
-
-    <div class="hero-right">
-      <div class="phone-wrap">
-        <div class="phone-glow"></div>
-
-        <!-- Float cards -->
-        <div class="float-card fc-1 reveal">
-          <div class="float-card-label"><i class="fas fa-bolt" style="color:var(--amber)"></i>Instant Delivery</div>
-          <div class="float-card-val">1.2s</div>
-          <div class="float-card-sub">Avg processing time</div>
-          <div class="float-card-badge" style="background:rgba(16,185,129,.1);color:var(--green)">⚡ Super Fast</div>
-        </div>
-        <div class="float-card fc-2 reveal reveal-delay-2">
-          <div class="float-card-label"><i class="fas fa-shield-halved" style="color:var(--sky)"></i>100% Secure</div>
-          <div class="float-card-val">SSL</div>
-          <div class="float-card-sub">Bank-grade encryption</div>
-          <div class="float-card-badge" style="background:rgba(14,165,233,.1);color:var(--sky)">🔒 Verified</div>
-        </div>
-        <div class="float-card fc-3 reveal reveal-delay-1">
-          <div class="float-card-label"><i class="fas fa-naira-sign" style="color:var(--green)"></i>Today's Savings</div>
-          <div class="float-card-val">₦12,400</div>
-          <div class="float-card-sub">Saved by users today</div>
-        </div>
-        <div class="float-card fc-4 reveal reveal-delay-3">
-          <div class="float-card-label"><i class="fas fa-users" style="color:var(--purple)"></i>Online Now</div>
-          <div class="float-card-val" id="onlineCount">2,841</div>
-          <div class="float-card-sub">Users transacting</div>
-        </div>
-
-        <!-- Phone mockup -->
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="phone-status">
-              <span class="phone-status-time" id="phoneTime">9:41</span>
-              <div class="phone-status-icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-three-quarters"></i>
-              </div>
-            </div>
-
-            <!-- Mini wallet -->
-            <div class="phone-wallet">
-              <div class="phone-wallet-lbl">WALLET BALANCE</div>
-              <div class="phone-wallet-bal">₦15,420.00</div>
-              <div class="phone-wallet-btns">
-                <div class="phone-wallet-btn">+ Fund</div>
-                <div class="phone-wallet-btn">Transfer</div>
-                <div class="phone-wallet-btn">History</div>
-              </div>
-            </div>
-
-            <!-- Services -->
-            <div class="phone-services">
-              <div class="phone-svc"><i class="fas fa-wifi"></i><span>Data</span></div>
-              <div class="phone-svc"><i class="fas fa-phone"></i><span>Airtime</span></div>
-              <div class="phone-svc"><i class="fas fa-tv"></i><span>Cable</span></div>
-              <div class="phone-svc"><i class="fas fa-bolt"></i><span>Bills</span></div>
-            </div>
-
-            <!-- Transactions -->
-            <div style="font-size:.42rem;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;padding-left:2px">Recent</div>
-            <div class="phone-txs">
-              <div class="phone-tx">
-                <div class="phone-tx-ico" style="background:rgba(14,165,233,.15);color:#0ea5e9"><i class="fas fa-wifi"></i></div>
-                <div class="phone-tx-desc">MTN 1GB Data</div>
-                <div>
-                  <div class="phone-tx-amt">-₦420</div>
-                  <div class="phone-tx-badge">Done</div>
-                </div>
-              </div>
-              <div class="phone-tx">
-                <div class="phone-tx-ico" style="background:rgba(16,185,129,.15);color:#10b981"><i class="fas fa-phone"></i></div>
-                <div class="phone-tx-desc">Glo Airtime</div>
-                <div>
-                  <div class="phone-tx-amt">-₦200</div>
-                  <div class="phone-tx-badge">Done</div>
-                </div>
-              </div>
-              <div class="phone-tx">
-                <div class="phone-tx-ico" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-bolt"></i></div>
-                <div class="phone-tx-desc">KANO ELEC Token</div>
-                <div>
-                  <div class="phone-tx-amt">-₦5K</div>
-                  <div class="phone-tx-badge">Done</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="loader-text"><strong id="procLoadTitle">Logging you in...</strong><span id="procLoadSub"></span></div>
   </div>
-</section>
 
-<!-- ═══════════════ TICKER ═══════════════ -->
-<div class="ticker">
-  <div class="ticker-track" id="tickerTrack"></div>
-</div>
-
-
-<!-- ═══════════════ ABOUT ═══════════════ -->
-<section class="about-section" id="about">
-  <div class="about-inner">
-    <!-- Visual Side -->
-    <div class="about-visual reveal">
-      <div class="about-card-main">
-        <div class="about-brand-row">
-          <div class="about-brand-mark">
-            <img src="logo.png" alt="SubHub Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-            <span class="about-brand-mark-txt" style="display:none">S</span>
-          </div>
-          <div>
-            <div class="about-brand-name">SubHub</div>
-            <div class="about-brand-sub">Operated by <b>Earncial Global </b>
-            </div>
-          </div>
-        </div>
-        <div class="about-mission">
-          Built to make <span>digital payments</span> accessible, affordable and instant for every Nigerian! buy, resell.
-        </div>
-        <div class="about-values">
-          <div class="about-value">
-            <div class="about-value-icon"><i class="fas fa-bolt"></i></div>
-            <div class="about-value-title">Speed</div>
-            <div class="about-value-desc">Transactions complete in under 2 seconds</div>
-          </div>
-          <div class="about-value">
-            <div class="about-value-icon"><i class="fas fa-shield-halved"></i></div>
-            <div class="about-value-title">Security</div>
-            <div class="about-value-desc">Bank-grade encryption on every transaction</div>
-          </div>
-          <div class="about-value">
-            <div class="about-value-icon"><i class="fas fa-tags"></i></div>
-            <div class="about-value-title">Savings</div>
-            <div class="about-value-desc">Nigeria's lowest rates across all services</div>
-          </div>
-          <div class="about-value">
-            <div class="about-value-icon"><i class="fas fa-headset"></i></div>
-            <div class="about-value-title">Support</div>
-            <div class="about-value-desc">Live human support 24 hours, 7 days a week</div>
-          </div>
-        </div>
-      </div>
-      <!-- Floating cards -->
-      <div class="about-fc about-fc-1">
-        <div class="about-fc-label"><i class="fas fa-users" style="color:#00aaff"></i>Active Users</div>
-        <div class="about-fc-val">50,000+</div>
-        <div class="about-fc-sub">Across all 36 states</div>
-      </div>
-      <div class="about-fc about-fc-2">
-        <div class="about-fc-label"><i class="fas fa-check-circle" style="color:#10b981"></i>Success Rate</div>
-        <div class="about-fc-val">99.8%</div>
-        <div class="about-fc-sub">Transaction success rate</div>
-      </div>
+  <div class="proc-sheet" id="procBox" role="alert" hidden>
+    <span class="proc-handle"></span>
+    <div class="orb">
+      <span class="orb-ring o1"></span><span class="orb-ring o2"></span><span class="orb-ripple"></span>
+      <span class="orb-core"><svg class="i"><use href="#i-lock"/></svg></span>
     </div>
-
-    <!-- Content Side -->
-    <div class="about-right reveal reveal-delay-2">
-      <div class="sec-badge"><i class="fas fa-info-circle"></i>What is SubHub?</div>
-      <h2 class="sec-h2" style="margin-bottom:16px">Nigeria's All-in-One<br/><span>Digital Services Hub</span></h2>
-      <div class="about-story">
-        <strong>SubHub</strong> is a Nigerian fintech platform designed to simplify everyday digital transactions. Whether you need to buy mobile data, top up airtime, pay your electricity bill, resell to customers or subscribe to cable TV. SubHub makes it all happen in seconds, from one app, at the best prices available anywhere in Nigeria.
-        <br/><br/>
-        We believe that <strong>every Nigerian deserves fast, reliable and affordable digital services</strong> — regardless of where they live or how tech-savvy they are. That's why SubHub is designed to be dead-simple, lightning fast and built specifically for the Nigerian experience.
-      </div>
-
-      <div class="about-pillars">
-        <div class="about-pillar">
-          <div class="about-pillar-num">01</div>
-          <div class="about-pillar-content">
-            <div class="about-pillar-title">Built for Everyday Nigerians</div>
-            <div class="about-pillar-desc">From students buying cheap data to business owners running bulk SMS campaigns, SubHub works for everyone. Simple interface, no technical knowledge needed.</div>
-          </div>
-        </div>
-        <div class="about-pillar">
-          <div class="about-pillar-num">02</div>
-          <div class="about-pillar-content">
-            <div class="about-pillar-title">Powered by Multiple Providers</div>
-            <div class="about-pillar-desc">We integrate with the most reliable VTU API providers in Nigeria — so when one is down, we automatically switch to another. Maximum uptime, zero wahala.</div>
-          </div>
-        </div>
-        <div class="about-pillar">
-          <div class="about-pillar-num">03</div>
-          <div class="about-pillar-content">
-            <div class="about-pillar-title">Empowering Resellers & Entrepreneurs</div>
-            <div class="about-pillar-desc">SubHub is the secret weapon for thousands of Nigerian resellers. Bulk data cards, printable vouchers, recharge cards and bulk SMS — all in one platform.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="about-founded">
-        <div class="about-founded-icon">🇳🇬</div>
-        <div class="about-founded-text">
-          <strong>Proudly Nigerian.</strong> SubHub was founded in Nigeria by Nigerians, for Nigerians. We understand the unique challenges of the Nigerian digital economy and we've built every feature to solve them.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ BRANDS ═══════════════ -->
-<div class="brands-section">
-  <div class="brands-label">Trusted Partners & Networks</div>
-  <div class="brands-row">
-    <div class="brand-item"><div class="brand-dot" style="background:#ffcc00"></div>MTN Nigeria</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#ef0000"></div>Airtel Nigeria</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#009a44"></div>Glo Mobile</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#006b3c"></div>9Mobile</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#003087"></div>DStv / MultiChoice</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#0ea5e9"></div>Palmpay</div>
-    <div class="brand-item"><div class="brand-dot" style="background:#cc0000"></div>StarTimes</div>
+    <div class="proc-title" id="procTitle"></div>
+    <div class="proc-sub" id="procSub"></div>
+    <button type="button" class="btn btn-primary proc-btn" id="procBtn">Try again</button>
   </div>
 </div>
 
-<!-- ═══════════════ SERVICES ═══════════════ -->
-<section class="services-section" id="services">
-  <div class="sec-center reveal">
-    <div class="sec-badge"><i class="fas fa-grid-2"></i>Everything You Need</div>
-    <h2 class="sec-h2">One App, <span>All Services</span></h2>
-    <p class="sec-p">From data to electricity SubHub handles all your daily digital transactions at the best prices available in Nigeria.</p>
-  </div>
+  <div class="toasts" id="toastContainer" aria-live="polite"></div>
 
-  <div class="services-grid">
-    <div class="svc-card reveal">
-      <div class="svc-card-icon" style="background:rgba(14,165,233,.1);color:var(--sky)"><i class="fas fa-wifi"></i></div>
-      <div class="svc-card-title">Mobile Data</div>
-      <div class="svc-card-desc">Get cheap SME, corporate and gifting data for MTN, Airtel, Glo and 9Mobile. Delivered instantly, 24/7.</div>
-      <div class="svc-card-tag">All Networks · Instant</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-1">
-      <div class="svc-card-icon" style="background:rgba(16,185,129,.1);color:var(--green)"><i class="fas fa-phone"></i></div>
-      <div class="svc-card-title">Airtime Top-Up</div>
-      <div class="svc-card-desc">Recharge any Nigerian phone number instantly. No hidden charges what you enter is what you get.</div>
-      <div class="svc-card-tag">₦50 – ₦100,000</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-2">
-      <div class="svc-card-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-tv"></i></div>
-      <div class="svc-card-title">Cable TV</div>
-      <div class="svc-card-desc">Subscribe to DStv, GOtv and StarTimes plans at the best prices. Never miss your favourite shows.</div>
-      <div class="svc-card-tag">DStv · GOtv · StarTimes</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-3">
-      <div class="svc-card-icon" style="background:rgba(245,158,11,.1);color:var(--amber)"><i class="fas fa-bolt"></i></div>
-      <div class="svc-card-title">Electricity Tokens</div>
-      <div class="svc-card-desc">Buy prepaid and postpaid electricity tokens for all DISCOs in Nigeria. Token delivered to your phone.</div>
-      <div class="svc-card-tag">All 10 DISCOs</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-1">
-      <div class="svc-card-icon" style="background:rgba(249,115,22,.1);color:var(--orange, #f97316)"><i class="fas fa-graduation-cap"></i></div>
-      <div class="svc-card-title">Exam Pins</div>
-      <div class="svc-card-desc">Purchase WAEC, NECO, NABTEB and JAMB result checker pins instantly at the lowest prices.</div>
-      <div class="svc-card-tag">WAEC · NECO · JAMB</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-2">
-      <div class="svc-card-icon" style="background:rgba(20,184,166,.1);color:#14b8a6"><i class="fas fa-id-card"></i></div>
-      <div class="svc-card-title">Recharge Cards</div>
-      <div class="svc-card-desc">Generate and print physical recharge cards in bulk. Perfect for resellers and business owners.</div>
-      <div class="svc-card-tag">Bulk · Instant PINs</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal reveal-delay-3">
-      <div class="svc-card-icon" style="background:rgba(236,72,153,.1);color:var(--rose)"><i class="fas fa-comment-dots"></i></div>
-      <div class="svc-card-title">Bulk SMS</div>
-      <div class="svc-card-desc">Send targeted SMS to thousands of customers with your business sender ID. As low as ₦4/SMS.</div>
-      <div class="svc-card-tag">Custom Sender ID</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    <div class="svc-card reveal">
-      <div class="svc-card-icon" style="background:rgba(239,68,68,.1);color:var(--rose)"><i class="fas fa-print"></i></div>
-      <div class="svc-card-title">Print Data Cards</div>
-      <div class="svc-card-desc">Generate branded data voucher cards to sell to your customers. High-quality printable cards.</div>
-      <div class="svc-card-tag">Reseller Feature</div>
-      <div class="svc-card-arrow"><i class="fas fa-arrow-right"></i></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
-<section class="how-section" id="how">
-  <div class="sec-center reveal">
-    <div class="sec-badge"><i class="fas fa-map"></i>Dead Simple</div>
-    <h2 class="sec-h2">Start in <span>4 Easy Steps</span></h2>
-    <p class="sec-p">No paperwork, no waiting, no wahala. Get started in under 2 minutes and start saving money today.</p>
-  </div>
-
-  <div class="steps">
-    <div class="step reveal">
-      <div class="step-num"><i class="fas fa-user-plus"></i></div>
-      <div class="step-title">Create Account</div>
-      <div class="step-desc">Sign up with your small information such as phone number, fullname, email in under 60 seconds. No documents required to start.</div>
-    </div>
-    <div class="step reveal reveal-delay-1">
-      <div class="step-num"><i class="fas fa-wallet"></i></div>
-      <div class="step-title">Fund Your Wallet</div>
-      <div class="step-desc">Add money via bank transfer. Funds reflect instantly in your SubHub wallet.</div>
-    </div>
-    <div class="step reveal reveal-delay-2">
-      <div class="step-num"><i class="fas fa-th-large"></i></div>
-      <div class="step-title">Choose a Service</div>
-      <div class="step-desc">Select from data, airtime, cable, electricity and more. Pick your plan or provider.</div>
-    </div>
-    <div class="step reveal reveal-delay-3">
-      <div class="step-num"><i class="fas fa-check-circle"></i></div>
-      <div class="step-title">Done Instantly</div>
-      <div class="step-desc">Transaction completes in seconds. Get a receipt and track your history anytime.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ STATS ═══════════════ -->
-<section class="stats-section">
-  <div class="stats-orb stats-orb-1"></div>
-  <div class="stats-orb stats-orb-2"></div>
-  <div class="stats-inner">
-    <div class="stat-item reveal">
-      <span class="stat-num" data-target="50000" data-prefix="" data-suffix="+">0</span>
-      <div class="stat-label">Happy Customers<br/>across Nigeria</div>
-      <div class="stat-sub">Growing 40% monthly</div>
-    </div>
-    <div class="stat-item reveal reveal-delay-1">
-      <span class="stat-num" data-target="2400000" data-prefix="₦" data-suffix="">₦0</span>
-      <div class="stat-label">Average Savings<br/>Generated Monthly</div>
-      <div class="stat-sub">vs. competitors</div>
-    </div>
-    <div class="stat-item reveal reveal-delay-2">
-      <span class="stat-num" data-target="99" data-prefix="" data-suffix=".8%">0</span>
-      <div class="stat-label">Transaction Success<br/>Rate</div>
-      <div class="stat-sub">Industry best</div>
-    </div>
-    <div class="stat-item reveal reveal-delay-3">
-      <span class="stat-num" data-target="24" data-prefix="" data-suffix="/7">0</span>
-      <div class="stat-label">Always Available<br/>Customer Support</div>
-      <div class="stat-sub">Live chat & WhatsApp</div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ FEATURES BENTO ═══════════════ -->
-<section class="features-section" id="features">
-  <div class="reveal">
-    <div class="sec-badge"><i class="fas fa-stars"></i>Why SubHub?</div>
-    <h2 class="sec-h2">Built Different.<br/><span>Better in Every Way.</span></h2>
-    <p class="sec-p">We didn't just build another VTU app. We built the platform we always wished existed fast, cheap, beautiful and reliable.</p>
-  </div>
-
-  <div class="bento">
-    <!-- Instant speed -->
-    <div class="bento-card big reveal">
-      <div class="bento-card-ico" style="background:rgba(14,165,233,.1);color:var(--sky)"><i class="fas fa-bolt"></i></div>
-      <div class="bento-card-h">Lightning Fast Delivery</div>
-      <div class="bento-card-p">Average transaction completes in 1.2 seconds. We process orders in parallel across multiple providers so you never wait. Whether it's 2am or 2pm, your service is delivered instantly.</div>
-      <div class="speed-visual" id="speedVisual">
-        <div class="speed-bar competitor" style="height:30%"></div>
-        <div class="speed-bar competitor" style="height:60%"></div>
-        <div class="speed-bar" style="height:95%"></div>
-        <div class="speed-bar competitor" style="height:45%"></div>
-        <div class="speed-bar competitor" style="height:75%"></div>
-        <div class="speed-bar" style="height:98%"></div>
-        <div class="speed-bar competitor" style="height:50%"></div>
-        <div class="speed-bar" style="height:96%"></div>
-      </div>
-      <div style="font-size:.72rem;color:var(--slate);margin-top:8px;display:flex;gap:16px">
-        <span><span style="display:inline-block;width:10px;height:6px;background:var(--sky);border-radius:2px;margin-right:4px"></span>SubHub (1.2s avg)</span>
-        <span><span style="display:inline-block;width:10px;height:6px;background:#cbd5e1;border-radius:2px;margin-right:4px"></span>Others</span>
-      </div>
-    </div>
-
-    <!-- Networks -->
-    <div class="bento-card reveal reveal-delay-1">
-      <div class="bento-card-ico" style="background:rgba(16,185,129,.1);color:var(--green)"><i class="fas fa-signal"></i></div>
-      <div class="bento-card-h">All Networks Covered</div>
-      <div class="bento-card-p">One platform for every Nigerian network. Buy, gift and manage data for any network.</div>
-      <div class="net-logos">
-        <div class="net-logo" style="background:#ffcc00;color:#1a1a00;border-color:#ffcc00">MTN</div>
-        <div class="net-logo" style="background:#ef0000;border-color:#ef0000">AIR</div>
-        <div class="net-logo" style="background:#009a44;border-color:#009a44">GLO</div>
-        <div class="net-logo" style="background:#006b3c;border-color:#006b3c">9MB</div>
-      </div>
-    </div>
-
-    <!-- Security -->
-    <div class="bento-card tall reveal reveal-delay-2">
-      <div class="bento-card-ico" style="background:rgba(16,185,129,.1);color:var(--green)"><i class="fas fa-shield-halved"></i></div>
-      <div class="bento-card-h">Bank-Grade Security</div>
-      <div class="bento-card-p">Your money and data are protected with the same technology used by major banks. Every transaction requires PIN confirmation.</div>
-      <div class="security-badges">
-        <div class="sec-badge-item"><i class="fas fa-lock"></i>256-bit SSL</div>
-        <div class="sec-badge-item"><i class="fas fa-key"></i>Transaction PIN</div>
-        <div class="sec-badge-item"><i class="fas fa-eye-slash"></i>Data Privacy</div>
-        <div class="sec-badge-item"><i class="fas fa-shield-check"></i>Fraud Detection</div>
-        <div class="sec-badge-item"><i class="fas fa-fingerprint"></i>Biometric Auth</div>
-        <div class="sec-badge-item"><i class="fas fa-bell"></i>Real-time Alerts</div>
-      </div>
-      <div style="margin-top:20px;padding:14px;background:rgba(16,185,129,.06);border-radius:var(--r);border:1px solid rgba(16,185,129,.15)">
-        <div style="font-size:.72rem;font-weight:700;color:var(--green);margin-bottom:4px"><i class="fas fa-check-circle"></i> Zero fraud incidents since launch</div>
-        <div style="font-size:.72rem;color:var(--slate);line-height:1.5">Our AI-powered fraud detection system monitors every transaction in real time.</div>
-      </div>
-    </div>
-
-    <!-- Savings calculator -->
-    <div class="bento-card reveal">
-      <div class="bento-card-ico" style="background:rgba(249,115,22,.1);color:#f97316"><i class="fas fa-piggy-bank"></i></div>
-      <div class="bento-card-h">Best Prices in Nigeria</div>
-      <div class="bento-card-p">Compare and see how much you save with SubHub.</div>
-      <div class="savings-calc">
-        <div class="savings-row">
-          <span class="savings-label">MTN 1GB (Others)</span>
-          <span class="savings-val">₦500</span>
-        </div>
-        <div class="savings-row">
-          <span class="savings-label">MTN 1GB (SubHub)</span>
-          <span class="savings-val">₦250</span>
-        </div>
-        <div class="savings-bar"><div class="savings-fill" id="savingsFill" style="width:0%"></div></div>
-        <div class="savings-row">
-          <span class="savings-label">You Save Per Purchase</span>
-          <span class="savings-val save">₦250 (50%)</span>
-        </div>
-        <div class="savings-row">
-          <span class="savings-label">Annual Savings (2x/week)</span>
-          <span class="savings-val save">₦20,320+</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Virtual account -->
-    <div class="bento-card big reveal reveal-delay-2">
-      <div class="bento-card-ico" style="background:rgba(14,165,233,.1);color:var(--sky)"><i class="fas fa-building-columns"></i></div>
-      <div class="bento-card-h">Dedicated Virtual Bank Account</div>
-      <div class="bento-card-p">Get a personal virtual account number (Palmpay, Opay / Flutterwave) to fund your wallet instantly via direct transfer. No waiting, no upload of receipts  just transfer and go. Perfect for frequent users and resellers.</div>
-      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-        <div style="flex:1;min-width:180px;background:var(--off);border-radius:var(--r);padding:14px;border:1px solid var(--mist)">
-          <div style="font-size:.65rem;color:var(--slate);font-weight:700;margin-bottom:6px;text-transform:uppercase">Account Number</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:var(--ink);letter-spacing:1px">Auto-generated</div>
-          <div style="font-size:.68rem;color:var(--slate);margin-top:3px">Your name · Palmpay . Opay</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:7px;font-size:.76rem;font-weight:600;color:var(--green)"><i class="fas fa-check-circle"></i>Instant credit</div>
-          <div style="display:flex;align-items:center;gap:7px;font-size:.76rem;font-weight:600;color:var(--green)"><i class="fas fa-check-circle"></i>Zero charge</div>
-          <div style="display:flex;align-items:center;gap:7px;font-size:.76rem;font-weight:600;color:var(--green)"><i class="fas fa-check-circle"></i>24/7 active</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ PRICING ═══════════════ -->
-<section class="pricing-section" id="pricing">
-  <div class="sec-center reveal">
-    <div class="sec-badge"><i class="fas fa-tags"></i>Transparent Pricing</div>
-    <h2 class="sec-h2">No Hidden Fees,<br/><span>No Surprises</span></h2>
-    <p class="sec-p">SubHub is completely free to use. You only pay for the services you buy and always at the best rates.</p>
-  </div>
-
-  <div class="pricing-tabs reveal">
-    <button class="ptab active" id="ptab-data" onclick="switchPricing('data')">Data Plans</button>
-    <button class="ptab" id="ptab-airtime" onclick="switchPricing('airtime')">Airtime</button>
-    <button class="ptab" id="ptab-cable" onclick="switchPricing('cable')">Cable TV</button>
-    <button class="ptab" id="ptab-elec" onclick="switchPricing('elec')">Electricity</button>
-  </div>
-
-  <div class="pricing-grid reveal" id="pricingGrid"></div>
-</section>
-
-<!-- ═══════════════ TESTIMONIALS ═══════════════ -->
-<section class="testimonials-section">
-  <div class="testi-intro reveal">
-    <div class="sec-badge"><i class="fas fa-quote-left"></i>Real People, Real Results</div>
-    <h2 class="sec-h2">What Nigerians<br/><span>Are Saying</span></h2>
-    <p class="sec-p">Over 50,000 Nigerians use SubHub daily. Here's what they say about us.</p>
-  </div>
-  <div class="testi-track-wrap">
-    <div class="testi-track" id="testiTrack"></div>
-  </div>
-</section>
-
-<!-- ═══════════════ FAQ ═══════════════ -->
-<section class="faq-section" id="faq">
-  <div class="sec-center reveal">
-    <div class="sec-badge"><i class="fas fa-circle-question"></i>Common Questions</div>
-    <h2 class="sec-h2">Got Questions?<br/><span>We Have Answers.</span></h2>
-  </div>
-  <div class="faq-wrap" id="faqWrap"></div>
-</section>
-
-<!-- ═══════════════ APP DOWNLOAD (COMING SOON — uncomment when app is live) ═══════════════-->
-<section class="app-section" id="download">
-  <div class="app-inner">
-    <div class="reveal">
-      <div class="sec-badge" style="border-color:rgba(14,165,233,.3)"><i class="fas fa-mobile-screen"></i>Mobile App</div>
-      <h2 class="app-h">SubHub in Your<br/><span>Pocket, Always.</span></h2>
-      <p class="app-p">Download the SubHub app and enjoy the fastest VTU experience on Android and iOS. Biometric login, offline history, and instant notifications — all at your fingertips.</p>
-      <div class="app-btns">
-        <a href="https://play.google.com/store/apps/details?id=ng.subhub" class="app-btn">
-          <div class="app-btn-icon"><i class="fab fa-android"></i></div>
-          <div>
-            <span class="app-btn-sub">Download for</span>
-            <span class="app-btn-name">Android</span>
-          </div>
-        </a>
-        <a href="https://subhub.com.ng" class="app-btn">
-          <div class="app-btn-icon"><i class="fab fa-apple"></i></div>
-          <div>
-            <span class="app-btn-sub">Use on</span>
-            <span class="app-btn-name">Web App</span>
-          </div>
-        </a>
-        <!--<a href="https://subhub.com.ng" class="app-btn">
-          <div class="app-btn-icon"><i class="fas fa-globe"></i></div>
-          <div>
-            <span class="app-btn-sub">Use on</span>
-            <span class="app-btn-name">Web App</span>
-          </div>
-        </a>-->
-      </div>
-    </div>
-    <div class="app-phones reveal reveal-delay-2">
-      <div class="app-phone-img">
-        <div class="app-phone-inner" style="background:linear-gradient(145deg,#0ea5e9,#0284c7)"></div>
-      </div>
-      <div class="app-phone-img">
-        <div class="app-phone-inner" style="background:linear-gradient(145deg,#0369a1,#0ea5e9)"></div>
-      </div>
-    </div>
-  </div>
-</section>
-<!--END APP DOWNLOAD SECTION -->
-
-<!-- ═══════════════ FOOTER ═══════════════ -->
-<footer>
-  <div class="footer-top">
-    <div>
-      <div class="footer-brand">
-        <div class="footer-logo">
-          <img src="logo.png" alt="S" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-          <span class="footer-logo-text">S</span>
-        </div>
-        <span class="footer-wordmark">Sub<span>Hub</span></span>
-      </div>
-      <div class="footer-tagline">Nigeria's the best VTU platform, operated by <span style='color:rgba(0,170,255,.7);font-weight:600'>Earncial Global</span>. Buy data, airtime, pay bills, resell and more  instantly and securely.</div>
-      <div class="footer-socials">
-       <!-- <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>-->
-        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.facebook.com/subhubng?mibextid=ZbWKwL" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://wa.me/2347040495661" class="social-btn"><i class="fab fa-whatsapp"></i></a>
-        <a href="https://www.tiktok.com/@subhubng" class="social-btn"><i class="fab fa-tiktok"></i></a>
-      </div>
-    </div>
-    <div>
-      <h4>Services</h4>
-      <div class="footer-links">
-        <a href="sign-up" class="footer-link">Buy Data</a>
-        <a href="sign-up" class="footer-link">Buy Airtime</a>
-        <a href="sign-up" class="footer-link">Cable TV</a>
-        <a href="sign-up" class="footer-link">Electricity Bills</a>
-        <a href="sign-up" class="footer-link">Exam Pins</a>
-        <a href="sign-up" class="footer-link">Bulk SMS</a>
-      </div>
-    </div>
-    <div>
-      <h4>Company</h4>
-      <div class="footer-links">
-        <a class='footer-link' href='/about'>About SubHub</a>
-        <a class='footer-link' href='/about'>Blog</a>
-        <a href="about.html" class="footer-link">Careers</a>
-        <a href="https://earncial.com" class="footer-link">Earncial</a>
-        <a href="faq.html" class="footer-link">Partners</a>
-      </div>
-    </div>
-    <div>
-      <h4>Support</h4>
-      <div class="footer-links">
-        <a href="#" class="footer-link">Help Center</a>
-        <a href="https://wa.me/2347040495661" class="footer-link">WhatsApp</a>
-        <a href="login" class="footer-link">Live Chat</a>
-        <a href="https://wa.me/2347040495661" class="footer-link">Report a Bug</a>
-        <a href="https://wa.me/2347040495661" class="footer-link">Reseller Program</a>
-      </div>
-    </div>
-    <div>
-      <h4>Legal</h4>
-      <div class="footer-links">
-        <a href="/privacy" class="footer-link">Privacy Policy</a>
-        <a class='footer-link' href='/terms'>Terms of Use</a>
-        <a href="#" class="footer-link">Refund Policy</a>
-        <a href="#" class="footer-link">Cookie Policy</a>
-        <!--<a href="#" class="footer-link">Dispute Resolution</a>
-        <a href="#" class="footer-link">Compliance</a>-->
-      </div>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2026 SubHub • Powered by <strong style="color:rgba(255,255,255,.55)">Earncial Global</strong> · All rights reserved.</span>
-    <div class="footer-legal">
-      <a href="/privacy">Privacy</a><a href='/terms'>Terms</a><a href="/faq">FAQ</a>
-    </div>
-  </div>
-</footer>
-<!-- ═══════════════ WHATSAPP FLOAT ═══════════════ -->
-<a href="https://wa.me/2347040495661?text=Hello%20SubHub%20Team"
-   class="wa-float"
-   target="_blank"
-   aria-label="Chat on WhatsApp">
-
-  <!-- Ripple Rings -->
-  <span class="wa-ripple"></span>
-  <span class="wa-ripple wa-ripple-delay"></span>
-
-  <!-- Notification Badge -->
-  <span class="wa-badge">1</span>
-
-  <!-- Icon -->
-  <div class="wa-icon">
-    <i class="fab fa-whatsapp"></i>
-  </div>
-
-  <!-- Tooltip -->
-  <div class="wa-tooltip">
-    Chat with SubHub Support
-  </div>
-</a>
- <!--END OF WHATSAPP FLOAT-->
- 
-<script src="assets/js/main.js"></script>
-<script src="/assets/js/playstore-banner.js"></script>
-<script src="assets/js/whatsapp-banner.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
-</script>
+  <!-- Load order matters: config.js first -->
+  <script src="/assets/js/config.js?v=2" defer></script>
+  <script src="/assets/js/login.js?v=1" defer></script>
+  <script src="/assets/js/sign-up.js?v=1" defer></script>
+  <script src="/assets/js/pin.js?v=2" defer></script>
+  <script src="/assets/js/support.js" data-position="right"></script>
 </body>
 </html>
