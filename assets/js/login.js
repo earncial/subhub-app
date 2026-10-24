@@ -317,7 +317,7 @@ function goHome(){
 /* ============================================================
    FORGOT PASSWORD
 ============================================================ */
-function openForgot(){
+/*function openForgot(){
   document.querySelector('#forgotModal .sheet').classList.remove('shake');
   $('fpErr').classList.remove('show'); $('fpForm').hidden = false; $('fpSuccess').hidden = true;
   const guess = (state.mode === 'first' || state.editing ? $('credential').value.trim() : (state.saved ? state.saved.username : '')) || '';
@@ -336,7 +336,7 @@ async function handleForgot(){
   await apiCall('/auth/forgot-password', { method:'POST', body:JSON.stringify({ email }) });
   setLoading(b, false);
   $('fpSentEmail').textContent = email; $('fpForm').hidden = true; $('fpSuccess').hidden = false;
-}
+}*/
 
 /* ============================================================
    INIT
@@ -380,14 +380,14 @@ document.querySelectorAll('[data-eye]').forEach(btn => btn.addEventListener('cli
   $(f).classList.remove('invalid'); $(f + 'Error').classList.remove('show'); $('formError').classList.remove('show');
 }));
 
-$('forgotBtn').addEventListener('click', openForgot);
+/*$('forgotBtn').addEventListener('click', openForgot);
 $('forgotClose').addEventListener('click', closeForgot);
 $('fpDone').addEventListener('click', closeForgot);
 $('forgotModal').addEventListener('click', e => { if (e.target === $('forgotModal')) closeForgot(); });
 $('fpSubmit').addEventListener('click', handleForgot);
 $('fpEmail').addEventListener('keydown', e => { if (e.key === 'Enter') handleForgot(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeForgot(); } });
-
+*/
 /* sign-up.js uses this after a successful signup */
 function showLoginWith(username){
   navStack.length = 0;
