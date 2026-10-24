@@ -74,7 +74,6 @@ function saveState(s){ st = s; if (s) store.set(STORE_KEY, JSON.stringify(s)); e
 const CSS = `
 .proc-ov{z-index:1100!important}
 .fg-sheet{max-height:94vh;overflow-y:auto}
-.fg-sheet .sheet-close{z-index:5}
 .fg-back{left:16px;right:auto}
 .fg-step{animation:fgIn .35s cubic-bezier(.22,1,.36,1) both}
 @keyframes fgIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
