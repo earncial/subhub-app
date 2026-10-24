@@ -22,7 +22,7 @@ const { $, K, store, ico, setIcon, setLoading, vibrate, errorFeedback, showToast
 const USE_MOCK        = false;                       // true = test the screens with fake answers (code 123456)
 const FORGOT_ENDPOINT = '/auth/forgot-password';     // POST { email }              -> sends the 6-digit code
 const VERIFY_ENDPOINT = '/auth/verify-reset-code';   // POST { email, code }        -> { success, resetToken, expiresIn? }   <- NEW, confirm with backend
-const RESET_ENDPOINT  = '/auth/reset-password/';     // POST /:resetToken { password }
+const RESET_ENDPOINT  = '/auth/reset-password';     // POST /:resetToken { password }
 const RESEND_SECONDS  = 45;                          // wait before "Resend code"
 const CODE_SCREEN_TTL = 30 * 60 * 1000;              // how long the code screen is remembered after closing the app
 
@@ -106,7 +106,7 @@ const HTML = `
     <!-- 1) email -->
     <div class="fg-step" id="fgStepEmail">
       <h2>Forgot password?</h2>
-      <p><p>Don't worry, it happens! Enter the email address associated with your <b>SubHub</b> account, and we'll send you a 6-digit code to reset your password.</p>
+      <p>Don't worry, it happens! Enter the email address associated with your <b>SubHub</b> account, and we'll send you a 6-digit code to reset your password.</p>
       <div class="field">
         <label for="fgEmailInput">Email address</label>
         <div class="input-wrap">
@@ -339,7 +339,10 @@ async function verify(){
     return;
   }
   codeErr((d && d.message) || 'Incorrect code. Please try again.');
-
+    await wait(700);
+    code = ''; paintBoxes();
+  }
+  
 /* ============================================================
    STEP 3: NEW PASSWORD
 ============================================================ */
