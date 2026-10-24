@@ -98,6 +98,16 @@ function errorSheet(title, msg){
   errorFeedback(proc.box); proc.btn.focus();
 }
 
+function getDeviceId(){
+  let id = store.get('sh_device_id');
+  if (!id) {
+    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+       : 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+    store.set('sh_device_id', id);
+  }
+  return id;
+}
+
 window.SubHub = {
   API_BASE, REFRESH_ENDPOINT, HOME_URL, K, $, ico, setIcon, store, app, state,
   setLoading, vibrate, errorFeedback, showToast, apiCall, proc, loaderShow, procHide, errorSheet

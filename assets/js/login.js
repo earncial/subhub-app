@@ -258,7 +258,14 @@ async function handleSignIn(e){
   app.busy = true;
   const btn = $('loginBtn'); setLoading(btn, true);            // button disabled + spinner, no overlay
 
-  const data = await apiCall('/auth/signin', { method:'POST', body:JSON.stringify({ credential, password }) });
+  const data = await apiCall('/auth/signin', {
+  method: 'POST',
+  body: JSON.stringify({
+    credential,
+    password,
+    deviceId: getDeviceId()
+  })
+});
 
   if (!data || !data.success) {
     app.busy = false; setLoading(btn, false);
