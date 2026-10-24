@@ -109,7 +109,7 @@ function getDeviceId(){
 }
 
 window.SubHub = {
-  API_BASE, REFRESH_ENDPOINT, HOME_URL, K, $, ico, setIcon, store, app, state,
+  API_BASE, REFRESH_ENDPOINT, HOME_URL, getDeviceId, K, $, ico, setIcon, store, app, state,
   setLoading, vibrate, errorFeedback, showToast, apiCall, proc, loaderShow, procHide, errorSheet
 };
 })();

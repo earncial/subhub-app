@@ -19,7 +19,7 @@
 const { $, K, store, ico, setIcon, setLoading, vibrate, errorFeedback, showToast, apiCall, loaderShow, procHide, app } = window.SubHub;
 
 /* ---- settings ---- */
-const USE_MOCK        = true;                       // true = test the screens with fake answers (code 123456)
+const USE_MOCK        = false;                       // true = test the screens with fake answers (code 123456)
 const FORGOT_ENDPOINT = '/auth/forgot-password';     // POST { email }              -> sends the 6-digit code
 const VERIFY_ENDPOINT = '/auth/verify-reset-code';   // POST { email, code }        -> { success, resetToken, expiresIn? }   <- NEW, confirm with backend
 const RESET_ENDPOINT  = '/auth/reset-password/';     // POST /:resetToken { password }
@@ -59,7 +59,7 @@ function readState(){
     const s = JSON.parse(store.get(STORE_KEY) || 'null');
     if (s && s.email) {
       if (s.step === 'code' && Date.now() - s.sentAt < CODE_SCREEN_TTL) return s;
-      if (s.step === 'password' && s.resetToken && s.exp > Date.now()) return s;
+      if (s.step === 'password' && s.code && s.exp > Date.now()) return s;
     }
   } catch (e) {}
   store.del(STORE_KEY);
@@ -74,6 +74,7 @@ function saveState(s){ st = s; if (s) store.set(STORE_KEY, JSON.stringify(s)); e
 const CSS = `
 .proc-ov{z-index:1100!important}
 .fg-sheet{max-height:94vh;overflow-y:auto}
+.fg-sheet .sheet-close{z-index:5}
 .fg-back{left:16px;right:auto}
 .fg-step{animation:fgIn .35s cubic-bezier(.22,1,.36,1) both}
 @keyframes fgIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
@@ -104,8 +105,8 @@ const HTML = `
 
     <!-- 1) email -->
     <div class="fg-step" id="fgStepEmail">
-      <h2>Forgot password</h2>
-      <p>Enter the email on your SubHub account. We will send you a 6-digit code.</p>
+      <h2>Forgot password?</h2>
+      <p><p>Don't worry, it happens! Enter the email address associated with your <b>SubHub</b> account, and we'll send you a 6-digit code to reset your password.</p>
       <div class="field">
         <label for="fgEmailInput">Email address</label>
         <div class="input-wrap">
@@ -120,7 +121,7 @@ const HTML = `
     <!-- 2) code -->
     <div class="fg-step" id="fgStepCode" hidden>
       <h2>Enter the code</h2>
-      <p>We sent a 6-digit code to <b id="fgMask"></b>. It expires in 10 minutes.</p>
+      <p>We sent a 6-digit code to <b id="fgMask"></b>. It expires in 15 minutes.</p>
       <div class="fg-otp" id="fgOtp" aria-live="polite">
         <span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span>
       </div>
@@ -332,15 +333,12 @@ async function verify(){
 
   procHide(); setLoading($('fgVerify'), false); busy = false;
 
-  if (isOk(d) && d.resetToken) {
-    saveState({ step: 'password', email: st.email, resetToken: d.resetToken, exp: Date.now() + ((d.expiresIn || 900) * 1000) });
+  if (isOk(d)) {
+    saveState({ step: 'password', email: st.email, code, exp: (st.sentAt || Date.now()) + 15 * 60 * 1000 });
     showStep('pass');
     return;
   }
-  codeErr(isOk(d) ? 'Unexpected answer from the server. Please try again.' : ((d && d.message) || 'Incorrect code. Please try again.'));
-  await wait(700);
-  code = ''; paintBoxes();
-}
+  codeErr((d && d.message) || 'Incorrect code. Please try again.');
 
 /* ============================================================
    STEP 3: NEW PASSWORD
@@ -356,7 +354,7 @@ function passErr(msg){
   errorFeedback($('fgSheet'));
 }
 async function resetPassword(){
-  if (busy || !st || !st.resetToken) return;
+  if (busy || !st || !st.code) return;
   $('fgPassErr').classList.remove('show');
   const p1 = $('fgPass').value, p2 = $('fgPass2').value;
   if (p1.length < 8) return passErr('Password must be at least 8 characters.');
@@ -366,12 +364,12 @@ async function resetPassword(){
   busy = true; setLoading($('fgReset'), true);
   loaderShow('Updating your password...', 'Please wait a moment.');   // logo loader
 
-  const d = await api(RESET_ENDPOINT + encodeURIComponent(st.resetToken), { method: 'POST', body: JSON.stringify({ password: p1 }) });
+  const d = await api(RESET_ENDPOINT, { method: 'POST', body: JSON.stringify({ email: st.email, code: st.code, password: p1 }) });
 
   procHide(); setLoading($('fgReset'), false); busy = false;
 
   if (isOk(d)) return success();
-  if (d && (d.status === 401 || d.status === 404 || d.status === 410)) {          // the reset session is no longer valid
+  if (d && (d.status === 400 || d.status === 401 || d.status === 404 || d.status === 410 || d.status === 429)) {          // the reset session is no longer valid
     saveState(null); $('fgPass').value = ''; $('fgPass2').value = '';
     showStep('email');
     emailErr('This reset session expired. Please start again.');

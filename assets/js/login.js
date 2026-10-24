@@ -6,7 +6,7 @@
 (function () {
 'use strict';
 const { $, K, store, ico, setIcon, setLoading, errorFeedback, showToast, apiCall,
-        loaderShow, procHide, errorSheet, proc, app, state, REFRESH_ENDPOINT, HOME_URL } = window.SubHub;
+        loaderShow, procHide, errorSheet, proc, app, state, REFRESH_ENDPOINT, HOME_URL, getDeviceId } = window.SubHub;
 
 /* ============================================================
    FINGERPRINT BRIDGE (window.AndroidAuth, slot 'login')
@@ -258,14 +258,16 @@ async function handleSignIn(e){
   app.busy = true;
   const btn = $('loginBtn'); setLoading(btn, true);            // button disabled + spinner, no overlay
 
-  const data = await apiCall('/auth/signin', {
-  method: 'POST',
-  body: JSON.stringify({
-    credential,
-    password,
-    deviceId: getDeviceId()
-  })
-});
+  let data;
+  try {
+    data = await apiCall('/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ credential, password, deviceId: getDeviceId() })
+    });
+  } catch (err) {
+    console.error('SignIn error:', err);
+    data = { success: false, message: err.message };
+  }
 
   if (!data || !data.success) {
     app.busy = false; setLoading(btn, false);
