@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('sh_dark')==='1'?'dark':'light');}catch(e){}</script>
+<title>Transactions • SubHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/transactions.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="icon-btn" id="backBtn" aria-label="Back" data-ico="back"></button>
+  <h1>Transactions</h1>
+  <button class="icon-btn" id="exportBtn" aria-label="Download statement" data-ico="download"></button>
+  <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode"></button>
+</header>
+
+<main class="page">
+  <div class="seg rise" id="period" role="tablist" aria-label="Period"></div>
+  <section class="card sum rise" id="sum" style="--d:60ms"></section>
+
+  <div class="tools rise" style="--d:120ms">
+    <label class="search"><span data-ico="search"></span><input id="q" type="search" placeholder="Search reference, phone, meter or plan" autocomplete="off" enterkeyhint="search"><button class="clr" id="qClear" hidden aria-label="Clear search" data-ico="x"></button></label>
+    <button class="fbtn" id="fBtn" aria-label="Filters"><span data-ico="filter"></span><span class="n" id="fCount" hidden>0</span></button>
+  </div>
+  <div class="chips rise" id="chips" style="--d:160ms"></div>
+
+  <div id="list"></div>
+  <div id="sentinel" style="height:2px"></div>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="/assets/js/transactions.js"></script>
+</body>
+</html>

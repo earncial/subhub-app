@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('sh_dark')==='1'?'dark':'light');}catch(e){}</script>
+<title>Profile • SubHub (DEMO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SubHub — Profile & settings   (DEMO: one file, fake data)
+   Same look as the login page: colours, cards, sheets, keypad, toasts.
+============================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --brand:#00aaff;--brand2:#0070cc;--brand-dim:rgba(0,170,255,.12);--glow:rgba(0,170,255,.32);
+  --error:#e8334a;--success:#00c07a;--warn:#f59e0b;--purple:#8b5cf6;--pink:#ff4d8d;
+  --ease:cubic-bezier(.22,1,.36,1)
+}
+:root,[data-theme="light"]{--bg:#f3f8ff;--surface:#fff;--surface2:#f7faff;--border:rgba(0,100,200,.13);--text:#0d1a2e;--sub:#4d6480;--muted:#8096b8;--shadow:rgba(0,80,180,.10);--overlay:rgba(8,20,40,.5);--off:#cddbee}
+[data-theme="dark"]{--bg:#080c12;--surface:#111820;--surface2:#161e2a;--border:rgba(255,255,255,.09);--text:#eef2ff;--sub:#8fa0bf;--muted:#7080a0;--shadow:rgba(0,0,0,.55);--overlay:rgba(0,0,0,.65);--off:#2a3547}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+body.lock{overflow:hidden}
+.i{width:1em;height:1em;flex-shrink:0;display:inline-block;vertical-align:-.125em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer}
+:is(button,a,.row[tabindex]):focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:12px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.topbar.scrolled{border-bottom-color:var(--border)}
+.topbar h1{flex:1;font-size:1.1rem;font-weight:800;letter-spacing:-.3px}
+.top-actions{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);color:var(--sub);display:grid;place-items:center;font-size:1.15rem;box-shadow:0 3px 12px var(--shadow);transition:transform .08s}
+.icon-btn:active{transform:scale(.92)}
+
+.page{max-width:560px;margin:0 auto;padding:6px 16px calc(40px + env(safe-area-inset-bottom))}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:22px;box-shadow:0 14px 36px var(--shadow);overflow:hidden}
+.sec{margin:26px 4px 10px;font-size:.78rem;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-top:26px}
+.sec-head .sec{margin:0 4px 10px}
+.sub{margin:16px 4px 8px;font-size:.84rem;font-weight:700;color:var(--sub)}
+.rise{opacity:0;animation:rise .6s var(--ease) var(--d,0ms) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.flash{animation:flash 1.3s ease}
+@keyframes flash{0%,100%{box-shadow:0 14px 36px var(--shadow)}30%{box-shadow:0 0 0 4px var(--brand-dim),0 14px 36px var(--glow)}}
+
+/* ---------- skeleton ---------- */
+.sk{border-radius:14px;background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 37%,var(--surface2) 63%);background-size:400% 100%;animation:sk 1.3s ease infinite}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* ---------- hero ---------- */
+.hero{text-align:center;padding-bottom:18px}
+.hero-top{height:96px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--brand),#0066cc)}
+.hero-top::before,.hero-top::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero-top::before{width:150px;height:150px;right:-40px;top:-70px;animation:drift 9s ease-in-out infinite alternate}
+.hero-top::after{width:100px;height:100px;left:-30px;bottom:-60px;animation:drift 11s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(18px,12px) scale(1.12)}}
+.avatar-wrap{position:relative;width:96px;height:96px;margin:-48px auto 0}
+.avatar{width:96px;height:96px;border-radius:50%;border:4px solid var(--surface);background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-size:1.9rem;font-weight:800;overflow:hidden;box-shadow:0 10px 26px var(--glow);animation:pop .7s var(--ease) .2s both}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.cam{position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;border:3px solid var(--surface);display:grid;place-items:center;font-size:.95rem;box-shadow:0 4px 10px var(--glow);transition:transform .1s}
+.cam:active{transform:scale(.9)}
+.hero h2{margin-top:12px;font-size:1.3rem;font-weight:800;letter-spacing:-.4px;padding:0 16px;overflow-wrap:anywhere}
+.handle{font-size:.88rem;color:var(--sub);font-weight:600;margin-top:2px}
+.chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px;padding:0 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:.74rem;font-weight:700;background:var(--surface2);border:1.5px solid var(--border);color:var(--sub)}
+.chip .i{width:14px;height:14px}
+.chip.ok{color:var(--success);background:rgba(0,192,122,.1);border-color:rgba(0,192,122,.3)}
+.chip.warn{color:var(--warn);background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)}
+.chip.bad{color:var(--error);background:rgba(232,51,74,.08);border-color:rgba(232,51,74,.3)}
+.tier-bronze{color:#b4783a;background:rgba(180,120,58,.12);border-color:rgba(180,120,58,.35)}
+.tier-silver{color:#7d8aa0;background:rgba(125,138,160,.14);border-color:rgba(125,138,160,.4)}
+.tier-gold{color:#c9930f;background:rgba(217,162,27,.14);border-color:rgba(217,162,27,.4)}
+.tier-platinum{color:var(--purple);background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.35)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin:18px 14px 0;border:1.5px solid var(--border);border-radius:18px;background:var(--surface2)}
+.stat{padding:12px 6px}
+.stat+.stat{border-left:1.5px solid var(--border)}
+.stat b{display:block;font-size:1.02rem;font-weight:800;letter-spacing:-.3px}
+.stat small{display:block;margin-top:2px;font-size:.7rem;font-weight:600;color:var(--muted)}
+
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 6px;border-radius:18px;background:var(--surface);border:1.5px solid var(--border);box-shadow:0 8px 22px var(--shadow);font-size:.78rem;font-weight:700;color:var(--sub);transition:transform .1s}
+.qbtn:active{transform:scale(.96)}
+.qbtn .ico{width:38px;height:38px}
+
+.banner{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px;border-radius:18px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.35)}
+.banner .ico{background:rgba(245,158,11,.18);color:var(--warn)}
+.banner p{flex:1;font-size:.82rem;line-height:1.45;color:var(--sub)}
+.banner p b{color:var(--text)}
+.banner.bad{background:rgba(232,51,74,.07);border-color:rgba(232,51,74,.32)}
+.banner.bad .ico{background:rgba(232,51,74,.14);color:var(--error)}
+.banner.ok{background:rgba(0,192,122,.08);border-color:rgba(0,192,122,.3)}
+.banner.ok .ico{background:rgba(0,192,122,.16);color:var(--success)}
+.mini{padding:8px 14px;border-radius:999px;background:var(--brand);color:#fff;font-size:.78rem;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px var(--glow)}
+.mini.ghost{background:var(--surface);color:var(--text);border:1.5px solid var(--border);box-shadow:none}
+
+/* ---------- rows ---------- */
+.ico{width:40px;height:40px;border-radius:13px;flex-shrink:0;display:grid;place-items:center;font-size:1.15rem}
+.t-blue{background:var(--brand-dim);color:var(--brand)}.t-green{background:rgba(0,192,122,.14);color:var(--success)}
+.t-amber{background:rgba(245,158,11,.16);color:var(--warn)}.t-red{background:rgba(232,51,74,.12);color:var(--error)}
+.t-purple{background:rgba(139,92,246,.14);color:var(--purple)}.t-pink{background:rgba(255,77,141,.14);color:var(--pink)}
+.t-gray{background:var(--surface2);color:var(--sub)}
+.row{display:flex;align-items:center;gap:13px;width:100%;padding:13px 16px;min-height:64px;text-align:left;border-bottom:1px solid var(--border);position:relative;transition:background .12s}
+.row:last-child{border-bottom:0}
+button.row:active,.row[role="switch"]:active{background:var(--surface2)}
+.row-main{flex:1;min-width:0}
+.row-main b{display:block;font-size:.93rem;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.row-main small{display:block;margin-top:2px;font-size:.76rem;color:var(--muted);line-height:1.4}
+.row-end{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.8rem;font-weight:600}
+.row-end .i{width:18px;height:18px}
+.row.danger b{color:var(--error)}
+.sw{position:relative;width:48px;height:28px;border-radius:999px;background:var(--off);flex-shrink:0;transition:background .22s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .25s var(--ease)}
+.row[aria-checked="true"] .sw{background:var(--brand)}
+.row[aria-checked="true"] .sw::after{transform:translateX(20px)}
+.row[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.row.busy .sw{opacity:.6}
+.group-title{padding:14px 16px 4px;font-size:.72rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.dim{opacity:.45;pointer-events:none;filter:grayscale(.4);transition:opacity .25s}
+.note{margin:10px 6px 0;font-size:.78rem;line-height:1.5;color:var(--muted)}
+.save-pill{margin-bottom:10px;font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px;opacity:0;transition:opacity .25s;display:inline-flex;align-items:center;gap:6px}
+.save-pill.show{opacity:1}
+.save-pill.saving{color:var(--muted);background:var(--surface2)}
+.save-pill.saved{color:var(--success);background:rgba(0,192,122,.12)}
+.save-pill.error{color:var(--error);background:rgba(232,51,74,.1)}
+.mini-spin{width:11px;height:11px;border:2px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* wallet */
+.wallet{padding:18px;background:linear-gradient(135deg,#0a2a52,#0b4f8f 60%,#0a7fc4);color:#fff;border:0;position:relative}
+.wallet::after{content:'';position:absolute;right:-40px;top:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08)}
+.wallet small{font-size:.74rem;opacity:.75;font-weight:600}
+.wallet .num{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 4px}
+.wallet .num b{font-size:1.7rem;font-weight:800;letter-spacing:2px}
+.wallet .nm{font-size:.82rem;font-weight:600;opacity:.9}
+.wallet .acts{display:flex;gap:10px;margin-top:14px}
+.wbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:14px;background:rgba(255,255,255,.16);font-size:.82rem;font-weight:700;color:#fff;transition:transform .1s,background .15s}
+.wbtn:active{transform:scale(.96);background:rgba(255,255,255,.26)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border-radius:999px;font:700 .93rem 'Sora',system-ui,sans-serif;transition:transform .08s,opacity .15s}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 6px 20px var(--glow)}
+.btn-danger{background:linear-gradient(135deg,#ef4458,#c2182f);color:#fff;box-shadow:0 6px 20px rgba(232,51,74,.3)}
+.btn-ghost{background:var(--surface2);border:1.5px solid var(--border)}
+.btn-outline-danger{border:1.5px solid rgba(232,51,74,.4);color:var(--error);background:transparent}
+.btn .spinner{display:none;width:20px;height:20px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.btn.loading .spinner{display:block}.btn.loading .lbl{display:none}
+.stack{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+
+/* invite */
+.invite{padding:18px;background:linear-gradient(135deg,var(--purple),#5b3fd0);color:#fff;border:0;position:relative}
+.invite h3{font-size:1.05rem;font-weight:800}
+.invite p{font-size:.82rem;opacity:.85;margin-top:4px;line-height:1.5}
+.linkbox{display:flex;align-items:center;gap:8px;margin-top:14px;padding:6px 6px 6px 14px;border-radius:14px;background:rgba(255,255,255,.16)}
+.linkbox span{flex:1;min-width:0;font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkbox button{padding:9px 14px;border-radius:11px;background:#fff;color:#4b2fb8;font-size:.78rem;font-weight:800}
+.istats{display:flex;gap:18px;margin-top:14px;font-size:.78rem;opacity:.95}
+.istats b{display:block;font-size:1.05rem}
+
+/* ---------- sheets ---------- */
+.ov{position:fixed;inset:0;z-index:900;background:var(--overlay);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{position:relative;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--surface);border-radius:32px 32px 0 0;padding:12px 22px calc(24px + env(safe-area-inset-bottom));animation:up .28s var(--ease)}
+@keyframes up{from{transform:translateY(60px);opacity:.3}to{transform:none;opacity:1}}
+.grab{display:block;width:44px;height:5px;border-radius:3px;background:var(--muted);opacity:.35;margin:0 auto 18px}
+.sheet-x{position:absolute;top:22px;right:16px;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);display:grid;place-items:center}
+.sheet-x .i{width:16px;height:16px}
+.sheet h3{font-size:1.15rem;font-weight:800;letter-spacing:-.3px;padding-right:40px}
+.sheet .lead{margin:6px 0 16px;font-size:.86rem;line-height:1.55;color:var(--sub)}
+.sheet.center{text-align:center}.sheet.center h3{padding-right:0}
+.big-ico{width:68px;height:68px;margin:2px auto 14px;border-radius:50%;display:grid;place-items:center;font-size:1.9rem;animation:pop .5s var(--ease) both}
+.field{margin-bottom:14px}
+.field label{display:block;margin-bottom:6px;font-size:.8rem;font-weight:600;color:var(--sub)}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-wrap>.i{position:absolute;left:14px;color:var(--muted);font-size:1rem;pointer-events:none}
+.input{width:100%;min-height:50px;padding:12px 44px 12px 42px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;font:500 1rem 'Sora',system-ui,sans-serif;color:var(--text);outline:none;transition:border-color .12s,box-shadow .12s;-webkit-appearance:none;appearance:none}
+.input:focus{border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 3px var(--brand-dim)}
+.input.invalid{border-color:var(--error);box-shadow:0 0 0 3px rgba(232,51,74,.12)}
+.eye{position:absolute;right:4px;width:42px;height:42px;display:grid;place-items:center;color:var(--muted);border-radius:10px}
+.eye .i{width:20px;height:20px}
+.err{display:none;margin:-6px 0 12px;font-size:.78rem;font-weight:600;color:var(--error)}
+.err.show{display:block;animation:rise .3s both}
+.form-err{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:rgba(232,51,74,.08);color:var(--error);font-size:.82rem;font-weight:600;line-height:1.4}
+.form-err.show{display:block}
+.strength{display:flex;gap:6px;margin-top:8px}
+.strength span{flex:1;height:5px;border-radius:3px;background:var(--border);transition:background .15s}
+.strength.s1 span:nth-child(-n+1){background:var(--error)}.strength.s2 span:nth-child(-n+2){background:var(--warn)}
+.strength.s3 span:nth-child(-n+3){background:var(--brand)}.strength.s4 span{background:var(--success)}
+.strength-lbl{margin-top:4px;font-size:.74rem;font-weight:700;min-height:1em;color:var(--muted)}
+.opt{display:flex;align-items:center;gap:12px;width:100%;padding:14px;margin-bottom:10px;border-radius:16px;border:1.5px solid var(--border);background:var(--surface2);text-align:left;font-weight:700;font-size:.92rem;transition:border-color .15s,background .15s}
+.opt .radio{margin-left:auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--off);display:grid;place-items:center;transition:all .15s}
+.opt.on{border-color:var(--brand);background:var(--brand-dim)}
+.opt.on .radio{border-color:var(--brand);background:var(--brand);color:#fff}
+.opt .radio .i{width:13px;height:13px;stroke-width:3;opacity:0}.opt.on .radio .i{opacity:1}
+.steps{display:flex;justify-content:center;gap:8px;margin:2px 0 14px}
+.steps span{width:8px;height:8px;border-radius:999px;background:var(--border);transition:width .25s,background .25s}
+.steps span.on{width:26px;background:var(--brand)}
+.linkbtn{display:block;margin:14px auto 0;padding:6px 10px;font-size:.84rem;font-weight:700;color:var(--brand)}
+.linkbtn.mut{color:var(--muted);font-weight:600}
+.dev{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dev:last-child{border-bottom:0}
+.tag{font-size:.66rem;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(0,192,122,.14);color:var(--success);margin-left:6px;vertical-align:middle}
+.rm{padding:7px 12px;border-radius:999px;border:1.5px solid rgba(232,51,74,.35);color:var(--error);font-size:.74rem;font-weight:700}
+
+/* digit pad (PIN / OTP) */
+.dp-boxes{display:flex;justify-content:center;gap:10px;margin:4px auto 6px;max-width:300px}
+.dp-box{flex:1;min-width:0;max-width:56px;height:58px;border-radius:14px;background:var(--surface2);border:1.5px solid var(--border);display:grid;place-items:center;font-size:1.4rem;font-weight:800;transition:border-color .12s,box-shadow .12s,background .12s}
+.six .dp-box{max-width:46px;height:54px;font-size:1.3rem}
+.six .dp-box:nth-child(3){margin-right:8px}
+.dp-box.filled{border-color:rgba(0,170,255,.5);background:var(--surface)}
+.dp-box.dot::after{content:'';width:13px;height:13px;border-radius:50%;background:var(--text)}
+.dp-box.active{border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 3px var(--brand-dim)}
+.dp-box.pop{animation:popb .3s var(--ease)}
+@keyframes popb{0%{transform:scale(.8)}55%{transform:scale(1.13)}100%{transform:scale(1)}}
+.dp-boxes.err .dp-box{border-color:var(--error);background:rgba(232,51,74,.06)}
+.dp-boxes.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-12px)}30%{transform:translateX(12px)}45%{transform:translateX(-9px)}60%{transform:translateX(9px)}75%{transform:translateX(-5px)}90%{transform:translateX(5px)}}
+.dp-err{min-height:1.4em;margin:6px 0 8px;text-align:center;font-size:.8rem;font-weight:600;color:var(--error)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:290px;margin:0 auto 14px}
+.key{height:52px;border-radius:17px;border:1.5px solid var(--border);background:var(--surface2);font:700 1.35rem 'Sora',system-ui,sans-serif;display:grid;place-items:center;transition:transform .08s,background .12s,border-color .12s;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.key:active{transform:scale(.92);background:var(--brand-dim);border-color:var(--brand)}
+.key.ic{color:var(--sub)}.key.ic .i{width:23px;height:23px}
+@media (max-height:720px){.key{height:46px}}
+
+/* toast + push banner */
+.toasts{position:fixed;top:max(12px,env(safe-area-inset-top));left:0;right:0;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 14px;pointer-events:none}
+.toast{--tc:#00aaff;--tc2:#0080cc;position:relative;overflow:hidden;width:100%;max-width:420px;display:flex;align-items:center;gap:12px;padding:13px 12px 16px 13px;border-radius:20px;background:var(--surface);border:1.5px solid var(--border);box-shadow:0 18px 44px rgba(0,0,0,.2);pointer-events:auto;cursor:pointer;animation:tIn .3s cubic-bezier(.2,.9,.3,1.2) both}
+.toast.success{--tc:#00c07a;--tc2:#00a067}.toast.error{--tc:#e8334a;--tc2:#c2182f}.toast.warn{--tc:#f59e0b;--tc2:#d97706}
+.toast .t-i{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:1.1rem;background:linear-gradient(135deg,var(--tc),var(--tc2))}
+.toast b{display:block;font-size:.93rem;font-weight:800}.toast span{display:block;margin-top:2px;font-size:.78rem;color:var(--sub);line-height:1.4}
+.toast .bar{position:absolute;left:0;bottom:0;height:4px;width:100%;background:linear-gradient(90deg,var(--tc),var(--tc2));transform-origin:left;animation:bar linear forwards}
+.toast.out{animation:tOut .25s ease forwards}
+@keyframes tIn{from{opacity:0;transform:translateY(-22px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateY(-14px) scale(.95)}}
+@keyframes bar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.push{width:100%;max-width:420px;display:flex;gap:12px;padding:13px;border-radius:22px;background:var(--surface);border:1.5px solid var(--border);box-shadow:0 20px 50px rgba(0,0,0,.28);pointer-events:auto;animation:tIn .4s cubic-bezier(.2,.9,.3,1.2) both}
+.push .app{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.push small{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.4px}
+.push b{display:block;font-size:.9rem;margin-top:1px}.push p{font-size:.8rem;color:var(--sub);margin-top:2px;line-height:1.4}
+.vibe{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);z-index:3000;padding:8px 14px;border-radius:999px;background:#0d1a2e;color:#fff;font-size:.78rem;font-weight:700;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.vibe.on{opacity:1;transform:translateX(-50%)}
+.seg{display:flex;gap:6px;padding:4px;border-radius:14px;background:var(--surface2);border:1.5px solid var(--border)}
+.seg button{flex:1;padding:9px 4px;border-radius:10px;font-size:.78rem;font-weight:700;color:var(--sub);transition:background .15s,color .15s}
+.seg button.on{background:var(--brand);color:#fff}
+
+/* ---------- sections (screens) ---------- */
+.screen.in-fwd{animation:slideF .38s var(--ease) both}
+.screen.in-back{animation:slideB .38s var(--ease) both}
+@keyframes slideF{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+@keyframes slideB{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
+/* email verify box */
+.vbox{margin-top:14px;padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(255,77,141,.08));border:1.5px solid rgba(245,158,11,.38);display:flex;flex-direction:column;gap:12px;animation:rise .5s var(--ease) both}
+.vbox .top{display:flex;gap:12px;align-items:flex-start}
+.vbox .vico{width:44px;height:44px;border-radius:14px;background:rgba(245,158,11,.2);color:var(--warn);display:grid;place-items:center;font-size:1.3rem;flex-shrink:0;animation:wiggle 3.2s ease-in-out infinite}
+@keyframes wiggle{0%,84%,100%{transform:rotate(0)}88%{transform:rotate(-12deg)}92%{transform:rotate(10deg)}96%{transform:rotate(-6deg)}}
+.vbox b{display:block;font-size:.95rem;font-weight:800}
+.vbox p{margin-top:3px;font-size:.8rem;line-height:1.5;color:var(--sub)}
+.vbox .btn{min-height:46px}
+#s-account .vbox{margin-top:12px}
+/* collapsible notification groups */
+.acc-h{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;text-align:left}
+.acc-h .row-main b{font-size:.95rem}
+.acc-h>.i{width:20px;height:20px;color:var(--muted);transition:transform .25s var(--ease)}
+.acc.open .acc-h>.i{transform:rotate(90deg)}
+.acc-b{display:none;border-top:1px solid var(--border)}
+.acc.open .acc-b{display:block;animation:rise .35s var(--ease) both}
+/* always-on (locked) notification row */
+.row.locked{cursor:default}
+.row.locked .row-end{gap:10px}
+.row.locked .row-end .i{color:var(--success)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .rise{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <button class="icon-btn" id="backBtn" aria-label="Back"><span data-ico="back"></span></button>
+  <h1 id="pageTitle">Profile</h1>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode"><span id="themeIco" data-ico="moon"></span></button>
+    <button class="icon-btn" id="demoBtn" aria-label="Demo controls"><span data-ico="sliders"></span></button>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- loading skeleton -->
+  <div id="skeleton" aria-hidden="true">
+    <div class="card" style="padding-bottom:18px"><div class="sk" style="height:96px;border-radius:0"></div>
+      <div class="sk" style="width:96px;height:96px;border-radius:50%;margin:-48px auto 0;border:4px solid var(--surface)"></div>
+      <div class="sk" style="height:22px;width:55%;margin:14px auto 8px"></div><div class="sk" style="height:14px;width:35%;margin:0 auto 16px"></div>
+      <div class="sk" style="height:62px;margin:0 14px"></div></div>
+    <div class="sk" style="height:84px;margin-top:14px;border-radius:18px"></div>
+    <div class="sk" style="height:22px;width:30%;margin:26px 4px 10px"></div>
+    <div class="sk" style="height:260px;border-radius:22px"></div>
+    <div class="sk" style="height:22px;width:34%;margin:26px 4px 10px"></div>
+    <div class="sk" style="height:200px;border-radius:22px"></div>
+  </div>
+
+  <div id="app" hidden>
+
+    <!-- MAIN: who you are + a short menu. Every menu row opens its own section. -->
+    <div class="screen" id="s-main">
+      <section class="card hero" id="hero"></section>
+      <div id="verifyBox"></div>
+      <h2 class="sec">Manage</h2>
+      <div class="card" id="menuList"></div>
+      <div class="stack" style="margin-top:22px"><button class="btn btn-danger" id="logoutBtn"><span data-ico="logout"></span>Log out</button></div>
+      <p class="note" style="text-align:center;margin-top:14px" id="verLine"></p>
+    </div>
+
+    <div class="screen" id="s-account" hidden>
+      <div id="verifyBox2"></div>
+      <h2 class="sec">Your details</h2>
+      <div class="card" id="accountList"></div>
+    </div>
+
+    <div class="screen" id="s-security" hidden>
+      <h2 class="sec">Sign in and purchases</h2>
+      <div class="card" id="securityList"></div>
+      <p class="note">Your PIN and fingerprint stay on your phone. We never see them.</p>
+    </div>
+
+    <div class="screen" id="s-sessions" hidden>
+      <p class="note" style="margin-top:12px">These are the phones and browsers where you are logged in. Log out of any you do not recognise.</p>
+      <h2 class="sec">Logged in now</h2>
+      <div class="card" id="sessionList"></div>
+      <div class="stack"><button class="btn btn-outline-danger" id="logoutAllBtn"><span data-ico="logout"></span>Log out from all devices</button></div>
+    </div>
+
+    <div class="screen" id="s-notifications" hidden>
+      <div class="sec-head" id="secNotif"><h2 class="sec">Push notifications</h2><span class="save-pill" id="savePill" aria-live="polite"></span></div>
+      <div id="permBanner"></div>
+      <div class="card" id="notifMain" style="margin-top:12px"></div>
+      <div id="notifGroups"></div>
+      <h3 class="sub">Test and devices</h3>
+      <div class="card" id="notifDevices"></div>
+      <p class="note">Your choices are saved automatically and apply to all your devices.</p>
+    </div>
+
+    <div class="screen" id="s-preferences" hidden>
+      <h2 class="sec">App</h2>
+      <div class="card" id="prefList"></div>
+    </div>
+
+    <div class="screen" id="s-help" hidden>
+      <h2 class="sec">We are here to help</h2>
+      <div class="card" id="helpList"></div>
+    </div>
+  </div>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="vibe" id="vibe">Phone vibrates now</div>
+<input type="file" id="fileInput" accept="image/*" hidden>
+
+<script>
+(function () {
+'use strict';
+
+/* ============================================================
+   1. HELPERS + ICONS (all offline, no libraries)
+============================================================ */
+const $ = id => document.getElementById(id);
+const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
+const clone = o => JSON.parse(JSON.stringify(o));
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const naira = n => '\u20A6' + Number(n).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const dataFmt = mb => mb >= 1024 ? (mb / 1024).toFixed(1) + ' GB' : mb + ' MB';
+function ago(ts){
+  const s = Math.max(0, (Date.now() - ts) / 1000);
+  if (s < 60) return 'Just now';
+  if (s < 3600) return Math.floor(s / 60) + ' min ago';
+  if (s < 86400) return Math.floor(s / 3600) + ' hr ago';
+  const d = Math.floor(s / 86400);
+  return d === 1 ? 'Yesterday' : d + ' days ago';
+}
+const mem = {};
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return k in mem ? mem[k] : null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k] = String(v); } },
+  del(k){ try { localStorage.removeItem(k); } catch(e){ delete mem[k]; } }
+};
+const readJSON = k => { try { return JSON.parse(store.get(k)); } catch(e){ return null; } };
+
+const P = {
+  back:'<path d="M19 12H5M11 6l-6 6 6 6"/>', chev:'<path d="m9 6 6 6-6 6"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+  at:'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3"/><path d="M17 6l3 3"/>',
+  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.5 6.8C3.6 8.6 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 4-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  check:'<path d="M5 12.5 10 17 19 7"/>', checkc:'<circle cx="12" cy="12" r="9"/><path d="M8 12.3 10.6 15 16 9.3"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/>',
+  warn:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>',
+  finger:'<path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>',
+  shield:'<path d="M12 3.2 19 6v5c0 5-3.5 8.6-7 9.8-3.5-1.2-7-4.8-7-9.8V6l7-2.8z"/><path d="M9 12.2 11 14.2 15.2 10"/>',
+  bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  pencil:'<path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/>',
+  copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4"/><path d="m8.7 13.3 6.6 4.4"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+  device:'<rect x="7" y="2" width="10" height="20" rx="2.2"/><line x1="10.6" y1="18" x2="13.4" y2="18"/>',
+  desktop:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  pin:'<path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bank:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
+  crown:'<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5L3 8z"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 0 1 5 1c0 1.7-2.5 2-2.5 3.5"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/>',
+  doc:'<path d="M7 2h7l4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>',
+  send:'<path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/><path d="M12 8H7.5a2.5 2.5 0 1 1 2.5-2.5V8"/><path d="M12 8h4.5A2.5 2.5 0 1 0 14 5.5V8"/>',
+  wallet:'<path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2h-3.2a2.2 2.2 0 0 0 0 4.4H19V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><circle cx="16.4" cy="13.2" r="1" fill="currentColor" stroke="none"/>',
+  wifi:'<path d="M2 8.5a15 15 0 0 1 20 0"/><path d="M5 12a10 10 0 0 1 14 0"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>',
+  call:'<path d="M4.5 3h3.8l1.7 4.4-2.3 2.3a12.5 12.5 0 0 0 6.1 6.1l2.3-2.3 4.4 1.7v3.8a1.8 1.8 0 0 1-2 1.8A16.5 16.5 0 0 1 2.7 5a1.8 1.8 0 0 1 1.8-2z"/>',
+  tv:'<rect x="2" y="7" width="20" height="13" rx="2"/><path d="M17 2l-5 5-5-5"/>',
+  bulb:'<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+  cap:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/><path d="M22 10v6"/>',
+  ticket:'<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8z"/><path d="M14 6v12" stroke-dasharray="2 2"/>',
+  message:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/>',
+  swap:'<path d="M4 7h13"/><path d="M14 3.8l3 3.2-3 3.2"/><path d="M20 17H7"/><path d="M10 13.8l-3 3.2 3 3.2"/>',
+  tag:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/>',
+  userplus:'<circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 6-6h2"/><path d="M19 8v6M16 11h6"/>',
+  trash:'<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>',
+  backspace:'<path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m16 9-5 6M11 9l5 6"/>',
+  paste:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/>'
+};
+const ico = (n, cls) => '<svg class="i ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (P[n] || '') + '</svg>';
+const fillIcons = root => (root || document).querySelectorAll('[data-ico]').forEach(e => { e.innerHTML = ico(e.dataset.ico); });
+
+/* ============================================================
+   2. DEMO DATA + FAKE SERVER (saved in this browser only)
+============================================================ */
+const STATE_KEY = 'sh_profile_demo', FLAG_KEY = 'sh_profile_flags';
+const DAY = 86400000;
+function seed(){
+  const now = Date.now();
+  return {
+    user: { fullName:'Abdulmalik Ahmad', username:'abdulmalik_ahm', email:'abdulmalik@example.com', phone:'08012345678',
+      isVerified:false, accountType:'silver', createdAt: now - 74 * DAY, profilePicture:'', transactionPinSet:true,
+      whatsappLinked:true, whatsappLanguage:'ha', walletBalance:12450.5, totalDataPurchasedMB:18432,
+      referralCount:7, referralEarned:3500,
+      virtualAccount:{ bankName:'Wema Bank', accountNumber:'7821345690', accountName:'SUBHUB-ABDULMALIK AHMAD' } },
+    settings:{ notifEnabled:true, notifAppEnabled:true, notifWebEnabled:true,
+      notifPrefs:{ data:true, airtime:true, cable:true, electricity:true, exam:true, epin:true, sms:true, wallet:true, transactions:true, marketing:false, system:true } },
+    devices:[
+      { token:'tok_this', platform:'android', label:'Samsung SM-A135F', lastSeenAt: now },
+      { token:'tok_web', platform:'web', label:'Chrome on Windows 11', lastSeenAt: now - 2 * DAY } ],
+    sessions:[
+      { id:'s1', kind:'android', device:'Samsung SM-A135F \u00B7 Android 13', place:'Kano, Nigeria', lastUsedAt: now, current:true },
+      { id:'s2', kind:'desktop', device:'Chrome on Windows 11', place:'Kaduna, Nigeria', lastUsedAt: now - 2 * DAY },
+      { id:'s3', kind:'android', device:'Infinix X6816 \u00B7 Android 12', place:'Lagos, Nigeria', lastUsedAt: now - 9 * DAY } ],
+    bio:{ login:true, buy:false }, password:'Pass1234!', pin:'1357', pinFails:0, pinLockUntil:0
+  };
+}
+let S = readJSON(STATE_KEY) || seed();
+S.settings.notifPrefs.system = true;                   // security and system alerts are always on
+const flags = Object.assign({ hw:true, perm:'default', denies:0, offline:false }, readJSON(FLAG_KEY));
+const save = () => store.set(STATE_KEY, JSON.stringify(S));
+const saveFlags = () => store.set(FLAG_KEY, JSON.stringify(flags));
+let view = { settings: clone(S.settings) };            // what the screen shows (changes first, then the server confirms)
+
+const fail = (msg, extra) => Object.assign(new Error(msg), extra || {});
+async function call(fn, ms){
+  await wait(ms || 600);
+  if (flags.offline) throw fail('No connection. Check your internet and try again.', { network:true });
+  return fn();
+}
+/* In the real page each of these is one request (see the comment on the right) */
+const API = {
+  profile:  () => call(() => clone(S.user), 750),                                            // GET  /user/me
+  settings: () => call(() => clone(S.settings), 400),                                        // GET  /notifications/settings
+  patchSettings: body => call(() => {                                                       // PATCH /notifications/settings
+    const s = S.settings;
+    ['notifEnabled', 'notifAppEnabled', 'notifWebEnabled'].forEach(k => { if (body[k] !== undefined) s[k] = !!body[k]; });
+    if (body.notifPrefs) Object.assign(s.notifPrefs, body.notifPrefs);
+    s.notifPrefs.system = true;                                                            // can never be turned off (the real backend must enforce this too)
+    save(); return clone(s);
+  }, 450),
+  removeDevice: token => call(() => { S.devices = S.devices.filter(d => d.token !== token); save(); }, 500),   // DELETE /notifications/devices {token}
+  testPush: () => call(() => true, 700),                                                    // POST /notifications/test
+  updateName: name => call(() => { S.user.fullName = name; save(); return clone(S.user); }, 750),            // PATCH /user/me
+  setAvatar: url => call(() => { S.user.profilePicture = url; save(); }, 900),              // POST /user/avatar
+  changePassword: (cur, next) => call(() => {                                               // POST /auth/change-password
+    if (cur !== S.password) throw fail('Your current password is incorrect.');
+    if (next === S.password) throw fail('Choose a password you have not used before.');
+    S.password = next; save();
+  }, 900),
+  checkPin: pin => call(() => {                                                             // POST /user/verify-pin
+    if (Date.now() < S.pinLockUntil) throw fail('Too many wrong attempts. Try again in a few minutes.');
+    if (pin !== S.pin) {
+      S.pinFails++; if (S.pinFails >= 3) { S.pinLockUntil = Date.now() + 20000; S.pinFails = 0; save(); throw fail('Too many wrong attempts. Try again in a few minutes.'); }
+      save(); throw fail('Incorrect PIN. ' + (3 - S.pinFails) + ' attempt' + (3 - S.pinFails === 1 ? '' : 's') + ' left.');
+    }
+    S.pinFails = 0; save();
+  }, 650),
+  setPin: pin => call(() => { S.pin = pin; S.user.transactionPinSet = true; save(); }, 800),              // POST /user/change-pin
+  verifyEmail: code => call(() => { if (code !== '123456') throw fail('Incorrect code. Please try again.'); S.user.isVerified = true; save(); }, 850),
+  resendCode: () => call(() => true, 700),
+  setLang: l => call(() => { S.user.whatsappLanguage = l; save(); }, 500),
+  revokeSession: id => call(() => { S.sessions = S.sessions.filter(s => s.id !== id); save(); }, 700),        // DELETE /auth/sessions/:id
+  revokeAll: () => call(() => { S.sessions = S.sessions.filter(s => s.current); S.devices = S.devices.filter(d => d.token === 'tok_this'); save(); }, 1100), // POST /auth/logout {all:true}
+  setBio: (k, v) => call(() => { S.bio[k] = v; save(); }, 300)
+};
+
+/* ============================================================
+   3. TOAST, VIBRATION, SHEETS
+============================================================ */
+let lastVib = 0, vibTimer;
+function vibrate(p){
+  const n = Date.now(); if (n - lastVib < 450) return; lastVib = n;
+  try { if (navigator.vibrate) navigator.vibrate(p || [90, 50, 90, 50, 200]); } catch(e){}
+  const b = $('vibe'); b.classList.add('on'); clearTimeout(vibTimer); vibTimer = setTimeout(() => b.classList.remove('on'), 900);
+}
+const tap = () => { try { if (navigator.vibrate) navigator.vibrate(10); } catch(e){} };
+
+function toast(title, msg, type, ms){
+  type = type || 'info'; ms = ms || 3500;
+  if (type === 'error' || type === 'warn') vibrate();
+  const icons = { success:'check', error:'x', info:'info', warn:'warn' };
+  const t = el('div', 'toast ' + type);
+  t.innerHTML = '<span class="t-i">' + ico(icons[type] || 'info') + '</span><div style="flex:1;min-width:0"><b>' + esc(title) + '</b>' + (msg ? '<span>' + esc(msg) + '</span>' : '') + '</div><i class="bar" style="animation-duration:' + ms + 'ms"></i>';
+  const out = () => { if (t.classList.contains('out')) return; t.classList.add('out'); setTimeout(() => t.remove(), 260); };
+  t.addEventListener('click', out); $('toasts').appendChild(t); setTimeout(out, ms);
+}
+function pushBanner(title, body){                       // looks like a real Android notification
+  const p = el('div', 'push');
+  p.innerHTML = '<div class="app">S</div><div><small>SUBHUB \u00B7 now</small><b>' + esc(title) + '</b><p>' + esc(body) + '</p></div>';
+  $('toasts').appendChild(p);
+  setTimeout(() => { p.style.transition = 'opacity .3s,transform .3s'; p.style.opacity = '0'; p.style.transform = 'translateY(-14px)'; setTimeout(() => p.remove(), 320); }, 4800);
+}
+
+let openOv = null;
+function sheet(html, opts){
+  opts = opts || {};
+  closeSheet();
+  const ov = el('div', 'ov'), sh = el('div', 'sheet' + (opts.center ? ' center' : ''));
+  sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true');
+  sh.innerHTML = '<span class="grab"></span>' + (opts.noClose ? '' : '<button class="sheet-x" type="button" aria-label="Close">' + ico('x') + '</button>') + html;
+  ov.appendChild(sh); document.body.appendChild(ov); document.body.classList.add('lock');
+  fillIcons(sh);
+  const ctl = { ov, sh, cleanups: [], locked: false, close(force){ if (ctl.locked && !force) return; ctl.cleanups.forEach(f => f()); ov.remove(); document.body.classList.remove('lock'); if (openOv === ctl) openOv = null; if (opts.onClose) opts.onClose(); } };
+  const x = sh.querySelector('.sheet-x'); if (x) x.addEventListener('click', () => ctl.close());
+  ov.addEventListener('click', e => { if (e.target === ov && !opts.noClose) ctl.close(); });
+  openOv = ctl; return ctl;
+}
+function closeSheet(){ if (openOv) openOv.close(true); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && openOv && !openOv.locked) openOv.close(); });
+
+function setLoading(btn, on){ btn.disabled = on; btn.classList.toggle('loading', on); }
+const btnHtml = (id, label, cls) => '<button type="button" class="btn ' + (cls || 'btn-primary') + '" id="' + id + '"><span class="spinner"></span><span class="lbl">' + label + '</span></button>';
+
+/* confirm sheet: action() runs only after the user agrees; errors show inside the sheet */
+function confirmSheet(o){
+  return new Promise(resolve => {
+    const tone = o.tone === 'brand' ? 't-blue' : 't-red';
+    const s = sheet('<div class="big-ico ' + tone + '">' + ico(o.icon || 'warn') + '</div><h3>' + esc(o.title) + '</h3><p class="lead">' + esc(o.text) + '</p>' +
+      '<div class="form-err" id="cfErr" role="alert"></div>' + btnHtml('cfYes', esc(o.yes), o.tone === 'brand' ? 'btn-primary' : 'btn-danger') + '<div class="stack" style="margin-top:10px"><button type="button" class="btn btn-ghost" id="cfNo">Cancel</button></div>',
+      { center: true, onClose: () => resolve(done) });
+    let done = false;
+    $('cfNo').addEventListener('click', () => s.close());
+    $('cfYes').addEventListener('click', async () => {
+      const yes = $('cfYes'); $('cfErr').classList.remove('show');
+      setLoading(yes, true); $('cfNo').disabled = true; s.locked = true;
+      try { if (o.action) await o.action(); done = true; s.locked = false; s.close(); }
+      catch (e) { s.locked = false; setLoading(yes, false); $('cfNo').disabled = false; $('cfErr').textContent = e.message; $('cfErr').classList.add('show'); vibrate(); }
+    });
+    setTimeout(() => $('cfNo').focus(), 60);
+  });
+}
+
+/* ---------- digit pad: 4-digit PIN (dots) or 6-digit code (numbers) ---------- */
+function digitPad(len, o){
+  o = o || {};
+  const w = el('div');
+  const keys = '123456789'.split('').map(n => '<button type="button" class="key" data-k="' + n + '">' + n + '</button>').join('');
+  w.innerHTML = '<div class="dp-boxes' + (len === 6 ? ' six' : '') + '">' + '<span class="dp-box"></span>'.repeat(len) + '</div><div class="dp-err" role="alert"></div>' +
+    '<div class="keypad">' + keys + '<button type="button" class="key ic" data-x="side" aria-label="' + (len === 6 ? 'Paste code' : 'Show PIN') + '">' + ico(len === 6 ? 'paste' : 'eye') + '</button>' +
+    '<button type="button" class="key" data-k="0">0</button><button type="button" class="key ic" data-x="del" aria-label="Delete">' + ico('backspace') + '</button></div>';
+  const row = w.querySelector('.dp-boxes'), boxes = [].slice.call(w.querySelectorAll('.dp-box')), err = w.querySelector('.dp-err');
+  let val = '', locked = false, show = false;
+  const api = {
+    el: w,
+    get value(){ return val; },
+    paint(){ boxes.forEach((b, i) => { const f = i < val.length; b.classList.toggle('filled', f); b.classList.toggle('dot', f && !(show || len === 6)); b.classList.toggle('active', !locked && i === Math.min(val.length, len - 1)); b.textContent = f && (show || len === 6) ? val[i] : ''; }); },
+    error(msg){ err.textContent = msg || ''; row.classList.toggle('err', !!msg); if (msg) { row.classList.remove('shake'); void row.offsetWidth; row.classList.add('shake'); vibrate(); } },
+    clear(){ val = ''; api.paint(); },
+    lock(b){ locked = b; api.paint(); },
+    press(d){ if (locked || val.length >= len) return; api.error(''); val += d; api.paint(); const bx = boxes[val.length - 1]; bx.classList.remove('pop'); void bx.offsetWidth; bx.classList.add('pop'); if (val.length === len && o.onFull) setTimeout(() => o.onFull(val), 200); },
+    del(){ if (locked || !val) return; api.error(''); val = val.slice(0, -1); api.paint(); },
+    async fill(s){ for (const c of s.slice(0, len)) { api.press(c); await wait(70); } }
+  };
+  w.addEventListener('click', async e => {
+    const b = e.target.closest('.key'); if (!b) return;
+    if (b.dataset.k !== undefined) api.press(b.dataset.k);
+    else if (b.dataset.x === 'del') api.del();
+    else if (len === 6) { try { const t = await navigator.clipboard.readText(); const d = (t.match(/\d/g) || []).join(''); if (d.length >= 6) { api.clear(); api.fill(d); } else toast('No code found', 'Copy the 6-digit code from your email first.', 'info'); } catch (x) { toast('Cannot paste here', 'Type the code with the keypad.', 'info'); } }
+    else { show = !show; b.innerHTML = ico(show ? 'eyeoff' : 'eye'); api.paint(); }
+  });
+  api.paint();
+  api.keys = e => { if (/^[0-9]$/.test(e.key)) api.press(e.key); else if (e.key === 'Backspace') api.del(); };
+  return api;
+}
+function bindPad(ctl, pad){ document.addEventListener('keydown', pad.keys); ctl.cleanups.push(() => document.removeEventListener('keydown', pad.keys)); }
+
+/* ============================================================
+   4. DRAW THE PAGE
+============================================================ */
+const U = () => S.user;
+const initials = n => { const w = String(n || '?').trim().split(/\s+/); return ((w[0] || '?')[0] + (w[1] ? w[1][0] : '')).toUpperCase(); };
+const TIER = { bronze:'Bronze', silver:'Silver', gold:'Gold', platinum:'Platinum' };
+
+function setAvatar(box, u){                           // photo -> /avatar.png -> initials
+  box.textContent = initials(u.fullName);
+  const id = (box._a = (box._a || 0) + 1);
+  const src = [u.profilePicture, '/avatar.png'].filter(Boolean);
+  (function next(i){
+    if (i >= src.length) return;
+    const im = new Image(); im.alt = '';
+    im.onload = () => { if (box._a === id) { box.textContent = ''; box.appendChild(im); } };
+    im.onerror = () => next(i + 1); im.src = src[i];
+  })(0);
+}
+function countUp(node, to, fmt){
+  const t0 = performance.now(), dur = 900;
+  (function step(t){ const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); node.textContent = fmt(to * e); if (p < 1) requestAnimationFrame(step); })(t0);
+}
+
+function renderHero(first){
+  const u = U();
+  $('hero').innerHTML = '<div class="hero-top"></div><div class="avatar-wrap"><div class="avatar" id="avatar"></div><button class="cam" id="camBtn" aria-label="Change photo">' + ico('camera') + '</button></div>' +
+    '<h2>' + esc(u.fullName) + '</h2><div class="handle">@' + esc(u.username) + '</div>' +
+    '<div class="chips"><span class="chip tier-' + u.accountType + '">' + ico('crown') + TIER[u.accountType] + ' account</span>' +
+    (u.isVerified ? '<span class="chip ok">' + ico('checkc') + 'Email verified</span>' : '<span class="chip warn">' + ico('warn') + 'Email not verified</span>') + '</div>' +
+    '<div class="stats"><div class="stat"><b id="stW">0</b><small>Wallet</small></div><div class="stat"><b id="stD">0</b><small>Data bought</small></div><div class="stat"><b id="stR">0</b><small>Orders</small></div></div>';
+  setAvatar($('avatar'), u);
+  if (first) { countUp($('stW'), u.walletBalance, v => naira(v)); countUp($('stD'), u.totalDataPurchasedMB, v => dataFmt(Math.round(v))); countUp($('stR'), u.orders == null ? 57 : u.orders, v => String(Math.round(v))); }
+  else { $('stW').textContent = naira(u.walletBalance); $('stD').textContent = dataFmt(u.totalDataPurchasedMB); $('stR').textContent = String(u.orders == null ? 57 : u.orders); }
+}
+
+function row(o){                                       // a normal tappable row
+  return '<button type="button" class="row ' + (o.cls || '') + '" data-act="' + o.act + '"' + (o.data || '') + '><span class="ico ' + o.tint + '">' + ico(o.icon) + '</span><span class="row-main"><b>' + o.title + '</b>' + (o.sub ? '<small>' + o.sub + '</small>' : '') + '</span><span class="row-end">' + (o.end || ico('chev')) + '</span></button>';
+}
+function swRow(o){                                     // a switch row (the whole row is the switch)
+  return '<div class="row" role="switch" tabindex="0" data-sw="' + o.key + '" aria-checked="' + (o.on ? 'true' : 'false') + '"' + (o.disabled ? ' aria-disabled="true"' : '') + '><span class="ico ' + o.tint + '">' + ico(o.icon) + '</span><span class="row-main"><b>' + o.title + '</b>' + (o.sub ? '<small>' + o.sub + '</small>' : '') + '</span><span class="sw"></span></div>';
+}
+
+function renderAccount(){
+  const u = U();
+  $('accountList').innerHTML =
+    row({ act:'edit', tint:'t-blue', icon:'user', title:'Full name', sub:esc(u.fullName), end:ico('pencil') }) +
+    row({ act:'copyUser', tint:'t-purple', icon:'at', title:'Username', sub:'@' + esc(u.username), end:ico('copy') }) +
+    row({ act:'email', tint:'t-green', icon:'mail', title:'Email', sub:esc(u.email), end:u.isVerified ? '<span class="chip ok">Verified</span>' : '<span class="chip warn">Verify</span>' }) +
+    row({ act:'phone', tint:'t-amber', icon:'phone', title:'Phone number', sub:esc(u.phone), end:ico('lock') }) +
+    row({ act:'tier', tint:'t-pink', icon:'crown', title:'Account type', sub:'Your prices follow your account type', end:'<span class="chip tier-' + u.accountType + '">' + TIER[u.accountType] + '</span>' }) +
+    row({ act:'noop', tint:'t-gray', icon:'clock', title:'Member since', sub:new Date(u.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }), end:'' });
+  renderVerify(); renderMenu();
+}
+function vboxHtml(){
+  return U().isVerified ? '' : '<div class="vbox"><div class="top"><span class="vico">' + ico('mail') + '</span><div><b>Verify your email</b><p>Protect your account and be able to recover it if you forget your password.</p></div></div><button type="button" class="btn btn-primary" data-act="email">Verify email</button></div>';
+}
+function renderVerify(){ ['verifyBox', 'verifyBox2'].forEach(id => { const e = $(id); if (e) e.innerHTML = vboxHtml(); }); }
+function renderMenu(){
+  const u = U(), s = view.settings, m = $('menuList'), dev = S.sessions.length; if (!m) return;
+  const go = (to, tint, icon, title, sub, chip) => row({ act:'go', data:' data-to="' + to + '"', tint, icon, title, sub, end:(chip || '') + ico('chev') });
+  m.innerHTML =
+    go('account', 't-blue', 'user', 'Account details', 'Name, email and phone') +
+    go('security', 't-green', 'shield', 'Security', u.transactionPinSet ? 'Password, PIN and fingerprint' : 'Create your transaction PIN', u.transactionPinSet ? '' : '<span class="chip warn">PIN needed</span>') +
+    go('sessions', 't-purple', 'device', 'Devices', dev + ' device' + (dev === 1 ? '' : 's') + ' logged in') +
+    go('notifications', 't-amber', 'bell', 'Notifications', s.notifEnabled ? 'On' : 'Off (security alerts stay on)') +
+    go('preferences', 't-gray', 'sliders', 'Preferences', 'Dark mode and WhatsApp language') +
+    go('help', 't-pink', 'help', 'Help and support', 'Chat with us on WhatsApp');
+}
+
+
+function renderSecurity(){
+  const u = U();
+  let h = row({ act:'password', tint:'t-blue', icon:'lock', title:'Change password', sub:'Use a strong password you do not use elsewhere' }) +
+          row({ act:'pin', tint:'t-purple', icon:'key', title:u.transactionPinSet ? 'Change transaction PIN' : 'Create transaction PIN', sub:u.transactionPinSet ? '4-digit PIN that confirms your purchases' : 'Required before you can buy' });
+  if (flags.hw) {
+    h += swRow({ key:'bioLogin', tint:'t-green', icon:'finger', title:'Fingerprint login', sub:'Log in with your fingerprint', on:S.bio.login }) +
+         swRow({ key:'bioBuy', tint:'t-amber', icon:'finger', title:'Fingerprint for purchases', sub:u.transactionPinSet ? 'Confirm purchases without typing your PIN' : 'Create a PIN first', on:S.bio.buy && u.transactionPinSet, disabled:!u.transactionPinSet });
+  }
+  $('securityList').innerHTML = h;
+  renderMenu();
+}
+
+function renderSessions(){
+  $('sessionList').innerHTML = S.sessions.map(s =>
+    '<div class="row"><span class="ico ' + (s.current ? 't-green' : 't-gray') + '">' + ico(s.kind === 'desktop' ? 'desktop' : 'device') + '</span><span class="row-main"><b>' + esc(s.device) + (s.current ? '<span class="tag">This device</span>' : '') + '</b><small>' + ico('pin') + ' ' + esc(s.place) + ' \u00B7 ' + (s.current ? 'Active now' : ago(s.lastUsedAt)) + '</small></span>' +
+    (s.current ? '' : '<button class="rm" data-act="revoke" data-id="' + s.id + '">Log out</button>') + '</div>').join('') ||
+    '<div class="row"><span class="row-main"><small>No other devices.</small></span></div>';
+  $('logoutAllBtn').hidden = S.sessions.length <= 1;
+  renderMenu();
+}
+
+/* ---------- notifications ---------- */
+const SERVICES = {
+  data:{ icon:'wifi', tint:'t-blue', t:'Data', d:'Data bundle purchases' },
+  airtime:{ icon:'call', tint:'t-green', t:'Airtime', d:'Airtime top-ups' },
+  cable:{ icon:'tv', tint:'t-purple', t:'Cable TV', d:'TV subscriptions' },
+  electricity:{ icon:'bulb', tint:'t-amber', t:'Electricity', d:'Meter token purchases' },
+  exam:{ icon:'cap', tint:'t-pink', t:'Exam PINs', d:'WAEC, NECO and NABTEB PINs' },
+  epin:{ icon:'ticket', tint:'t-blue', t:'Recharge cards', d:'Recharge card PINs' },
+  sms:{ icon:'message', tint:'t-green', t:'Bulk SMS', d:'SMS sending updates' },
+  wallet:{ icon:'wallet', tint:'t-amber', t:'Wallet', d:'Wallet funding and balance' },
+  transactions:{ icon:'swap', tint:'t-blue', t:'Transactions', d:'Receipts and status updates' },
+  marketing:{ icon:'tag', tint:'t-pink', t:'Offers and news', d:'Discounts, promos and news' },
+  system:{ icon:'shield', tint:'t-purple', t:'Security and system', d:'Login alerts and app updates' }
+};
+const openGroups = {};
+const GROUPS = [['Purchases', ['data', 'airtime', 'cable', 'electricity', 'exam', 'epin', 'sms']], ['Money', ['wallet', 'transactions']], ['Updates', ['marketing']]];
+
+function renderPerm(){
+  const p = flags.perm, b = $('permBanner');
+  if (p === 'granted') b.innerHTML = '<div class="banner ok"><span class="ico">' + ico('checkc') + '</span><p><b>Allowed on this phone</b><br>You will get alerts even when the app is closed.</p></div>';
+  else if (p === 'blocked') b.innerHTML = '<div class="banner bad"><span class="ico">' + ico('bell') + '</span><p><b>Blocked in phone settings</b><br>Turn them on in Android settings to get alerts.</p><button class="mini" data-act="openSettings">Open settings</button></div>';
+  else b.innerHTML = '<div class="banner"><span class="ico">' + ico('bell') + '</span><p><b>Notifications are off on this phone</b><br>Turn them on so you never miss a transaction.</p><button class="mini" data-act="askPerm">Turn on</button></div>';
+}
+function lockedRow(o){                                   // a switch that is ON and cannot be changed
+  return '<div class="row locked" role="switch" tabindex="0" data-locked="' + o.key + '" aria-checked="true" aria-readonly="true"><span class="ico ' + o.tint + '">' + ico(o.icon) + '</span><span class="row-main"><b>' + o.title + '</b><small>' + o.sub + '</small></span><span class="row-end">' + ico('lock') + '</span></div>';
+}
+function renderNotifs(){
+  const s = view.settings, on = s.notifEnabled;
+  $('notifMain').innerHTML =
+    swRow({ key:'n:notifEnabled', tint:'t-blue', icon:'bell', title:'Push notifications', sub:'Master switch. Security alerts always stay on.', on:s.notifEnabled }) +
+    '<div class="' + (on ? '' : 'dim') + '">' +
+    swRow({ key:'n:notifAppEnabled', tint:'t-green', icon:'device', title:'On the SubHub app', sub:'Notifications on your phone', on:s.notifAppEnabled }) +
+    swRow({ key:'n:notifWebEnabled', tint:'t-purple', icon:'globe', title:'On the website', sub:'Notifications in your browser', on:s.notifWebEnabled }) + '</div>';
+  $('notifGroups').innerHTML = GROUPS.map(g => {
+    const n = g[1].filter(k => s.notifPrefs[k]).length;
+    return '<div class="card acc ' + (openGroups[g[0]] ? 'open ' : '') + (on ? '' : 'dim') + '" style="margin-top:12px"><button type="button" class="acc-h" data-acc="' + g[0] + '" aria-expanded="' + !!openGroups[g[0]] + '"><span class="row-main"><b>' + g[0] + '</b><small>' + n + ' of ' + g[1].length + ' on</small></span>' + ico('chev') + '</button><div class="acc-b">' +
+      g[1].map(k => swRow({ key:'p:' + k, tint:SERVICES[k].tint, icon:SERVICES[k].icon, title:SERVICES[k].t, sub:SERVICES[k].d, on:s.notifPrefs[k] })).join('') + '</div></div>';
+  }).join('') +
+    '<div class="card" style="margin-top:12px"><div class="group-title">Always on</div>' + lockedRow({ key:'system', tint:'t-purple', icon:'shield', title:'Security and system', sub:'Login alerts and important app updates' }) + '</div>' +
+    '<p class="note">Security alerts keep your account safe, so they cannot be turned off.' + (on ? '' : ' Turn on push notifications to choose the others.') + '</p>';
+  renderMenu();
+}
+function renderDevices(){
+  $('notifDevices').innerHTML =
+    '<button type="button" class="row" data-act="testPush"><span class="ico t-green">' + ico('send') + '</span><span class="row-main"><b>Send a test notification</b><small>Check that alerts reach this phone</small></span><span class="row-end">' + ico('chev') + '</span></button>' +
+    '<div class="group-title">Devices receiving notifications</div>' +
+    (S.devices.map(d => '<div class="row"><span class="ico ' + (d.token === 'tok_this' ? 't-green' : 't-gray') + '">' + ico(d.platform === 'web' ? 'desktop' : 'device') + '</span><span class="row-main"><b>' + esc(d.label) + (d.token === 'tok_this' ? '<span class="tag">This phone</span>' : '') + '</b><small>' + (d.platform === 'web' ? 'Browser' : 'Android app') + ' \u00B7 ' + (d.token === 'tok_this' ? 'Active now' : ago(d.lastSeenAt)) + '</small></span><button class="rm" data-act="rmDevice" data-t="' + d.token + '">Remove</button></div>').join('') || '<div class="row"><span class="row-main"><small>No devices yet.</small></span></div>');
+}
+
+function renderPrefs(){
+  const u = U(), dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const LANG = { en:'English', ha:'Hausa', yo:'Yor\u00F9b\u00E1', ig:'Igbo' };
+  $('prefList').innerHTML =
+    swRow({ key:'dark', tint:'t-gray', icon:'moon', title:'Dark mode', sub:'Easier on the eyes at night', on:dark }) +
+    row({ act:'whatsapp', tint:'t-green', icon:'message', title:'WhatsApp assistant', sub:u.whatsappLinked ? 'Linked \u00B7 ' + LANG[u.whatsappLanguage] : 'Not linked', end:u.whatsappLinked ? '<span class="chip ok">Linked</span>' : '<span class="chip">Link</span>' });
+}
+function renderHelp(){
+  $('helpList').innerHTML =
+    '<a class="row" href="https://wa.me/2347040495661" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><span class="ico t-green">' + ico('message') + '</span><span class="row-main"><b>Contact support</b><small>Chat with us on WhatsApp</small></span><span class="row-end">' + ico('chev') + '</span></a>' +
+    row({ act:'doc', tint:'t-gray', icon:'doc', title:'Privacy policy' }) + row({ act:'doc', tint:'t-gray', icon:'doc', title:'Terms of use' });
+  $('verLine').textContent = 'SubHub 1.0.3 \u00B7 by Earncial Global';
+}
+function renderAll(first){
+  renderHero(first); renderAccount(); renderSecurity(); renderSessions();
+  renderPerm(); renderNotifs(); renderDevices(); renderPrefs(); renderHelp();
+  fillIcons($('app'));
+}
+
+/* ============================================================
+   5. SWITCHES (notifications save by themselves)
+============================================================ */
+let pending = {}, saveTimer = null, lastGood = clone(S.settings);
+function pill(state, text){ const p = $('savePill'); p.className = 'save-pill show ' + state; p.innerHTML = (state === 'saving' ? '<i class="mini-spin"></i>' : state === 'saved' ? ico('check') : ico('warn')) + text; }
+function queueSave(patch){
+  if (patch.notifPrefs) { pending.notifPrefs = Object.assign(pending.notifPrefs || {}, patch.notifPrefs); delete patch.notifPrefs; }
+  Object.assign(pending, patch);
+  pill('saving', 'Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 450);
+}
+async function flush(){
+  const body = pending; pending = {};
+  try { const s = await API.patchSettings(body); lastGood = clone(s); pill('saved', 'Saved'); setTimeout(() => $('savePill').classList.remove('show'), 1800); }
+  catch (e) { view.settings = clone(lastGood); renderNotifs(); fillIcons($('notifMain')); pill('error', 'Not saved'); toast('Could not save', e.message, 'error'); }
+}
+function setSwitch(r, on){ r.setAttribute('aria-checked', on ? 'true' : 'false'); }
+
+async function onSwitch(r){
+  if (r.getAttribute('aria-disabled') === 'true' || r.classList.contains('busy')) return;
+  const key = r.dataset.sw, next = r.getAttribute('aria-checked') !== 'true';
+  tap();
+  if (key === 'dark') { applyTheme(next); return; }
+  if (key.indexOf('n:') === 0 || key.indexOf('p:') === 0) {
+    const k = key.slice(2);
+    if (key[0] === 'n') { view.settings[k] = next; queueSave({ [k]: next }); }
+    else { view.settings.notifPrefs[k] = next; queueSave({ notifPrefs: { [k]: next } }); }
+    setSwitch(r, next);
+    if (key === 'n:notifEnabled') { renderNotifs(); fillIcons($('notifMain')); if (next && flags.perm !== 'granted') toast('Almost there', 'Allow notifications on this phone to receive them.', 'info'); }
+    return;
+  }
+  if (key === 'bioLogin') {
+    r.classList.add('busy');
+    if (next) { const ok = await sensor('Turn on fingerprint login'); if (!ok) { r.classList.remove('busy'); return; } }
+    try { await API.setBio('login', next); setSwitch(r, next); toast(next ? 'Fingerprint login is on' : 'Fingerprint login is off', next ? 'Use your fingerprint next time you open the app.' : '', next ? 'success' : 'info'); }
+    catch (e) { toast('Could not change', e.message, 'error'); }
+    r.classList.remove('busy'); return;
+  }
+  if (key === 'bioBuy') {
+    r.classList.add('busy');
+    if (next) {
+      const pin = await askPin('Confirm your PIN', 'Enter your transaction PIN to turn on fingerprint for purchases.');
+      if (!pin) { r.classList.remove('busy'); return; }
+      const ok = await sensor('Turn on fingerprint for purchases'); if (!ok) { r.classList.remove('busy'); return; }
+    }
+    try { await API.setBio('buy', next); setSwitch(r, next); toast(next ? 'Fingerprint for purchases is on' : 'Fingerprint for purchases is off', next ? 'Your PIN stays safe on this phone.' : '', next ? 'success' : 'info'); }
+    catch (e) { toast('Could not change', e.message, 'error'); }
+    r.classList.remove('busy');
+  }
+}
+
+/* the phone's own fingerprint prompt (a real phone shows its own, once) */
+function sensor(title){
+  return new Promise(resolve => {
+    let res = false;
+    const s = sheet('<div class="big-ico t-blue">' + ico('finger') + '</div><h3>' + esc(title) + '</h3><p class="lead">Phone fingerprint prompt (simulated). A real phone shows its own system prompt here.</p>' +
+      '<button type="button" class="btn btn-primary" id="snOk">Touch sensor</button><div class="stack" style="margin-top:10px"><button type="button" class="btn btn-ghost" id="snNo">Cancel</button></div>', { center: true, onClose: () => resolve(res) });
+    $('snOk').addEventListener('click', () => { res = true; s.close(); });
+    $('snNo').addEventListener('click', () => s.close());
+  });
+}
+/* ask for the PIN (used before turning on fingerprint for purchases) */
+function askPin(title, text){
+  return new Promise(resolve => {
+    let res = null;
+    const s = sheet('<h3>' + esc(title) + '</h3><p class="lead">' + esc(text) + '</p><div id="apPad"></div>', { onClose: () => resolve(res) });
+    const pad = digitPad(4, { onFull: async v => {
+      pad.lock(true);
+      try { await API.checkPin(v); res = v; s.close(); }
+      catch (e) { pad.error(e.message); await wait(600); pad.clear(); pad.lock(false); }
+    } });
+    $('apPad').appendChild(pad.el); bindPad(s, pad);
+  });
+}
+
+/* ============================================================
+   6. FLOWS (each one is a bottom sheet)
+============================================================ */
+function editName(){
+  const s = sheet('<h3>Edit profile</h3><p class="lead">This is the name shown on your receipts.</p>' +
+    '<div class="field"><label for="enName">Full name</label><div class="input-wrap">' + ico('user') + '<input class="input" id="enName" value="' + esc(U().fullName) + '" autocomplete="name"></div></div><div class="err" id="enErr"></div>' + btnHtml('enSave', 'Save changes'));
+  const inp = $('enName'); setTimeout(() => { inp.focus(); inp.select(); }, 150);
+  const go = async () => {
+    const v = inp.value.trim().replace(/\s+/g, ' '), w = v.split(' ');
+    const bad = !/^[A-Za-z\s]+$/.test(v) ? 'Only letters and spaces are allowed.' : (w.length < 2 || w.length > 3) ? 'Enter 2 or 3 names (e.g. Abdulmalik Ahmad).' : w.some(x => x.length < 2) ? 'Each name must be at least 2 letters.' : '';
+    if (bad) { inp.classList.add('invalid'); $('enErr').textContent = bad; $('enErr').classList.add('show'); vibrate(); return; }
+    if (v === U().fullName) { s.close(); return; }
+    setLoading($('enSave'), true); s.locked = true;
+    try { await API.updateName(v); s.locked = false; s.close(); renderHero(false); renderAccount(); renderHelp(); fillIcons($('app')); toast('Profile updated', 'Your name was saved.', 'success'); }
+    catch (e) { s.locked = false; setLoading($('enSave'), false); $('enErr').textContent = e.message; $('enErr').classList.add('show'); vibrate(); }
+  };
+  $('enSave').addEventListener('click', go); inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  inp.addEventListener('input', () => { inp.classList.remove('invalid'); $('enErr').classList.remove('show'); });
+}
+
+function photoSheet(){
+  const has = !!U().profilePicture;
+  const s = sheet('<h3>Profile photo</h3><p class="lead">A clear photo helps us keep your account yours.</p>' +
+    '<button type="button" class="opt" id="phPick"><span class="ico t-blue">' + ico('camera') + '</span>Choose a photo</button>' +
+    (has ? '<button type="button" class="opt" id="phDel"><span class="ico t-red">' + ico('trash') + '</span>Remove photo</button>' : ''));
+  $('phPick').addEventListener('click', () => { s.close(); $('fileInput').click(); });
+  if (has) $('phDel').addEventListener('click', async () => { s.close(); try { await API.setAvatar(''); renderHero(false); fillIcons($('hero')); toast('Photo removed', '', 'info'); } catch (e) { toast('Could not remove', e.message, 'error'); } });
+}
+$('fileInput').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type)) return toast('Not a photo', 'Please choose an image file.', 'error');
+  if (f.size > 8 * 1024 * 1024) return toast('Photo is too big', 'Choose a photo under 8 MB.', 'error');
+  const rd = new FileReader();
+  rd.onload = () => {
+    const im = new Image();
+    im.onload = async () => {
+      const c = document.createElement('canvas'), n = 256; c.width = c.height = n;
+      const m = Math.min(im.width, im.height), sx = (im.width - m) / 2, sy = (im.height - m) / 2;
+      c.getContext('2d').drawImage(im, sx, sy, m, m, 0, 0, n, n);
+      const url = c.toDataURL('image/jpeg', .85);
+      $('avatar').style.opacity = .5;
+      try { await API.setAvatar(url); renderHero(false); fillIcons($('hero')); toast('Photo updated', 'Looking good!', 'success'); }
+      catch (x) { $('avatar').style.opacity = 1; toast('Could not upload', x.message, 'error'); }
+    };
+    im.onerror = () => toast('Not a photo', 'That file could not be opened.', 'error'); im.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+
+function strengthOf(pw){ let s = 0; if (pw.length >= 8) s++; if (/[A-Z]/.test(pw)) s++; if (/[0-9]/.test(pw)) s++; if (/[^A-Za-z0-9]/.test(pw)) s++; return s; }
+function pwField(id, label, ph, ac){ return '<div class="field"><label for="' + id + '">' + label + '</label><div class="input-wrap">' + ico('lock') + '<input class="input" type="password" id="' + id + '" placeholder="' + ph + '" autocomplete="' + ac + '"><button type="button" class="eye" data-eye="' + id + '" aria-label="Show password">' + ico('eye') + '</button></div></div>'; }
+function changePassword(){
+  const s = sheet('<h3>Change password</h3><p class="lead">You will stay logged in on this phone.</p>' + pwField('cpOld', 'Current password', 'Enter current password', 'current-password') +
+    pwField('cpNew', 'New password', 'Min. 8 characters', 'new-password') + '<div class="strength" id="cpBar"><span></span><span></span><span></span><span></span></div><div class="strength-lbl" id="cpLbl"></div>' +
+    '<div style="height:10px"></div>' + pwField('cpNew2', 'Re-enter new password', 'Re-enter new password', 'new-password') + '<div class="form-err" id="cpErr" role="alert"></div>' + btnHtml('cpSave', 'Update password') + '<button type="button" class="linkbtn mut" id="cpForgot">Forgot your current password?</button>');
+  s.sh.querySelectorAll('[data-eye]').forEach(b => b.addEventListener('click', () => { const i = $(b.dataset.eye), h = i.type === 'password'; i.type = h ? 'text' : 'password'; b.innerHTML = ico(h ? 'eyeoff' : 'eye'); }));
+  $('cpNew').addEventListener('input', () => { const sc = $('cpNew').value ? strengthOf($('cpNew').value) : 0; $('cpBar').className = 'strength' + (sc ? ' s' + sc : ''); $('cpLbl').textContent = ['', 'Weak', 'Fair', 'Good', 'Strong'][sc]; });
+  const showErr = m => { $('cpErr').textContent = m; $('cpErr').classList.add('show'); vibrate(); };
+  $('cpForgot').addEventListener('click', () => { s.close(); toast('Reset by email', 'The real page opens the 6-digit code reset here.', 'info', 4200); });
+  $('cpSave').addEventListener('click', async () => {
+    $('cpErr').classList.remove('show');
+    const a = $('cpOld').value, b = $('cpNew').value, c = $('cpNew2').value;
+    if (!a) return showErr('Enter your current password.');
+    if (b.length < 8) return showErr('New password must be at least 8 characters.');
+    if (strengthOf(b) < 2) return showErr('Too weak. Add a capital letter, number or symbol.');
+    if (b !== c) return showErr('The new passwords do not match.');
+    setLoading($('cpSave'), true); s.locked = true;
+    try { await API.changePassword(a, b); s.locked = false; s.close(); toast('Password changed', 'Use your new password next time you log in.', 'success'); }
+    catch (e) { s.locked = false; setLoading($('cpSave'), false); showErr(e.message); }
+  });
+}
+
+/* transaction PIN: current -> new -> confirm (create: new -> confirm) */
+function changePin(){
+  const has = U().transactionPinSet;
+  const order = has ? ['cur', 'new', 'conf'] : ['new', 'conf'];
+  let at = 0, cur = '', first = '';
+  const TXT = { cur:['Enter your current PIN', 'Confirm it is you before changing your PIN.'], new:[has ? 'Choose a new PIN' : 'Create your PIN', 'This 4-digit PIN confirms every purchase on SubHub.'], conf:['Confirm your PIN', 'Enter the same PIN again.'] };
+  const s = sheet('<div class="steps" id="pnSteps">' + order.map((x, i) => '<span class="' + (i === 0 ? 'on' : '') + '"></span>').join('') + '</div><h3 id="pnT"></h3><p class="lead" id="pnS"></p><div id="pnPad"></div>' + '<button type="button" class="linkbtn mut" id="pnForgot" ' + (has ? '' : 'hidden') + '>Forgot PIN?</button>');
+  const weak = p => /^(\d)\1{3}$/.test(p) || '0123456789'.indexOf(p) >= 0 || '9876543210'.indexOf(p) >= 0;
+  const pad = digitPad(4, { onFull: async v => {
+    const step = order[at];
+    pad.lock(true);
+    if (step === 'cur') {
+      try { await API.checkPin(v); cur = v; next(); } catch (e) { pad.error(e.message); await wait(650); pad.clear(); pad.lock(false); }
+    } else if (step === 'new') {
+      if (weak(v)) { pad.error('Choose a less obvious PIN (not 0000, 1111 or 1234).'); await wait(650); pad.clear(); pad.lock(false); return; }
+      if (cur && v === cur) { pad.error('Your new PIN must be different from the old one.'); await wait(650); pad.clear(); pad.lock(false); return; }
+      first = v; next();
+    } else {
+      if (v !== first) { pad.error('PINs do not match. Try again.'); await wait(650); pad.clear(); pad.lock(false); return; }
+      s.locked = true;
+      try { await API.setPin(v); s.locked = false; s.close(); renderSecurity(); fillIcons($('securityList')); toast(has ? 'PIN changed' : 'PIN created', 'Your new PIN is ready to use.', 'success'); }
+      catch (e) { s.locked = false; pad.error(e.message); await wait(650); pad.clear(); pad.lock(false); }
+    }
+  } });
+  function show(){ const k = order[at]; $('pnT').textContent = TXT[k][0]; $('pnS').textContent = TXT[k][1]; [].forEach.call($('pnSteps').children, (d, i) => d.classList.toggle('on', i === at)); pad.clear(); pad.lock(false); }
+  function next(){ at++; show(); }
+  $('pnPad').appendChild(pad.el); bindPad(s, pad); show();
+  if (has) $('pnForgot').addEventListener('click', () => { s.close(); toast('Reset by email', 'The real page sends a 6-digit code to your email.', 'info', 4200); });
+}
+
+/* optional email verification (6-digit code, demo code 123456) */
+function verifyEmail(){
+  if (U().isVerified) return toast('Email verified', 'To change your email, contact support.', 'info');
+  let cool = 0, timer = null;
+  const s = sheet('<div class="big-ico t-amber" style="margin-bottom:10px">' + ico('mail') + '</div><h3 style="padding:0">Enter the code</h3><p class="lead" style="margin-bottom:6px">We sent a 6-digit code to <b>' + esc(U().email) + '</b>.<br>Demo code: <b style="color:var(--brand);letter-spacing:2px">123456</b></p><div id="veBox"></div><div class="lead" id="veRes" style="text-align:center;margin:4px 0 0"></div>', { center: true, onClose: () => clearInterval(timer) });
+  const pad = digitPad(6, { onFull: async v => {
+    pad.lock(true);
+    try { await API.verifyEmail(v); s.close(); renderHero(false); renderAccount(); fillIcons($('app')); toast('Email verified', 'Thank you! Your account is safer now.', 'success'); }
+    catch (e) { pad.error(e.message); await wait(650); pad.clear(); pad.lock(false); }
+  } });
+  $('veBox').appendChild(pad.el); bindPad(s, pad);
+  const res = $('veRes');
+  function startCool(){ cool = 45; clearInterval(timer); const t = () => { if (cool > 0) { res.textContent = 'Resend code in 0:' + String(cool).padStart(2, '0'); cool--; } else { clearInterval(timer); res.innerHTML = 'Did not get it? <button class="linkbtn" style="display:inline;margin:0" id="veAgain">Resend code</button>'; $('veAgain').addEventListener('click', async () => { res.textContent = 'Sending...'; try { await API.resendCode(); toast('Code sent', 'Check your inbox and spam folder.', 'success'); } catch (e) { toast('Could not send', e.message, 'error'); } startCool(); }); } }; t(); timer = setInterval(t, 1000); }
+  startCool();
+}
+
+function whatsapp(){
+  const u = U(), L = [['en', 'English'], ['ha', 'Hausa'], ['yo', 'Yor\u00F9b\u00E1'], ['ig', 'Igbo']];
+  if (!u.whatsappLinked) return toast('Link WhatsApp', 'The real page sends you a code on WhatsApp.', 'info', 4000);
+  const s = sheet('<h3>WhatsApp assistant</h3><p class="lead">Choose the language our assistant uses when you chat with it.</p>' +
+    L.map(l => '<button type="button" class="opt ' + (u.whatsappLanguage === l[0] ? 'on' : '') + '" data-l="' + l[0] + '">' + l[1] + '<span class="radio">' + ico('check') + '</span></button>').join(''));
+  s.sh.querySelectorAll('[data-l]').forEach(b => b.addEventListener('click', async () => {
+    s.sh.querySelectorAll('.opt').forEach(o => o.classList.remove('on')); b.classList.add('on'); s.locked = true;
+    try { await API.setLang(b.dataset.l); s.locked = false; s.close(); renderPrefs(); fillIcons($('prefList')); toast('Language saved', b.textContent.trim(), 'success'); }
+    catch (e) { s.locked = false; toast('Could not save', e.message, 'error'); }
+  }));
+}
+
+async function askPerm(){
+  const res = await new Promise(resolve => {
+    let r = 'denied';
+    const s = sheet('<div class="big-ico t-blue">' + ico('bell') + '</div><h3>Allow SubHub to send you notifications?</h3><p class="lead">Phone permission prompt (simulated). A real phone shows its own prompt.</p>' +
+      '<button type="button" class="btn btn-primary" id="pmYes">Allow</button><div class="stack" style="margin-top:10px"><button type="button" class="btn btn-ghost" id="pmNo">Don\u2019t allow</button></div>', { center: true, onClose: () => resolve(r) });
+    $('pmYes').addEventListener('click', () => { r = 'granted'; s.close(); }); $('pmNo').addEventListener('click', () => s.close());
+  });
+  if (res === 'granted') { flags.perm = 'granted'; toast('Notifications allowed', 'You will get alerts on this phone.', 'success'); }
+  else { flags.denies++; if (flags.denies >= 2) flags.perm = 'blocked'; toast('Not allowed', flags.perm === 'blocked' ? 'Turn them on in your phone settings.' : 'You can turn them on any time.', 'warn'); }
+  saveFlags(); renderPerm(); fillIcons($('permBanner'));
+}
+
+async function testPush(){
+  if (flags.perm !== 'granted') return toast('Turn on notifications first', 'Allow notifications on this phone, then try again.', 'warn');
+  if (!view.settings.notifEnabled || !view.settings.notifAppEnabled) return toast('Notifications are off', 'Turn on push notifications for the app first.', 'warn');
+  const r = [].find.call(document.querySelectorAll('[data-act="testPush"]'), x => x);
+  r.style.opacity = .6;
+  try { await API.testPush(); pushBanner('SubHub', 'Test notification: your alerts are working \uD83C\uDF89'); }
+  catch (e) { toast('Could not send', e.message, 'error'); }
+  r.style.opacity = 1;
+}
+
+function logoutAll(){
+  confirmSheet({ icon:'logout', title:'Log out from all devices?', text:'You will be signed out on every phone and browser where you are logged in, including this one. You will need your password to log in again.', yes:'Log out everywhere',
+    action: async () => { await API.revokeAll(); } }).then(ok => { if (ok) done('Logged out everywhere', 'Taking you to the login page...'); });
+}
+function logoutHere(){
+  confirmSheet({ icon:'logout', title:'Log out?', text:'You can log in again with your password or fingerprint.', yes:'Log out', action: async () => { await wait(500); } }).then(ok => { if (ok) done('Logged out', 'See you soon!'); });
+}
+function done(t, m){
+  const s = sheet('<div class="big-ico t-green">' + ico('check') + '</div><h3>' + esc(t) + '</h3><p class="lead">' + esc(m) + ' <br>(In the real page this goes to the login page.)</p>' + '<button type="button" class="btn btn-primary" id="dnOk">Back to demo</button>', { center: true, noClose: true });
+  $('dnOk').addEventListener('click', () => { store.del(STATE_KEY); location.reload(); });
+}
+
+/* ============================================================
+   7. CLICKS
+============================================================ */
+const HANDLERS = {
+  edit: editName, email: verifyEmail, password: changePassword, pin: changePin, whatsapp, askPerm, testPush,
+  copyUser: () => copy(U().username, 'Username copied'),
+  go: t => openSection(t.dataset.to),
+  phone: () => toast('Phone number', 'To change your number, contact support.', 'info'),
+  tier: () => toast('Account type', 'Your prices follow your account type. Spend more to move up.', 'info', 4200),
+  openSettings: () => toast('Opens phone settings', 'The real app opens Android notification settings.', 'info'),
+  doc: () => toast('Opens in the browser', 'This opens the page on subhub.com.ng.', 'info'),
+  noop: () => {},
+  revoke: t => { const id = t.dataset.id, d = S.sessions.find(x => x.id === id); confirmSheet({ icon:'logout', title:'Log out this device?', text:(d ? d.device : 'This device') + ' will be signed out.', yes:'Log out device', action: async () => { await API.revokeSession(id); renderSessions(); fillIcons($('sessionList')); } }).then(ok => ok && toast('Device logged out', '', 'success')); },
+  rmDevice: t => { const tk = t.dataset.t, d = S.devices.find(x => x.token === tk); confirmSheet({ icon:'bell', tone:'brand', title:'Stop notifications here?', text:(d ? d.label : 'This device') + ' will stop receiving notifications until it logs in again.', yes:'Remove device', action: async () => { await API.removeDevice(tk); renderDevices(); fillIcons($('notifDevices')); } }).then(ok => ok && toast('Device removed', '', 'success')); }
+};
+async function copy(text, msg){ try { await navigator.clipboard.writeText(text); toast(msg, '', 'success', 2200); } catch (e) { toast('Copy it by hand', text, 'info', 4500); } }
+async function share(title, text){ try { if (navigator.share) { await navigator.share({ title, text }); return; } } catch (e) { return; } copy(text, 'Copied to share'); }
+
+document.addEventListener('click', e => {
+  const lk = e.target.closest('[data-locked]'); if (lk) { toast('Always on', 'Security alerts keep your account safe, so they cannot be turned off.', 'info', 3800); return; }
+  const ac = e.target.closest('[data-acc]'); if (ac) { const k = ac.dataset.acc; openGroups[k] = !openGroups[k]; const c = ac.closest('.acc'); c.classList.toggle('open', !!openGroups[k]); ac.setAttribute('aria-expanded', !!openGroups[k]); return; }
+  const sw = e.target.closest('[data-sw]'); if (sw) { onSwitch(sw); return; }
+  const a = e.target.closest('[data-act]'); if (a && HANDLERS[a.dataset.act]) { HANDLERS[a.dataset.act](a); return; }
+  const g = e.target.closest('[data-go]');
+  if (g) { if (g.dataset.go === 'edit') editName(); else { const t = $(g.dataset.go); t.scrollIntoView({ behavior:'smooth', block:'start' }); const c = t.nextElementSibling && t.nextElementSibling.classList.contains('card') ? t.nextElementSibling : (t.parentElement.querySelector('#notifMain') || t); setTimeout(() => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }, 350); } return; }
+  if (e.target.closest('#camBtn')) photoSheet();
+});
+document.addEventListener('keydown', e => { const sw = e.target.closest && e.target.closest('[data-sw]'); if (sw && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSwitch(sw); } });
+$('logoutAllBtn').addEventListener('click', logoutAll);
+$('logoutBtn').addEventListener('click', logoutHere);
+$('backBtn').addEventListener('click', () => { if (cur !== 'main') backToMain(); else toast('Demo', 'The real page goes back to the dashboard.', 'info', 2200); });
+window.addEventListener('scroll', () => $('topbar').classList.toggle('scrolled', window.scrollY > 8), { passive:true });
+
+/* ---------- theme ---------- */
+function applyTheme(dark){
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light'); store.set('sh_dark', dark ? '1' : '0');
+  $('themeIco').innerHTML = ico(dark ? 'sun' : 'moon');
+  const r = document.querySelector('[data-sw="dark"]'); if (r) setSwitch(r, dark);
+}
+$('themeBtn').addEventListener('click', () => applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark'));
+
+/* ---------- demo controls ---------- */
+$('demoBtn').addEventListener('click', () => {
+  const seg = (name, items, cur) => '<div class="seg" data-seg="' + name + '">' + items.map(i => '<button type="button" data-v="' + i[0] + '" class="' + (String(cur) === String(i[0]) ? 'on' : '') + '">' + i[1] + '</button>').join('') + '</div>';
+  const s = sheet('<h3>Demo controls</h3><p class="lead">Only for testing here. They will not exist in the real page.</p>' +
+    '<div class="field"><label>This phone has fingerprint</label>' + seg('hw', [[true, 'Yes'], [false, 'No']], flags.hw) + '</div>' +
+    '<div class="field"><label>Phone notification permission</label>' + seg('perm', [['default', 'Not asked'], ['granted', 'Allowed'], ['blocked', 'Blocked']], flags.perm) + '</div>' +
+    '<div class="field"><label>Internet</label>' + seg('offline', [[false, 'Online'], [true, 'Offline']], flags.offline) + '</div>' +
+    '<p class="lead" style="margin-bottom:12px">Demo PIN is <b>1357</b>. Demo email code is <b>123456</b>. Demo password is <b>Pass1234!</b>.</p>' +
+    '<button type="button" class="btn btn-ghost" id="dmReset">Reset all demo data</button>');
+  s.sh.querySelectorAll('[data-seg]').forEach(g => g.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    g.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    const k = g.dataset.seg, v = b.dataset.v; flags[k] = (k === 'perm') ? v : v === 'true';
+    if (k === 'perm') flags.denies = v === 'blocked' ? 2 : 0;
+    saveFlags(); renderSecurity(); renderPerm(); fillIcons($('app'));
+  }));
+  $('dmReset').addEventListener('click', () => { store.del(STATE_KEY); store.del(FLAG_KEY); location.reload(); });
+});
+
+/* ============================================================
+   SECTIONS (screens). A link like  profile.html#notifications  opens that section directly.
+============================================================ */
+const SCREENS = ['main', 'account', 'security', 'sessions', 'notifications', 'preferences', 'help'];
+const TITLES = { main:'Profile', account:'Account details', security:'Security', sessions:'Devices', notifications:'Notifications', preferences:'Preferences', help:'Help and support' };
+let cur = 'main', pushed = 0;
+function route(){
+  const n = (location.hash || '').replace('#', '') || 'main', name = SCREENS.indexOf(n) >= 0 ? n : 'main';
+  if (name === cur && !$('s-' + name).hidden) return;
+  closeSheet();
+  const back = name === 'main'; cur = name;
+  SCREENS.forEach(x => { const sc = $('s-' + x); sc.hidden = x !== name; sc.classList.remove('in-fwd', 'in-back'); });
+  const sc = $('s-' + name); void sc.offsetWidth; sc.classList.add(back ? 'in-back' : 'in-fwd');
+  $('pageTitle').textContent = TITLES[name];
+  if (name === 'main') pushed = 0;
+  const h = document.documentElement; h.style.scrollBehavior = 'auto'; window.scrollTo(0, 0); h.style.scrollBehavior = '';
+}
+function openSection(n){ pushed++; location.hash = n; }
+function backToMain(){ if (pushed > 0) { pushed--; history.back(); } else { history.replaceState(null, '', location.pathname + location.search); route(); } }
+window.addEventListener('hashchange', route);
+/* Android: in onBackPressed call  webView.evaluateJavascript("window.SubHubBack()", ...)  -> "true" means the page handled it */
+window.SubHubBack = () => { if (openOv) { openOv.close(); return true; } if (cur !== 'main') { backToMain(); return true; } return false; };
+
+/* ============================================================
+   8. START
+============================================================ */
+fillIcons();
+$('themeIco').innerHTML = ico(document.documentElement.getAttribute('data-theme') === 'dark' ? 'sun' : 'moon');
+(async function init(){
+  try { await Promise.all([API.profile(), API.settings()]); } catch (e) { toast('Could not load', e.message, 'error'); }
+  view.settings = clone(S.settings); lastGood = clone(S.settings);
+  renderAll(true);
+  $('skeleton').hidden = true; $('app').hidden = false;
+  [].forEach.call($('s-main').children, (n, i) => { n.classList.add('rise'); n.style.setProperty('--d', (i * 55) + 'ms'); });
+  setTimeout(() => [].forEach.call($('s-main').children, n => n.classList.remove('rise')), 1500);
+  route();
+})();
+})();
+</script>
+</body>
+</html>
