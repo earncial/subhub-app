@@ -16,7 +16,7 @@
 /* ============================================================================
    1. CONFIG
 ============================================================================ */
-const API_BASE = 'https://subhub-sandbox.onrender.com/api';                 // logout.js reads this
+const API_BASE = 'https://api.subhub.ng/api';                 // logout.js reads this
 const TOKEN_KEY = 'sh_access_token';
 const REFRESH_KEY = 'sh_refresh_token';
 const LOGIN_URL = '/';
@@ -972,7 +972,20 @@ async function submitVA(card, ident) {
 }
 
 /* ----- fund modal ----- */
-function openFundModal() { Sl.fund = 0; renderFundCards(); $('#fundMoreOptionsBtn').onclick = openDepositOptions; Modal.open('fundModal'); const ft = $('#fundVATrack'); if (ft) ft.scrollTop = 0; }
+function openFundModal() { Sl.fund = 0; renderFundCards(); $('#fundMoreOptionsBtn').onclick = openDepositOptions; Modal.open('fundModal'); const ft = $('#fundVATrack'); if (ft) ft.scrollTop = 0; fixFundScroll(); }
+/* The list never traps the finger: if the modal itself scrolls, the list simply flows inside it.
+   Only when nothing around it scrolls, the list gets its own scroll area (and scroll passes on at its ends). */
+function fixFundScroll() {
+  const track = $('#fundVATrack'); if (!track) return;
+  track.classList.remove('fund-inner');
+  let p = track.parentElement, sc = null;
+  while (p && p !== document.body && p !== document.documentElement) {
+    const o = getComputedStyle(p).overflowY;
+    if (o === 'auto' || o === 'scroll') { sc = p; break; }
+    p = p.parentElement;
+  }
+  if (!sc) track.classList.add('fund-inner');
+}
 function renderFundCards() {
   const cards = buildVaCards();
   const track = $('#fundVATrack');
@@ -1140,6 +1153,20 @@ function loadRecents() {
   return a;
 }
 function saveRecents() { store.set(RECENT_KEY, S.recents); }
+const pickedNames = {};                       // phone -> name, remembered when the user picks a contact
+function contactName(phone) {
+  if (pickedNames[phone]) return pickedNames[phone];
+  const c = CT.device.find(x => x.phone === phone);
+  return c ? c.name : '';
+}
+/* numbers saved earlier without a name get the name from the phone's contacts as soon as contacts are known */
+function syncRecentNames() {
+  if (!CT.device.length) return;
+  const by = {}; CT.device.forEach(c => { if (c.name) by[c.phone] = c.name; });
+  let changed = false;
+  S.recents.forEach(n => { if (!n.name && by[n.phone]) { n.name = by[n.phone]; changed = true; } });
+  if (changed) { saveRecents(); renderRecents(); }
+}
 function rememberNumber(phone, networkId) {
   if (!validLocal11(phone)) return;
   const i = S.recents.findIndex(x => x.phone === phone);
@@ -1148,6 +1175,7 @@ function rememberNumber(phone, networkId) {
   else item = { id: 'rn' + Math.random().toString(36).slice(2, 8), name: '', phone: phone, network: networkId || detectNetwork(phone) || 'MTN' };
   item.ts = Date.now();
   if (networkId) item.network = networkId;
+  if (!item.name) { const nm = contactName(phone); if (nm) item.name = nm; }      // saved with the contact's name
   S.recents.unshift(item);
   const named = S.recents.filter(x => x.name), unnamed = S.recents.filter(x => !x.name).slice(0, 12);
   S.recents = S.recents.filter(x => named.includes(x) || unnamed.includes(x));
@@ -1271,11 +1299,12 @@ async function loadDeviceContactsRun() {
   });
   out.sort((a, b) => (a.name || '~').localeCompare(b.name || '~'));
   CT.device = out; CT.loaded = r.success;
+  syncRecentNames();
   CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'Contact access is off. Tap Open settings, allow Contacts for SubHub, then come back.';
 }
 function renderContactsShell() {
   $('#contactsPageBody').innerHTML =
-    '<div class="contacts-page-search"><i class="fas fa-search"></i><input type="text" id="ctSearch" placeholder="Search by name or number" autocomplete="off"/></div><div class="contacts-page-list" id="ctList"></div>';
+    '<div class="contacts-page-search"><i class="fas fa-search"></i><input type="text" id="ctSearch" placeholder="Search by name or number" autocomplete="off"/></div><div class="ct-count" id="ctCount"></div><div class="contacts-page-list" id="ctList"></div>';
   $('#ctSearch').oninput = e => { CT.filter = e.target.value; CT.shown = 0; renderContactsList(); };
   $('#contactsPageBody').onscroll = () => { const b = $('#contactsPageBody'); if (b.scrollTop + b.clientHeight > b.scrollHeight - 200) renderContactsList(true); };
 }
@@ -1287,6 +1316,8 @@ function renderContactsList(more) {
   const seen = new Set();
   saved.concat(CT.device).forEach(c => { if (seen.has(c.phone)) return; seen.add(c.phone); all.push(c); });
   const list = all.filter(c => !f || (c.name || '').toLowerCase().includes(f) || c.phone.includes(f));
+  const cc = $('#ctCount');
+  if (cc) cc.textContent = !all.length ? '' : (f ? list.length + ' of ' + all.length + ' contacts' : all.length + (all.length === 1 ? ' contact' : ' contacts'));
   if (!list.length) {
     const failed = !CT.loaded && !f && isApp();
     wrap.innerHTML = emptyHTML('fa-user-slash', f ? 'No matches' : (CT.msg || 'No contacts yet'), failed ? 'ctRetry' : null);
@@ -1307,7 +1338,7 @@ function renderContactsList(more) {
   CT.shown = end;
   $$('#ctList .contact-item:not([data-b])').forEach(el => {
     el.dataset.b = '1';
-    el.onclick = () => { const rec = { name: el.dataset.n, phone: el.dataset.p, network: detectNetwork(el.dataset.p) || 'MTN' }; closeContactsPage(); setTimeout(() => openQuickService(rec), 200); };
+    el.onclick = () => { const rec = { name: el.dataset.n, phone: el.dataset.p, network: detectNetwork(el.dataset.p) || 'MTN' }; if (rec.name) pickedNames[rec.phone] = rec.name; closeContactsPage(); setTimeout(() => openQuickService(rec), 200); };
   });
 }
 
@@ -1422,8 +1453,30 @@ async function loadTransactions(quiet) {
   renderTransactions();
   saveCache();
 }
+/* The number in "Recent (6) Transactions" is the real count. Put <span id="txCount">6</span> around it in the HTML;
+   if it is not there yet, the script wraps the number in the existing label by itself. */
+function setTxCount(n) { const el = $('#txCount'); if (el) el.textContent = n; }
+function ensureTxCount() {
+  if ($('#txCount')) return;
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = w.nextNode())) {
+    const par = node.parentElement; if (!par || /^(SCRIPT|STYLE|TEXTAREA)$/.test(par.tagName)) continue;
+    const m = /\(\s*(\d+)\s*\)/.exec(node.data); if (!m) continue;
+    const label = par.textContent || '';
+    if (label.length > 70 || !/recent/i.test(label) || !/transaction/i.test(label)) continue;
+    const before = node.data.slice(0, m.index) + '(', after = ')' + node.data.slice(m.index + m[0].length);
+    const frag = document.createDocumentFragment();
+    frag.appendChild(document.createTextNode(before));
+    const sp = document.createElement('span'); sp.id = 'txCount'; sp.textContent = m[1]; frag.appendChild(sp);
+    frag.appendChild(document.createTextNode(after));
+    par.replaceChild(frag, node);
+    return;
+  }
+}
 function renderTransactions() {
   const list = S.txns.slice(0, 6);
+  setTxCount(list.length);
   if (!list.length) { renderTransactions._sig = ''; $('#txList').innerHTML = emptyHTML('fa-receipt', 'No transactions yet'); return; }
   const tsig = JSON.stringify(list.map(t => [t.requestId, t.status, t.amount, t.createdAt]));
   if (renderTransactions._sig === tsig && $('#txList .tx')) return;      // same data: leave the list alone, nothing flickers
@@ -2340,13 +2393,14 @@ function renderPopup(a) {
     if (a.showOnce) { const seen = store.get('sh_popups_seen', []); if (seen.indexOf(popKey(a)) === -1) { seen.push(popKey(a)); store.set('sh_popups_seen', seen.slice(-100)); } }
     Modal.hooks.annModal = null; Modal.close('annModal'); setTimeout(nextPopup, 300);
   };
-  const buttons = (a.primary || a.secondary) ? '<div class="ann-btns">' + (a.primary ? '<button class="ann-btn" id="annCta">' + esc(a.primary.label) + '</button>' : '') + (a.secondary ? '<button class="ann-btn2" id="annDismiss">' + esc(a.secondary.label) + '</button>' : '') + '</div>' : '';
+  const hasLbl = (b) => !!(b && String(b.label || '').trim());          // a button with an empty label is not shown
+  const buttons = (hasLbl(a.primary) || hasLbl(a.secondary)) ? '<div class="ann-btns">' + (hasLbl(a.primary) ? '<button class="ann-btn" id="annCta">' + esc(a.primary.label) + '</button>' : '') + (hasLbl(a.secondary) ? '<button class="ann-btn2" id="annDismiss">' + esc(a.secondary.label) + '</button>' : '') + '</div>' : '';
   const tgt = (b) => b ? (b.action || (b.href ? { href: b.href } : null)) : null;
   let html;
-  if (type === 'image') {          // an image popup can also carry title, text, links and buttons
+  if (type === 'image') {          // the whole flyer is shown (never cropped). Title, text and buttons are optional.
     const below = !!(a.title || a.message || buttons);
-    html = '<div class="ann-hero' + (below ? '' : ' solo') + '">' + imgBox('cover', a.image) + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div>' +
-      (below ? '<div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + (a.message ? '<div class="ann-msg">' + formatMessage(a.message) + '</div>' : '') + buttons + '</div>' : '');
+    html = '<div class="ann-hero full' + (below ? '' : ' solo') + '">' + imgBox('cover', a.image) + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div>' +
+      (below ? '<div class="ann-wrap" style="padding-top:14px">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + (a.message ? '<div class="ann-msg">' + formatMessage(a.message) + '</div>' : '') + buttons + '</div>' : '');
   }
   else if (type === 'text') html = '<button class="ann-x light" id="annX" aria-label="Close"><i class="fas fa-times"></i></button><div class="ann-wrap solo"><div class="alert-ico info"><i class="fas fa-bullhorn"></i></div>' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
   else html = '<div class="ann-hero">' + (a.image ? imgBox('cover', a.image) : '<i class="fas fa-rocket"></i>') + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div><div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
@@ -2642,20 +2696,28 @@ function injectCss() {
   if (document.getElementById('sh-js-css')) return;
   const st = document.createElement('style'); st.id = 'sh-js-css';
   st.textContent = [
-    '#fundVATrack.fund-list{display:flex!important;flex-direction:column;gap:12px;transform:none!important;width:100%;max-height:min(54vh,430px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2px 0 6px}',
+    '#fundVATrack.fund-list{display:flex!important;flex-direction:column;gap:12px;transform:none!important;width:100%;padding:2px 0 6px;touch-action:pan-y}',
+    '#fundVATrack.fund-list *{touch-action:pan-y}',
+    '#fundVATrack.fund-list.fund-inner{max-height:min(54vh,430px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
     '#fundVATrack.fund-list>.wallet-card{flex:0 0 auto!important;width:100%!important;min-width:0;margin:0}',
     '#fundSlider{overflow:visible!important;height:auto!important;touch-action:auto!important}',
     '.proc-wait{margin-top:14px;font-size:.74rem;font-weight:600;color:var(--muted);animation:procPulse 1.4s ease-in-out infinite}',
     '@keyframes procPulse{0%,100%{opacity:.4}50%{opacity:1}}',
     '.fmt-link{color:#00aaff;font-weight:700;text-decoration:underline;word-break:break-word}',
-    '.ct-skel{pointer-events:none}'
+    '.ct-skel{pointer-events:none}',
+    '.ct-count{font-size:.74rem;font-weight:700;color:var(--muted);padding:2px 4px 8px}',
+    '#annContent{max-height:92vh;overflow-y:auto}',
+    '.ann-hero.full{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;display:block!important}',
+    '.ann-hero.full .imgbox{position:relative!important;display:block!important;width:100%!important;height:auto!important;aspect-ratio:auto!important;min-height:170px}',
+    '.ann-hero.full .imgbox.loaded{min-height:0!important}',
+    '.ann-hero.full .imgbox img{position:static!important;display:block!important;width:100%!important;height:auto!important;max-height:72vh;object-fit:contain!important}'
   ].join('\n');
   document.head.appendChild(st);
 }
 
 async function init() {
   if (!localStorage.getItem(TOKEN_KEY)) { goLogin(); return; }
-  injectCss();
+  injectCss(); ensureTxCount();
   applyTheme(store.raw('sh_dark') === '1');
   S.recents = loadRecents();
   const cached = loadCache();
@@ -2663,7 +2725,7 @@ async function init() {
   renderServices(); renderSlides(); startPromoTimer(); renderRecents();
   renderBadge();
   if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
-  else { renderWallet(); renderStats(); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
+  else { renderWallet(); renderStats(); setTxCount('...'); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
   bindEvents(); initPasteChips(); watchImages();
   document.addEventListener('click', e => {                     // links inside admin messages
     const a = e.target.closest && e.target.closest('a.fmt-link'); if (!a) return;
@@ -2673,6 +2735,9 @@ async function init() {
   await loadMe();
   loadTransactions(); loadContent(); loadUnread();
   setTimeout(maybePromptNotifications, 8000);
+  setTimeout(() => {                                             // names for saved numbers + the contacts count, without asking for anything
+    try { if (window.AndroidContacts && window.AndroidContacts.hasContactsPermission && window.AndroidContacts.hasContactsPermission() && !CT.loaded) loadDeviceContacts(); } catch (e) {}
+  }, 3000);
   setInterval(() => { if (document.visibilityState === 'visible') loadUnread(); }, 60000);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

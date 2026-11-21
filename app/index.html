@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#00aaff"/>
-<title>SubHub | Dashboard</title>
+<title>Dashboard | SubHub</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
 /* OFFLINE ICONS: inline SVG masks, no font or CDN needed. Use <i class="fas fa-NAME"></i> */
@@ -121,7 +121,14 @@ i.fas,i.far,i.fab{display:inline-block;width:1em;height:1em;flex-shrink:0;vertic
   --shadow: 0 1px 4px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
   --shadow-md: 0 4px 24px rgba(0,0,0,.5);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', sans-serif; -webkit-tap-highlight-color: transparent; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', sans-serif; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; overflow-x: hidden; }
 a { text-decoration: none; color: inherit; }
