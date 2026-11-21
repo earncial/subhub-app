@@ -16,12 +16,16 @@
 /* ============================================================================
    1. CONFIG
 ============================================================================ */
-const API_BASE = 'https://subhub-sandbox.onrender.com/api';                 // logout.js reads this
+const API_BASE = 'http://localhost:4000/api';                 // logout.js reads this
 const TOKEN_KEY = 'sh_access_token';
 const REFRESH_KEY = 'sh_refresh_token';
 const LOGIN_URL = '/';
 const PLACEHOLDER = '/placeholder.png';
 const DEFAULT_AVATAR = '/avatar.png';
+const EXAMPLE_PHONE = '08012345678';           // the placeholder number shown in the phone boxes, not a real phone
+const EXAMPLE_PHONE_MSG = 'This is just an example number, not a real phone number. Enter your own number.';
+const CACHE_KEY = 'sh_cache_v1';              // last known account data, shown at once on the next visit
+const IMG_KEY = 'sh_img_ok_v1';               // image files that loaded before
 const REFERRAL_BONUS = 50;                    // shown in text only
 
 const ROUTES = {
@@ -146,6 +150,7 @@ const isNum = (v) => typeof v === 'number' && isFinite(v);
 const naira = (n) => '\u20A6' + num(n).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const naira0 = (n) => '\u20A6' + num(n).toLocaleString('en-NG');
 const DOT = ' \u2022 ';
+const ARROW = ' \u2192 ';
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const fmtClock = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).replace(/\u202f/g, ' ');
 const fmtDate = (ts) => { const d = new Date(ts); if (isNaN(d)) return ''; return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + fmtClock(d); };
@@ -165,7 +170,7 @@ const store = {
   raw(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   setRaw(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 };
-const goLogin = () => { window.location.replace(LOGIN_URL); };
+const goLogin = () => { try { localStorage.removeItem(CACHE_KEY); } catch (e) {} window.location.replace(LOGIN_URL); };
 const go = (url) => { window.location.href = url; };
 const isApp = () => !!window.AndroidAuth;
 const sourceTag = () => (isApp() ? 'app' : 'web');
@@ -173,13 +178,31 @@ const sourceTag = () => (isApp() ? 'app' : 'web');
 /* phones */
 function normalizePhone(raw) {
   let d = String(raw || '').replace(/[^\d]/g, '');
-  if (d.length === 13 && d.slice(0, 3) === '234') d = '0' + d.slice(3);
+  if (d.slice(0, 3) === '234' && d.length >= 13) { d = d.slice(3); if (d[0] !== '0') d = '0' + d; }
   else if (d.length === 10 && /^[789]/.test(d)) d = '0' + d;
   return d;
 }
 const digitsOnly = (v, max) => String(v || '').replace(/\D/g, '').slice(0, max || 20);
 const validPhone = (p) => /^0[789][01]\d{8}$/.test(String(p || '').trim());
 const validLocal11 = (p) => /^0\d{10}$/.test(String(p || '').trim());
+const isExamplePhone = (p) => String(p || '').trim() === EXAMPLE_PHONE;
+/* What the user types or pastes into a phone box: removes spaces, dashes and +, turns
+   234803... and +234 803... into 0803..., adds a missing 0 and keeps at most 11 digits. */
+function cleanPhoneInput(raw) {
+  let d = String(raw || '').replace(/\D/g, '');
+  if (d.slice(0, 3) === '234') { d = d.slice(3); if (d[0] !== '0') d = '0' + d; }
+  else if (/^[789]/.test(d)) d = '0' + d;
+  return d.slice(0, 11);
+}
+function bindPhoneInput(id, after) {
+  const el = document.getElementById(id); if (!el) return;
+  el.removeAttribute('maxlength');            // a pasted +234... is longer than 11 characters, we cut it to 11 ourselves
+  el.addEventListener('input', e => {
+    const v = cleanPhoneInput(e.target.value);
+    if (v !== e.target.value) e.target.value = v;
+    if (after) after(e);
+  });
+}
 const PREFIX = { '0803': 'MTN', '0806': 'MTN', '0703': 'MTN', '0706': 'MTN', '0813': 'MTN', '0816': 'MTN', '0810': 'MTN', '0814': 'MTN', '0903': 'MTN', '0906': 'MTN', '0913': 'MTN', '0916': 'MTN', '0704': 'MTN', '07025': 'MTN', '07026': 'MTN',
   '0707': 'MTN',
   '0802': 'Airtel', '0808': 'Airtel', '0708': 'Airtel', '0812': 'Airtel', '0701': 'Airtel', '0902': 'Airtel', '0901': 'Airtel', '0907': 'Airtel', '0912': 'Airtel',
@@ -253,7 +276,46 @@ function readClipboard() {
 
 /* 3.3 fingerprint */
 function bioAvailable() { try { return !!(window.AndroidAuth && window.AndroidAuth.isBiometricAvailable && window.AndroidAuth.isBiometricAvailable()); } catch (e) { return false; } }
-function bioHas(slot) { try { return !!(bioAvailable() && window.AndroidAuth.hasBiometricCredential && window.AndroidAuth.hasBiometricCredential(slot)); } catch (e) { return false; } }
+/* Why fingerprint can or cannot be used: ok | none-enrolled | no-hardware | hw-unavailable | weak-only | unsupported | no-bridge.
+   Older app builds have no biometricStatus(), so we fall back to the yes/no answer. */
+function bioStatus() {
+  try {
+    if (!window.AndroidAuth) return 'no-bridge';
+    if (typeof window.AndroidAuth.biometricStatus === 'function') return String(window.AndroidAuth.biometricStatus() || 'unsupported');
+    return bioAvailable() ? 'ok' : 'unsupported';
+  } catch (e) { return 'unsupported'; }
+}
+const BIO_MSG = {
+  'no-bridge': 'Fingerprint payment works in the SubHub Android app.',
+  'none-enrolled': 'No fingerprint is saved on this phone yet. Add one in your phone settings, then try again.',
+  'no-hardware': "This phone doesn't support fingerprint.",
+  'hw-unavailable': 'Fingerprint is not available right now. Please try again in a moment.',
+  'weak-only': "This phone's fingerprint sensor can't be used to protect payments, so fingerprint payment isn't supported on this phone.",
+  'unsupported': "This phone doesn't support fingerprint payment."
+};
+function bioHas(slot) { try { return !!(window.AndroidAuth && window.AndroidAuth.hasBiometricCredential && window.AndroidAuth.hasBiometricCredential(slot)); } catch (e) { return false; } }
+/* Turn fingerprint on for a slot. Resolves { success, reason }. */
+function bioEnable(slot, secret, title, subtitle) {
+  return new Promise(resolve => {
+    const A = window.AndroidAuth;
+    if (!A) return resolve({ success: false, reason: 'no-bridge' });
+    if (typeof A.enableBiometricCredentialCb !== 'function') {        // older app build: no answer comes back, so look again after a moment
+      try { A.enableBiometricCredential(slot, secret, title, subtitle); } catch (e) { return resolve({ success: false, reason: 'error' }); }
+      setTimeout(() => resolve({ success: bioHas(slot), reason: 'legacy' }), 2500);
+      return;
+    }
+    const id = 'en_' + Date.now() + Math.random().toString(36).slice(2, 6);
+    const prev = window.__subhubEnableCallback;
+    let done = false, timer;
+    const finish = (res) => { if (done) return; done = true; clearTimeout(timer); window.__subhubEnableCallback = prev; resolve(res); };
+    timer = setTimeout(() => finish({ success: false, reason: 'timeout' }), 60000);
+    window.__subhubEnableCallback = function (cbId, success, reason) {
+      if (cbId === id) finish({ success: success === true || success === 'true', reason: reason });
+      else if (typeof prev === 'function') prev(cbId, success, reason);
+    };
+    try { A.enableBiometricCredentialCb(slot, secret, title, subtitle, id); } catch (e) { finish({ success: false, reason: 'error' }); }
+  });
+}
 function bioGet(slot, title, subtitle) {
   return new Promise(resolve => {
     const id = 'cred_' + Date.now() + Math.random().toString(36).slice(2, 6);
@@ -384,15 +446,28 @@ const emptyHTML = (icon, msg, retryId) =>
   (retryId ? '<button class="btn-sec" id="' + retryId + '" style="width:auto;margin:10px auto 0;padding:9px 20px"><i class="fas fa-rotate-right"></i><span>Try again</span></button>' : '') + '</div>';
 
 /* ---------- images: /placeholder.png first, real image replaces it when loaded ---------- */
+/* Image files that loaded once are remembered on the phone, so logos and avatars show at once
+   on the next visit instead of flashing the placeholder first. */
+const IMG_TTL = 2 * 86400000;
+const imgMem = (function () { const m = store.get(IMG_KEY, {}); return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {}; })();
+const imgKnown = (u) => { const t = imgMem[u]; return !!(t && Date.now() - t < IMG_TTL); };
+let imgSaveT = null;
+function imgRemember(u, ok) {
+  if (ok) imgMem[u] = Date.now(); else delete imgMem[u];
+  clearTimeout(imgSaveT); imgSaveT = setTimeout(() => store.set(IMG_KEY, imgMem), 800);
+}
 function imgBox(cls, sources, fb) {
   const list = [].concat(sources || []).filter(Boolean);
-  return '<span class="imgbox ' + (cls || '') + '" data-srcs="' + esc(list.join('|')) + '"' +
-    (fb ? ' data-fb="' + esc(fb.text || '') + '" data-fbbg="' + esc(fb.bg || '') + '" data-fbfg="' + esc(fb.fg || '') + '"' : '') +
-    '><img src="' + PLACEHOLDER + '" alt=""/></span>';
+  const meta = ' data-srcs="' + esc(list.join('|')) + '"' +
+    (fb ? ' data-fb="' + esc(fb.text || '') + '" data-fbbg="' + esc(fb.bg || '') + '" data-fbfg="' + esc(fb.fg || '') + '"' : '');
+  for (const u of list) {
+    if (imgKnown(u)) return '<span class="imgbox loaded ' + (cls || '') + '" data-h="1"' + meta + '><img src="' + esc(u) + '" alt=""/></span>';
+  }
+  return '<span class="imgbox ' + (cls || '') + '"' + meta + '><img src="' + PLACEHOLDER + '" alt=""/></span>';
 }
 const imgCache = new Map();
 function probeImage(url) {
-  if (!imgCache.has(url)) imgCache.set(url, new Promise(res => { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = url; }));
+  if (!imgCache.has(url)) imgCache.set(url, new Promise(res => { const i = new Image(); i.onload = () => { imgRemember(url, true); res(true); }; i.onerror = () => res(false); i.src = url; }));
   return imgCache.get(url);
 }
 async function hydrateBox(el) {
@@ -412,6 +487,16 @@ async function hydrateBox(el) {
 let hydrateQueued = false;
 function hydrateImages() { $$('.imgbox:not([data-h])').forEach(hydrateBox); }
 function watchImages() {
+  document.addEventListener('error', e => {        // a remembered image that no longer loads: check it again
+    const im = e.target;
+    if (!im || im.tagName !== 'IMG') return;
+    const box = im.closest ? im.closest('.imgbox.loaded[data-h]') : null;
+    const src = im.getAttribute('src');
+    if (!box || !src || src === PLACEHOLDER) return;
+    imgRemember(src, false); imgCache.delete(src);
+    im.src = PLACEHOLDER; box.classList.remove('loaded'); box.removeAttribute('data-h');
+    hydrateImages();
+  }, true);
   new MutationObserver(() => {
     if (hydrateQueued) return;
     hydrateQueued = true;
@@ -438,6 +523,7 @@ function endSession(title, message) {
   sessionEnded = true;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
+  try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
   toast('red', title || 'Session Expired', message || 'Please login again');
   setTimeout(goLogin, 2500);
 }
@@ -459,7 +545,7 @@ function refreshAccess() {
       try { data = await res.json(); } catch (e) {}
       if (res.ok && data.success && data.accessToken) {
         localStorage.setItem(TOKEN_KEY, data.accessToken);
-        if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken);
+        if (data.refreshToken) { localStorage.setItem(REFRESH_KEY, data.refreshToken); retagCache(); }
         if (data.user) onUserFromRefresh(data.user);
         return { ok: true };
       }
@@ -542,9 +628,39 @@ const S = {
   balHidden: store.raw('sh_bal_hidden') === '1',
   busy: false,
   lastMe: 0,
-  offerPin: null
+  offerPin: null,
+  autoBio: false,
+  balFresh: false,           // false while the balance on screen is the one saved on the phone
+  balNote: '',
+  checking: false
 };
 function onUserFromRefresh(u) { if (S.user && u) Object.assign(S.user, u); }
+
+/* ----- local cache: the last known account data is shown at once, the API then updates it.
+   It is tied to the login (the tail of the refresh token), so another user never sees it. ----- */
+const CACHE_USER_FIELDS = ['fullName', 'email', 'phone', 'username', 'profilePicture', 'accountType', 'isVerified', 'transactionPinSet', 'virtualAccounts', 'totalDataPurchasedMB'];
+const sessionTag = () => String(localStorage.getItem(REFRESH_KEY) || '').slice(-24);
+function saveCache() {
+  if (!S.user) return;
+  const u = {};
+  CACHE_USER_FIELDS.forEach(k => { if (S.user[k] !== undefined) u[k] = S.user[k]; });
+  store.set(CACHE_KEY, {
+    t: Date.now(), tag: sessionTag(), user: u,
+    wallet: { balance: S.wallet.balance, totalFunded: S.wallet.totalFunded, totalSpent: S.wallet.totalSpent },
+    txns: S.txns.slice(0, 6)
+  });
+}
+function retagCache() { const c = store.get(CACHE_KEY, null); if (c) { c.tag = sessionTag(); store.set(CACHE_KEY, c); } }
+function clearCache() { try { localStorage.removeItem(CACHE_KEY); } catch (e) {} }
+function loadCache() {
+  const c = store.get(CACHE_KEY, null);
+  if (!c || !c.user || !c.tag || c.tag !== sessionTag()) { if (c) clearCache(); return false; }
+  S.user = c.user;
+  S.wallet = Object.assign({}, S.wallet, c.wallet || {});
+  S.txns = Array.isArray(c.txns) ? c.txns : [];
+  S.balFresh = false;
+  return true;
+}
 const planCache = {};
 const fresh = (k) => planCache[k] && Date.now() - planCache[k].t < 5 * 60 * 1000 ? planCache[k].v : null;
 
@@ -555,15 +671,18 @@ async function loadMe(quiet) {
   const r = await api(EP.me);
   if (!r.ok || !r.data.success) {
     if (!quiet) toast('warn', r.network ? 'No connection' : 'Account', r.network ? 'Could not reach SubHub. Check your internet.' : (r.data.message || 'Could not load your account'));
+    if (!S.balFresh) { S.balNote = 'Last saved balance'; renderWallet(); }
     return false;
   }
   S.user = r.data.user;
   S.wallet = Object.assign({}, S.wallet, r.data.wallet || {});
   S.lastMe = Date.now();
+  S.balFresh = true; S.balNote = '';
   renderAccount();
+  saveCache();
   return true;
 }
-function setBalance(n) { if (isNum(n)) { S.wallet.balance = n; renderWallet(); } }
+function setBalance(n) { if (isNum(n)) { S.wallet.balance = n; S.balFresh = true; S.balNote = ''; renderWallet(); saveCache(); } }
 
 function renderAccount() {
   const u = S.user; if (!u) return;
@@ -611,12 +730,42 @@ function updateGreeting() {
 }
 
 /* ----- slider helper ----- */
-function attachSwipe(el, onSwipe) {
-  if (!el || el.dataset.swipe) return;
+/* Drag slider: the cards follow the finger, then snap to the nearest card.
+   Vertical scrolling is left alone; only a mostly horizontal drag moves the cards. */
+function attachSwipe(el, track, kind, countFn) {
+  if (!el || !track || el.dataset.swipe) return;
   el.dataset.swipe = '1';
-  let x = 0, on = false;
-  el.addEventListener('touchstart', e => { x = e.touches[0].clientX; on = true; }, { passive: true });
-  el.addEventListener('touchend', e => { if (!on) return; on = false; const dx = e.changedTouches[0].clientX - x; if (Math.abs(dx) > 30) onSwipe(dx); }, { passive: true });
+  el.style.touchAction = 'pan-y';
+  let x0 = 0, y0 = 0, t0 = 0, dx = 0, drag = false, lock = null;
+  el.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    x0 = t.clientX; y0 = t.clientY; t0 = Date.now(); dx = 0; lock = null; drag = true;
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const t = e.touches[0], mx = t.clientX - x0, my = t.clientY - y0;
+    if (!lock) {
+      if (Math.abs(mx) < 6 && Math.abs(my) < 6) return;
+      lock = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+      if (lock === 'x') track.style.transition = 'none';
+    }
+    if (lock !== 'x') return;
+    dx = mx;
+    track.style.transform = 'translateX(calc(-' + (Sl[kind] * 100) + '% + ' + dx + 'px))';
+  }, { passive: true });
+  const end = () => {
+    if (!drag) return;
+    drag = false;
+    track.style.transition = '';
+    if (lock !== 'x') return;
+    const n = countFn(), w = el.offsetWidth || 300;
+    const fast = Math.abs(dx) / Math.max(1, Date.now() - t0) > 0.4 && Math.abs(dx) > 20;
+    let i = Sl[kind];
+    if (Math.abs(dx) > w * 0.2 || fast) i = Math.max(0, Math.min(n - 1, i + (dx < 0 ? 1 : -1)));
+    slideTo(kind, i, n);
+  };
+  el.addEventListener('touchend', end, { passive: true });
+  el.addEventListener('touchcancel', end, { passive: true });
 }
 const Sl = { wallet: 0, fund: 0 };
 function slideTo(kind, i, count) {
@@ -688,28 +837,43 @@ function bindVaButtons(root, copyAttr, genAttr) {
   });
   $$('[' + genAttr + ']', root).forEach(b => { b.onclick = () => generateVA(b.getAttribute(genAttr)); });
 }
+/* The wallet cards are built once. When only the balance, the eye or the "updated" text change,
+   just those texts are updated, so the slider is never reset or rebuilt under the user's finger. */
+let walletSig = '';
+const vaSig = (cards) => JSON.stringify(cards.map(c => [c.key, c.bankName, c.color, c.fee, c.acc ? [c.acc.accountNumber, c.acc.accountName, c.acc.status, c.acc.isDefault] : null]));
+function walletBalText() { return S.balHidden ? '••••••' : num(S.wallet.balance).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function walletSubText() { return 'Available Balance' + DOT + (S.balFresh ? 'Updated just now' : (S.balNote || 'Updating...')); }
 function renderWallet() {
-  const cards = buildVaCards();
-  const total = 1 + cards.length;
+  const cards = buildVaCards(), total = 1 + cards.length, sig = vaSig(cards);
+  const numEl = $('#walletNum');
+  if (sig === walletSig && numEl) {
+    numEl.textContent = walletBalText();
+    const sub = $('#walletSub'); if (sub) sub.textContent = walletSubText();
+    const eye = $('#eyeBtn i'); if (eye) eye.className = 'fas fa-eye' + (S.balHidden ? '-slash' : '');
+    return;
+  }
+  walletSig = sig;
   if (Sl.wallet >= total) Sl.wallet = 0;
-  const bal = S.balHidden ? '\u2022\u2022\u2022\u2022\u2022\u2022' : num(S.wallet.balance).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   let html = '<div class="wallet-card wc-main"><div class="wc-ring1"></div><div class="wc-ring2"></div><div class="wc-blob"></div><div class="wc-in">' +
     '<div class="wc-top"><div class="wc-lbl"><i class="fas fa-wallet"></i> Wallet Balance</div>' +
     '<button class="wc-eye" id="eyeBtn" aria-label="Show or hide balance"><i class="fas fa-eye' + (S.balHidden ? '-slash' : '') + '"></i></button></div>' +
-    '<div class="wc-bal"><span class="wc-bal-sym">\u20A6</span><span id="walletNum">' + bal + '</span></div>' +
-    '<div class="wc-sub">Available Balance' + DOT + 'Updated just now</div>' +
+    '<div class="wc-bal"><span class="wc-bal-sym">₦</span><span id="walletNum">' + walletBalText() + '</span></div>' +
+    '<div class="wc-sub" id="walletSub">' + walletSubText() + '</div>' +
     '<div class="wc-actions"><button class="wc-btn wc-btn-fund" id="wcFundBtn"><i class="fas fa-plus"></i> Fund Wallet</button>' +
     '<button class="wc-btn wc-btn-tx" id="wcTransferBtn"><i class="fas fa-paper-plane"></i> Transfer</button></div></div></div>';
   cards.forEach(c => { html += vaCardHTML(c, 'data-copy-va', 'data-gen-va'); });
-  $('#walletTrack').innerHTML = html;
+  const track = $('#walletTrack');
+  track.style.transition = 'none';
+  track.innerHTML = html;
   $('#walletDots').innerHTML = Array.from({ length: total }).map((_, i) => '<div class="wd' + (i === 0 ? ' on' : '') + '" data-slide="' + i + '"></div>').join('');
   $$('#walletDots .wd').forEach(d => { d.onclick = () => slideTo('wallet', parseInt(d.dataset.slide, 10), total); });
   $('#eyeBtn').onclick = () => { S.balHidden = !S.balHidden; store.setRaw('sh_bal_hidden', S.balHidden ? '1' : '0'); renderWallet(); };
   $('#wcFundBtn').onclick = openFundModal;
   $('#wcTransferBtn').onclick = openTransferChooser;
-  bindVaButtons($('#walletTrack'), 'data-copy-va', 'data-gen-va');
-  attachSwipe($('#walletSlider'), dx => slideTo('wallet', Sl.wallet + (dx < 0 ? 1 : -1), 1 + buildVaCards().length));
+  bindVaButtons(track, 'data-copy-va', 'data-gen-va');
+  attachSwipe($('#walletSlider'), track, 'wallet', () => 1 + buildVaCards().length);
   slideTo('wallet', Sl.wallet, total);
+  void track.offsetWidth; track.style.transition = '';
   if ($('#fundModal').classList.contains('show')) renderFundCards();
 }
 
@@ -770,7 +934,7 @@ function renderFundCards() {
   $('#fundVADots').innerHTML = Array.from({ length: total }).map((_, i) => '<div class="wd' + (i === 0 ? ' on' : '') + '" data-fva="' + i + '"></div>').join('');
   $$('#fundVADots .wd').forEach(d => { d.onclick = () => slideTo('fund', parseInt(d.dataset.fva, 10), total); });
   bindVaButtons($('#fundVATrack'), 'data-fund-copy', 'data-fund-gen');
-  attachSwipe($('#fundSlider'), dx => slideTo('fund', Sl.fund + (dx < 0 ? 1 : -1), buildVaCards().length));
+  attachSwipe($('#fundSlider'), $('#fundVATrack'), 'fund', () => buildVaCards().length);
   slideTo('fund', Math.min(Sl.fund, Math.max(0, total - 1)), total);
 }
 function openDepositOptions() {
@@ -977,7 +1141,7 @@ function deleteRecent(id) {
     onOk: () => { S.recents = S.recents.filter(x => x.id !== id); saveRecents(); renderRecents(); toast('green', 'Deleted', 'Number removed'); } });
 }
 function saveContactForm() {
-  const name = $('#scName').value.trim(), phone = digitsOnly($('#scPhone').value, 11), network = $('#scNet').value;
+  const name = $('#scName').value.trim(), phone = cleanPhoneInput($('#scPhone').value), network = $('#scNet').value;
   if (!name) { toast('warn', 'Invalid', 'Enter a name'); return; }
   if (!validLocal11(phone)) { toast('warn', 'Invalid', 'Enter a valid 11-digit phone number'); return; }
   if (editingId) {
@@ -1044,7 +1208,7 @@ function closeContactsPage() {
   if (!Modal.stack.length) document.body.style.overflow = '';
 }
 async function loadDeviceContacts() {
-  $('#contactsPageBody').innerHTML = emptyHTML('fa-address-book', 'Loading your contacts...');
+  const lw = $('#ctList'); if (lw) lw.innerHTML = emptyHTML('fa-address-book', 'Loading your contacts...');
   const r = await getDeviceContacts();
   const seen = new Set(); const out = [];
   (r.contacts || []).forEach(c => {
@@ -1199,6 +1363,7 @@ async function loadTransactions(quiet) {
   if (!r.ok || !r.data.success) { if (!quiet && !S.txns.length) $('#txList').innerHTML = emptyHTML('fa-receipt', r.network ? 'No connection' : 'Could not load transactions', 'txRetry'); const b = $('#txRetry'); if (b) b.onclick = () => loadTransactions(); return; }
   S.txns = r.data.transactions || [];
   renderTransactions();
+  saveCache();
 }
 function renderTransactions() {
   const list = S.txns.slice(0, 6);
@@ -1216,7 +1381,7 @@ function showTxDetail(ref) {
   const i = txInfo(tx);
   showReceipt({
     status: tx.status, amount: tx.amount, type: tx.type, ref: tx.requestId,
-    rows: [['Type', TX_LABEL[tx.type] || tx.type], ['Reference', tx.requestId, 'txid'], ['Date', fmtDate(tx.createdAt)], ['Direction', i.credit ? 'Credit' : 'Debit']]
+    rows: [['Service', TX_LABEL[tx.type] || tx.type], ['Reference', tx.requestId, 'txid'], ['Date', fmtDate(tx.createdAt)], ['Direction', i.credit ? 'Credit' : 'Debit']]
       .concat(isNum(tx.oldBalance) ? [['Balance Before', naira(tx.oldBalance), 'bal']] : [], isNum(tx.newBalance) ? [['Balance After', naira(tx.newBalance), 'bal']] : []),
     details: i.details, pins: i.pins
   });
@@ -1252,16 +1417,19 @@ function showReceipt(o) {
 }
 /* after the receipt closes, offer fingerprint for purchases (once the PIN was typed and accepted) */
 Modal.hooks.receiptModal = function () {
-  const pin = S.offerPin; S.offerPin = null;
-  if (!pin || !bioAvailable() || bioHas('transaction')) return;
+  const pin = S.offerPin, auto = !!S.autoBio;
+  S.offerPin = null; S.autoBio = false;
+  if (!pin || bioStatus() !== 'ok' || bioHas('transaction')) return;
+  const enable = async () => {
+    const r = await bioEnable('transaction', pin, 'Enable fingerprint', 'Confirm to pay faster next time');
+    if (r.success) toast('green', 'Fingerprint enabled', 'Confirm payments with your fingerprint');
+    else if (r.reason !== 'cancelled') toast('warn', 'Fingerprint', 'Could not turn on fingerprint. Please try again later.');
+  };
+  if (auto) { setTimeout(enable, 350); return; }          // the user asked for it on the PIN pad
   if (Date.now() < num(store.raw('sh_txbio_snooze'))) return;
   setTimeout(() => showAlert({
     icon: 'info', title: 'Pay with fingerprint?', message: 'Skip typing your PIN. Confirm your payments with your fingerprint next time.',
-    okLabel: 'Enable', cancelLabel: 'Not now',
-    onOk: () => {
-      try { window.AndroidAuth.enableBiometricCredential('transaction', pin, 'Enable fingerprint', 'Confirm to pay faster next time'); } catch (e) {}
-      setTimeout(() => { if (bioHas('transaction')) toast('green', 'Fingerprint enabled', 'Confirm payments with your fingerprint'); }, 2500);
-    },
+    okLabel: 'Enable', cancelLabel: 'Not now', onOk: enable,
     onCancel: () => store.setRaw('sh_txbio_snooze', String(Date.now() + 7 * 86400000))
   }), 350);
 };
@@ -1283,40 +1451,63 @@ function showConfirm(cfg) {
 }
 
 /* PIN pad (returns { pin, bio } or null when cancelled) */
-const PIN = { buf: '', resolve: null, bio: false };
+const PIN = { buf: '', resolve: null, bio: false, wantBio: false };
 function updatePinDots() { for (let i = 0; i < 4; i++) { const d = $('#pd' + i); if (d) d.classList.toggle('on', i < PIN.buf.length); } }
 function askPin(label) {
   return new Promise(resolve => {
-    PIN.resolve = resolve; PIN.buf = ''; PIN.bio = false;
+    PIN.resolve = resolve; PIN.buf = ''; PIN.bio = false; PIN.wantBio = false;
     $('#pinSum').textContent = label || ''; $('#pinErr').textContent = '';
     updatePinDots();
-    const fp = $('#pinKp [data-pk="fp"]'); if (fp) fp.style.visibility = bioHas('transaction') ? 'visible' : 'hidden';
+    const fp = $('#pinKp [data-pk="fp"]'); if (fp) fp.style.visibility = 'visible';      // always shown; tapping it explains if the phone can't do it
     Modal.open('pinModal');
   });
 }
-function finishPin(pin, bio) { const res = PIN.resolve; PIN.resolve = null; Modal.close('pinModal'); if (res) res(pin ? { pin: pin, bio: !!bio } : null); }
+function finishPin(pin, bio) { const res = PIN.resolve; PIN.resolve = null; Modal.close('pinModal'); if (res) res(pin ? { pin: pin, bio: !!bio, wantBio: !!PIN.wantBio } : null); }
 Modal.hooks.pinModal = function () { const res = PIN.resolve; PIN.resolve = null; if (res) res(null); };
 async function pinKey(k) {
   feedback('tap');
   if (k === 'del') PIN.buf = PIN.buf.slice(0, -1);
-  else if (k === 'fp') {
-    const r = await bioGet('transaction', 'Confirm payment', $('#pinSum').textContent);
-    if (r.success && /^\d{4}$/.test(String(r.credential || ''))) { finishPin(String(r.credential), true); return; }
-    return;
-  } else if (PIN.buf.length < 4) PIN.buf += k;
+  else if (k === 'fp') { pinFingerprint(); return; }
+  else if (PIN.buf.length < 4) PIN.buf += k;
   updatePinDots();
   if (PIN.buf.length === 4) setTimeout(() => finishPin(PIN.buf, false), 120);
 }
+const BIO_DEAD = ['key-invalidated', 'not-enrolled', 'decrypt-error'];
+/* Handles a fingerprint prompt that did not give a PIN. Returns true when the saved fingerprint is no longer usable. */
+function bioFailed(r) {
+  const why = r && r.reason;
+  if (BIO_DEAD.indexOf(why) > -1) {
+    try { window.AndroidAuth.disableBiometricCredential('transaction'); } catch (e) {}
+    toast('warn', 'Fingerprint', 'The fingerprints on your phone changed. Enter your PIN, and fingerprint will be turned on again after this payment.');
+    return true;
+  }
+  if (why === 'lockout') toast('warn', 'Fingerprint', 'Too many attempts. Use your PIN.');
+  return false;
+}
+/* The fingerprint key on the PIN pad */
+async function pinFingerprint() {
+  const st = bioStatus();
+  if (st !== 'ok') { showAlert({ icon: 'info', title: 'Fingerprint not available', message: BIO_MSG[st] || BIO_MSG.unsupported }); return; }
+  if (!bioHas('transaction')) {
+    PIN.wantBio = true;
+    toast('blue', 'Fingerprint', 'Enter your PIN this once. When the payment goes through, fingerprint will be turned on.');
+    return;
+  }
+  const r = await bioGet('transaction', 'Confirm payment', $('#pinSum').textContent);
+  if (r.success && /^\d{4}$/.test(String(r.credential || ''))) { finishPin(String(r.credential), true); return; }
+  if (bioFailed(r)) PIN.wantBio = true;
+}
 async function authorize(label) {
+  let rewant = false;
   if (bioHas('transaction')) {
     const r = await bioGet('transaction', 'Confirm payment', label);
     if (r.success && /^\d{4}$/.test(String(r.credential || ''))) return { pin: String(r.credential), bio: true };
-    if (r.reason && /invalid|key|perm|enrol|changed/i.test(String(r.reason))) {
-      try { window.AndroidAuth.disableBiometricCredential('transaction'); } catch (e) {}
-      toast('warn', 'Fingerprint', 'Your fingerprint setup changed. Enter your PIN.');
-    }
+    if (r.success) { try { window.AndroidAuth.disableBiometricCredential('transaction'); } catch (e) {} rewant = true; }
+    else rewant = bioFailed(r);
   }
-  return askPin(label);
+  const res = await askPin(label);
+  if (res && rewant) res.wantBio = true;
+  return res;
 }
 function ensurePinSet() {
   if (S.user && S.user.transactionPinSet) return true;
@@ -1325,12 +1516,20 @@ function ensurePinSet() {
 }
 function needFunds(amount) {
   if (amount <= S.wallet.balance) return false;
-  showAlert({ icon: 'err', title: 'Insufficient Balance', message: 'Your balance (' + naira(S.wallet.balance) + ') is not enough for this payment.', okLabel: 'Fund Wallet', cancelLabel: 'Close', onOk: openFundModal });
+  showAlert({ icon: 'err', title: 'Insufficient Balance', message: '(' + naira0(S.wallet.balance) + ') You need ' + naira0(amount) + ' to complete this transaction.', okLabel: 'Fund Wallet', cancelLabel: 'Close', onOk: openFundModal });
   return true;
 }
 /* cfg: { type, service, amount, details[], endpoint, body{}, label, recent{phone,network}, receipt(tx)->details[], pins(tx)->[], extraRows(tx) } */
-function startPurchase(cfg) {
-  if (!ensurePinSet() || needFunds(cfg.amount)) return;
+/* cfg also takes: modal (the form that opened it, stays open until the payment is accepted),
+   procTitle and procSub (the texts of the "Purchasing..." screen). */
+async function startPurchase(cfg) {
+  if (S.busy || S.checking) return;
+  if (!ensurePinSet()) return;
+  if (!S.balFresh) {                       // the balance on screen may be from the last visit: get the real one first
+    S.checking = true; showProc('Please wait', 'Checking your balance');
+    try { await loadMe(true); } finally { hideProc(); S.checking = false; }
+  }
+  if (needFunds(cfg.amount)) return;
   showConfirm({ service: cfg.service, amount: cfg.amount, details: cfg.details, onProceed: () => executePurchase(cfg) });
 }
 async function executePurchase(cfg) {
@@ -1338,7 +1537,7 @@ async function executePurchase(cfg) {
   const auth = await authorize(cfg.label || cfg.service);
   if (!auth) return;
   S.busy = true;
-  showProc('Processing', cfg.service + DOT + naira0(cfg.amount));
+  showProc(cfg.procTitle || 'Purchasing...', cfg.procSub || (cfg.service + DOT + naira0(cfg.amount)));
   let r;
   try {
     r = await api(cfg.endpoint, { method: 'POST', body: Object.assign({}, cfg.body, { pin: auth.pin, source: sourceTag() }), timeout: 75000 });
@@ -1349,6 +1548,7 @@ const syncAfter = () => Promise.all([loadMe(true), loadTransactions(true)]);
 async function handleResult(cfg, auth, r) {
   const d = r.data || {}, tx = d.transaction || {};
   if (r.network) {
+    if (cfg.modal) Modal.close(cfg.modal);          // the result is unknown, so do not let the user pay twice from the same form
     showAlert({ icon: 'warn', title: 'Connection lost', message: 'We could not confirm your payment. It may still have gone through, so check your transactions before trying again.',
       okLabel: 'View transactions', cancelLabel: 'Close', onOk: () => go(ROUTES.transactions) });
     setTimeout(syncAfter, 1500); return;
@@ -1365,7 +1565,8 @@ async function handleResult(cfg, auth, r) {
     const pending = r.status === 202 || String(tx.status || '').toLowerCase() === 'pending';
     if (isNum(tx.newBalance)) setBalance(tx.newBalance);
     if (cfg.recent) rememberNumber(cfg.recent.phone, cfg.recent.network);
-    if (!auth.bio) S.offerPin = auth.pin;
+    if (!auth.bio) { S.offerPin = auth.pin; S.autoBio = !!auth.wantBio; }
+    if (cfg.modal) Modal.close(cfg.modal);          // the form closes only now that the payment was accepted
     const rec = cfg.receipt ? cfg.receipt(tx) : [];
     const amount = isNum(tx.amount) ? tx.amount : cfg.amount;
     showReceipt({
@@ -1393,10 +1594,18 @@ function renderNetChips(sel, ctx, onChange) {
   wrap.innerHTML = NETWORKS.map(n => '<div class="nc' + (ctx.network === n.id ? ' sel' : '') + '" data-net="' + n.id + '">' + netLogo(n, 'nc-logo') + '<div class="nc-name">' + n.name + '</div></div>').join('');
   $$('[data-net]', wrap).forEach(el => { el.onclick = () => { ctx.network = el.dataset.net; $$('.nc', wrap).forEach(x => x.classList.remove('sel')); el.classList.add('sel'); onChange(); }; });
 }
+const NET_WAIT = { '0702': 1 };      // 0702 is Smile but 07025 and 07026 are MTN: wait for the fifth digit
 function updatePhoneState(inputId, stateId, netId) {
-  const st = document.getElementById(stateId), inp = document.getElementById(inputId); if (!st || !inp) return;
-  const v = inp.value.trim(); st.className = 'phone-state'; st.innerHTML = '';
-  if (!(v.length === 11 && validPhone(v) && netId)) return;
+  const inp = document.getElementById(inputId); if (!inp) return;
+  const v = inp.value.trim();
+  const errEl = document.getElementById(inputId + 'Err');
+  if (isExamplePhone(v)) { if (errEl) { errEl.textContent = EXAMPLE_PHONE_MSG; errEl.classList.add('on'); } }
+  else if (errEl && errEl.textContent === EXAMPLE_PHONE_MSG) errEl.classList.remove('on');
+  const st = document.getElementById(stateId); if (!st) return;
+  st.className = 'phone-state'; st.innerHTML = '';
+  if (isExamplePhone(v)) { st.className = 'phone-state bad'; st.innerHTML = '<i class="fas fa-xmark"></i>'; return; }
+  if (v.length < 4 || !netId) return;                      // the icon shows from the 4th digit, no need to finish the number
+  if (v.length === 4 && NET_WAIT[v]) return;
   const det = detectNetwork(v); if (!det) return;
   const ok = det === netId;
   st.className = 'phone-state ' + (ok ? 'ok' : 'bad'); st.innerHTML = ok ? '<i class="fas fa-check"></i>' : '<i class="fas fa-xmark"></i>';
@@ -1463,12 +1672,12 @@ function buyDataPlan(plan) {
   const phone = $('#dataPhone').value.trim(); clearErr('dataPhoneErr');
   if (!dataCtx.network) { toast('warn', 'Select network', 'Choose a network'); return; }
   if (plan.inStock === false) { toast('warn', 'Out of stock', plan.message || 'This plan is unavailable'); return; }
+  if (isExamplePhone(phone)) { fieldErr('dataPhoneErr', EXAMPLE_PHONE_MSG); return; }
   if (!validPhone(phone)) { fieldErr('dataPhoneErr', 'Enter a valid 11-digit phone number'); return; }
   const net = netOf(dataCtx.network);
   const proceed = () => {
-    if (!ensurePinSet() || needFunds(num(plan.sellingPrice))) return;
-    Modal.close('dataModal');
     startPurchase({
+      modal: 'dataModal', procSub: plan.planName + ' Data' + ARROW + phone,
       type: 'data', service: 'Data Purchase', amount: num(plan.sellingPrice),
       details: [['Network', net.name], ['Plan', plan.planName + ' (' + plan.validity + ')'], ['Phone', phone]],
       endpoint: EP.dataBuy, body: { planId: plan.planId, phone: phone }, label: net.name + ' ' + plan.planName + ' to ' + phone,
@@ -1498,13 +1707,13 @@ function submitAirtime() {
   const phone = $('#atPhone').value.trim(), amt = parseFloat($('#atAmt').value);
   clearErr('atPhoneErr'); clearErr('atAmtErr');
   if (!airCtx.network) { toast('warn', 'Select network', 'Choose a network'); return; }
+  if (isExamplePhone(phone)) { fieldErr('atPhoneErr', EXAMPLE_PHONE_MSG); return; }
   if (!validPhone(phone)) { fieldErr('atPhoneErr', 'Enter a valid 11-digit phone number'); return; }
   if (!amt || amt < AIRTIME_MIN || amt > AIRTIME_MAX) { fieldErr('atAmtErr', 'Enter an amount between ' + naira0(AIRTIME_MIN) + ' and ' + naira0(AIRTIME_MAX)); return; }
   const net = netOf(airCtx.network);
   const proceed = () => {
-    if (!ensurePinSet() || needFunds(amt)) return;
-    Modal.close('airtimeModal');
     startPurchase({
+      modal: 'airtimeModal', procSub: naira0(amt) + ' Airtime' + ARROW + phone,
       type: 'airtime', service: 'Airtime', amount: amt,
       details: [['Network', net.name], ['Phone', phone], ['Amount', naira(amt)]],
       endpoint: EP.airtimeBuy, body: { network: net.api, phone: phone, amount: amt }, label: net.name + ' ' + naira0(amt) + ' to ' + phone,
@@ -1601,10 +1810,9 @@ function submitCable() {
   if (!/^\d{8,12}$/.test(card)) { fieldErr('cableCardErr', 'Enter a valid smart card number (8 to 12 digits)'); return; }
   const c = CABLES.find(x => x.id === cableCtx.provider);
   if (!cableCtx.verified || cableCtx.verified.key !== c.id + '|' + card) { fieldErr('cableCardErr', 'Verify the smart card number before you continue'); return; }
-  if (!ensurePinSet() || needFunds(num(p.sellingPrice))) return;
   const cust = cableCtx.verified.name;
-  Modal.close('cableModal');
   startPurchase({
+    modal: 'cableModal', procSub: c.name + ' ' + p.planName + ARROW + card,
     type: 'cable', service: 'Cable TV', amount: num(p.sellingPrice),
     details: [['Provider', c.name], ['Plan', p.planName], ['Smart Card', card], ['Customer', cust]],
     endpoint: EP.cableBuy, body: { cable: c.api, planCode: p.planCode, smartCard: card }, label: c.name + ' ' + p.planName,
@@ -1710,11 +1918,10 @@ function submitElec() {
   if (!elecCtx.verified || elecCtx.verified.key !== d.id + '|' + elecCtx.type + '|' + meter) { fieldErr('elecMeterErr', 'Verify the meter number before you continue'); return; }
   if (!amt || amt < d.min || amt > d.max) { fieldErr('elecAmtErr', 'Enter an amount between ' + naira0(d.min) + ' and ' + naira0(d.max)); return; }
   const c = elecCharge(amt), cust = elecCtx.verified.name, mt = elecCtx.type === 'PREPAID' ? 'Prepaid' : 'Postpaid';
-  if (!ensurePinSet() || needFunds(c.total)) return;
-  Modal.close('elecModal');
   const det = [['DISCO', d.name], ['Meter', meter], ['Customer', cust], ['Type', mt], ['Meter credit', naira(amt)]];
   if (c.markup != null && c.markup > 0) det.push(['Service charge', naira(c.markup)]);
   startPurchase({
+    modal: 'elecModal', procSub: naira0(amt) + ' Electricity' + ARROW + meter,
     type: 'electricity', service: 'Electricity', amount: c.total, details: det,
     endpoint: EP.elecBuy, body: { disco: d.id, meter: meter, meterType: elecCtx.type, amount: amt }, label: d.label + ' ' + naira0(amt),
     receipt: (tx) => [['Service', 'Electricity'], ['DISCO', d.name], ['Meter', tx.meter || meter], ['Customer', cust], ['Meter type', mt], ['Meter credit', naira(isNum(tx.meterCredit) ? tx.meterCredit : amt)]]
@@ -1762,9 +1969,8 @@ function submitExam() {
   const p = examCtx.plans.find(x => String(x.planId) === String(examCtx.planId));
   if (!p) { toast('warn', 'Select exam', 'Choose an exam type'); return; }
   const qty = examQty(), total = num(p.sellingPrice) * qty, name = p.planName || p.network;
-  if (!ensurePinSet() || needFunds(total)) return;
-  Modal.close('examModal');
   startPurchase({
+    modal: 'examModal', procSub: name + ' Pin' + (qty > 1 ? ' x' + qty : ''),
     type: 'exam', service: 'Exam Pins', amount: total, details: [['Exam', name], ['Quantity', qty], ['Unit price', naira0(p.sellingPrice)]],
     endpoint: EP.examBuy, body: { planId: p.planId, quantity: qty }, label: name + ' x' + qty,
     receipt: (tx) => [['Service', 'Exam Pins'], ['Exam', name], ['Quantity', tx.quantity || qty]],
@@ -1819,9 +2025,8 @@ function submitEpin() {
   const p = epinCtx.plans.find(x => String(x.planId) === String(epinCtx.planId));
   if (!p) { toast('warn', 'Select amount', 'Choose an amount'); return; }
   const net = netOf(epinCtx.network), qty = epinQty(), total = num(p.sellingPrice) * qty;
-  if (!ensurePinSet() || needFunds(total)) return;
-  Modal.close('rcModal');
   startPurchase({
+    modal: 'rcModal', procSub: net.name + ' ' + p.planName + ' Epin' + (qty > 1 ? ' x' + qty : ''),
     type: 'epin', service: 'Epin Print', amount: total, details: [['Network', net.name], ['Plan', p.planName], ['Quantity', qty], ['Unit price', naira0(p.sellingPrice)]],
     endpoint: EP.epinBuy, body: { planId: p.planId, quantity: qty }, label: net.name + ' ' + p.planName + ' x' + qty,
     receipt: (tx) => [['Service', 'Epin Print'], ['Network', tx.network || net.api], ['Plan', tx.plan || p.planName], ['Quantity', tx.quantity || qty]],
@@ -1832,7 +2037,7 @@ function submitEpin() {
 /* ============================================================================
    19. BULK SMS
 ============================================================================ */
-function smsNumbers() { return $('#smsNums').value.split(/[\s,;]+/).map(normalizePhone).filter(validLocal11).filter((n, i, a) => a.indexOf(n) === i); }
+function smsNumbers() { return $('#smsNums').value.split(/[\s,;]+/).map(normalizePhone).filter(validLocal11).filter(n => !isExamplePhone(n)).filter((n, i, a) => a.indexOf(n) === i); }
 function openSmsModal(o) {
   o = o || {};
   $('#smsSender').value = ''; $('#smsNums').value = o.phone || ''; $('#smsMsg').value = '';
@@ -1846,9 +2051,8 @@ function submitSms() {
   if (!msg) { toast('warn', 'Message', 'Type your message'); return; }
   if (msg.length > 160) { toast('warn', 'Too long', 'Max 160 characters'); return; }
   const cost = nums.length * SMS_RATE;
-  if (!ensurePinSet() || needFunds(cost)) return;
-  Modal.close('smsModal');
   startPurchase({
+    modal: 'smsModal', procSub: nums.length + ' SMS',
     type: 'sms', service: 'Bulk SMS', amount: cost, details: [['Sender', sender], ['Recipients', nums.length], ['Rate', naira0(SMS_RATE) + ' per SMS']],
     endpoint: EP.smsSend, body: { sender: sender, numbers: nums, message: msg }, label: nums.length + ' SMS',
     receipt: () => [['Service', 'Bulk SMS'], ['Sender ID', sender], ['Recipients', nums.length], ['Message', msg.length > 40 ? msg.slice(0, 40) + '...' : msg]]
@@ -1873,7 +2077,8 @@ function openTransferModal() {
   Modal.open('transferModal');
 }
 async function lookupRecipient() {
-  const phone = digitsOnly($('#trRecipient').value, 11); clearErr('trErr');
+  const phone = cleanPhoneInput($('#trRecipient').value); clearErr('trErr');
+  if (isExamplePhone(phone)) { fieldErr('trErr', EXAMPLE_PHONE_MSG); return; }
   if (!validLocal11(phone)) { fieldErr('trErr', 'Enter a valid 11-digit phone number starting with 0'); return; }
   if (S.user && phone === S.user.phone) { fieldErr('trErr', 'You cannot send money to yourself'); return; }
   const btn = $('#trLookupBtn'); setBtnLoading(btn, '');
@@ -1897,11 +2102,10 @@ function continueTransfer() {
   const amt = parseFloat($('#trAmt').value);
   if (!trCtx.recipient) { toast('warn', 'No recipient', 'Look up the phone number first'); return; }
   if (!amt || amt < 50) { fieldErr('trAmtErr', 'Minimum transfer is ' + naira0(50)); return; }
-  if (amt > S.wallet.balance) { fieldErr('trAmtErr', 'Insufficient. Balance: ' + naira(S.wallet.balance)); return; }
+  if (S.balFresh && amt > S.wallet.balance) { fieldErr('trAmtErr', 'Insufficient. Balance: ' + naira(S.wallet.balance)); return; }
   const r = trCtx.recipient, phone = trCtx.phone;
-  if (!ensurePinSet()) return;
-  Modal.close('transferModal');
   startPurchase({
+    modal: 'transferModal', procTitle: 'Sending...', procSub: naira0(amt) + ARROW + r.name,
     type: 'wallet_transfer', service: 'Wallet Transfer', amount: amt, details: [['Recipient', r.name], ['Phone', phone]],
     endpoint: EP.transfer, body: { phone: phone, amount: amt }, label: naira0(amt) + ' to ' + r.name,
     receipt: () => [['Service', 'Wallet Transfer'], ['Recipient', r.name], ['Phone', phone]]
@@ -2179,16 +2383,19 @@ function toggleTheme() { const dark = document.documentElement.getAttribute('dat
 function handleBack() {
   if (procOpen()) return true;
   if ($('#avDrop').classList.contains('show')) { $('#avDrop').classList.remove('show'); return true; }
+  if ($('#saveBar').classList.contains('open')) { $('#saveBar').classList.remove('open'); editingId = null; return true; }
   const id = Modal.stack[Modal.stack.length - 1];
   if (!id) return false;
   if (id === 'contactsPage') closeContactsPage(); else Modal.close(id);
   return true;
 }
 window.__subhubHandleBack = handleBack;
+window.subhubClearCache = clearCache;            // logout.js can call this too
 
 function logout() {
   $('#avDrop').classList.remove('show');
   showAlert({ icon: 'warn', title: 'Log out?', message: 'Are you sure you want to log out of your account?', okLabel: 'Log out', cancelLabel: 'Cancel', onOk: () => {
+    clearCache();
     if (typeof window.subhubLogout === 'function') window.subhubLogout();
     else { api('/auth/logout', { method: 'POST', body: { refreshToken: localStorage.getItem(REFRESH_KEY) || '' } }).finally(() => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(REFRESH_KEY); goLogin(); }); }
   } });
@@ -2231,7 +2438,7 @@ function bindEvents() {
   $('#saveContactBtn').onclick = () => { if ($('#saveBar').classList.contains('open')) $('#saveBar').classList.remove('open'); else openSaveBar(null); };
   $('#scCancelBtn').onclick = () => { $('#saveBar').classList.remove('open'); editingId = null; };
   $('#scSaveBtn').onclick = saveContactForm;
-  $('#scPhone').addEventListener('input', e => { e.target.value = digitsOnly(e.target.value, 11); });
+  bindPhoneInput('scPhone');
   $('#rnSearch').oninput = e => renderRecents(e.target.value);
   $('#exportContactsBtn').onclick = exportRecents;
   $('#viewAllContactsBtn').onclick = openContactsPage;
@@ -2245,10 +2452,10 @@ function bindEvents() {
     const row = e.target.closest('.dc[data-pid]');
     if (row) { dataCtx.planId = row.dataset.pid; $$('#plansWrap .dc').forEach(x => x.classList.remove('sel', 'flash')); row.classList.add('sel'); }
   });
-  $('#dataPhone').addEventListener('input', e => { e.target.value = digitsOnly(e.target.value, 11); updatePhoneState('dataPhone', 'dataPhoneState', dataCtx.network); });
+  bindPhoneInput('dataPhone', () => updatePhoneState('dataPhone', 'dataPhoneState', dataCtx.network));
 
   /* airtime */
-  $('#atPhone').addEventListener('input', e => { e.target.value = digitsOnly(e.target.value, 11); updatePhoneState('atPhone', 'atPhoneState', airCtx.network); });
+  bindPhoneInput('atPhone', () => updatePhoneState('atPhone', 'atPhoneState', airCtx.network));
   $$('[data-atamt]').forEach(b => { b.onclick = () => { $('#atAmt').value = b.dataset.atamt; $$('[data-atamt]').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); }; });
   $('#atSubmit').onclick = submitAirtime;
 
@@ -2270,7 +2477,7 @@ function bindEvents() {
   /* transfer */
   $('#trTypeSubhub').onclick = openTransferModal;
   $('#trTypeBank').onclick = bankComingSoon;
-  $('#trRecipient').addEventListener('input', e => { e.target.value = digitsOnly(e.target.value, 11); if (e.target.value.length === 11) lookupRecipient(); else { trCtx.recipient = null; $('#trRecipientCard').style.display = 'none'; $('#trAmtGroup').style.display = 'none'; $('#trContinueBtn').style.display = 'none'; } });
+  bindPhoneInput('trRecipient', e => { if (e.target.value.length === 11) lookupRecipient(); else { trCtx.recipient = null; $('#trRecipientCard').style.display = 'none'; $('#trAmtGroup').style.display = 'none'; $('#trContinueBtn').style.display = 'none'; } });
   $('#trLookupBtn').onclick = lookupRecipient;
   $('#trContinueBtn').onclick = continueTransfer;
 
@@ -2302,10 +2509,12 @@ async function init() {
   if (!localStorage.getItem(TOKEN_KEY)) { goLogin(); return; }
   applyTheme(store.raw('sh_dark') === '1');
   S.recents = loadRecents();
+  const cached = loadCache();
   updateGreeting(); setInterval(updateGreeting, 30000);
   renderServices(); renderSlides(); startPromoTimer(); renderRecents();
-  renderWallet(); renderStats(); renderBadge();
-  $('#txList').innerHTML = ''; skeleton($('#txList'), 3);
+  renderBadge();
+  if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
+  else { renderWallet(); renderStats(); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
   bindEvents(); initPasteChips(); watchImages();
   await loadMe();
   loadTransactions(); loadContent(); loadUnread();
