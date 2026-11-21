@@ -16,7 +16,7 @@
 /* ============================================================================
    1. CONFIG
 ============================================================================ */
-const API_BASE = 'https://subhub-sandbox.onrender.com/api';                 // logout.js reads this
+const API_BASE = 'http://localhost:4000/api';                 // logout.js reads this
 const TOKEN_KEY = 'sh_access_token';
 const REFRESH_KEY = 'sh_refresh_token';
 const LOGIN_URL = '/';
@@ -396,7 +396,15 @@ const Modal = {
     if (wasOpen && this.hooks[id]) this.hooks[id]();
   }
 };
-function showProc(title, sub) { $('#procTitle').textContent = title || 'Processing...'; $('#procSub').textContent = sub || 'Please wait'; $('#procOv').classList.add('show'); }
+function showProc(title, sub) {
+  $('#procTitle').textContent = title || 'Processing...';
+  const s = $('#procSub'); s.textContent = sub || ''; s.style.display = sub ? '' : 'none';
+  let w = $('#procWait');
+  if (!w) { w = document.createElement('div'); w.id = 'procWait'; w.className = 'proc-wait'; s.insertAdjacentElement('afterend', w); }
+  w.textContent = 'Please wait...';
+  w.style.display = /wait/i.test(title || '') ? 'none' : '';
+  $('#procOv').classList.add('show');
+}
 function hideProc() { $('#procOv').classList.remove('show'); }
 const procOpen = () => $('#procOv').classList.contains('show');
 
@@ -632,14 +640,23 @@ const S = {
   autoBio: false,
   balFresh: false,           // false while the balance on screen is the one saved on the phone
   balNote: '',
-  checking: false
+  checking: false,
+  balKnown: false            // true once a balance (saved or fresh) can be shown; before that no 0.00 is shown
 };
 function onUserFromRefresh(u) { if (S.user && u) Object.assign(S.user, u); }
 
 /* ----- local cache: the last known account data is shown at once, the API then updates it.
    It is tied to the login (the tail of the refresh token), so another user never sees it. ----- */
 const CACHE_USER_FIELDS = ['fullName', 'email', 'phone', 'username', 'profilePicture', 'accountType', 'isVerified', 'transactionPinSet', 'virtualAccounts', 'totalDataPurchasedMB'];
-const sessionTag = () => String(localStorage.getItem(REFRESH_KEY) || '').slice(-24);
+/* The cache belongs to one user: tagged with the user id inside the access token (it does not change when the token is
+   renewed). Fingerprint sign-in keeps no refresh token on the page, so the refresh token alone cannot be the tag. */
+function jwtUserId(t) {
+  try {
+    const p = JSON.parse(atob(String(t).split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return String(p.id || p._id || p.userId || p.sub || '');
+  } catch (e) { return ''; }
+}
+const sessionTag = () => jwtUserId(localStorage.getItem(TOKEN_KEY)) || String(localStorage.getItem(REFRESH_KEY) || '').slice(-24);
 function saveCache() {
   if (!S.user) return;
   const u = {};
@@ -654,11 +671,11 @@ function retagCache() { const c = store.get(CACHE_KEY, null); if (c) { c.tag = s
 function clearCache() { try { localStorage.removeItem(CACHE_KEY); } catch (e) {} }
 function loadCache() {
   const c = store.get(CACHE_KEY, null);
-  if (!c || !c.user || !c.tag || c.tag !== sessionTag()) { if (c) clearCache(); return false; }
+  if (!c || !c.user || c.tag !== sessionTag()) { if (c) clearCache(); return false; }
   S.user = c.user;
   S.wallet = Object.assign({}, S.wallet, c.wallet || {});
   S.txns = Array.isArray(c.txns) ? c.txns : [];
-  S.balFresh = false;
+  S.balFresh = false; S.balKnown = true;
   return true;
 }
 const planCache = {};
@@ -677,17 +694,18 @@ async function loadMe(quiet) {
   S.user = r.data.user;
   S.wallet = Object.assign({}, S.wallet, r.data.wallet || {});
   S.lastMe = Date.now();
-  S.balFresh = true; S.balNote = '';
+  S.balFresh = true; S.balKnown = true; S.balNote = '';
   renderAccount();
   saveCache();
   return true;
 }
-function setBalance(n) { if (isNum(n)) { S.wallet.balance = n; S.balFresh = true; S.balNote = ''; renderWallet(); saveCache(); } }
+function setBalance(n) { if (isNum(n)) { S.wallet.balance = n; S.balFresh = true; S.balKnown = true; S.balNote = ''; renderWallet(); saveCache(); } }
 
 function renderAccount() {
   const u = S.user; if (!u) return;
   $('#userName').textContent = String(u.fullName || 'User').split(' ')[0];
-  $('#avBtn').innerHTML = avatarBox(u.profilePicture, u.fullName, 'fill');
+  const avk = String(u.profilePicture || '') + '|' + String(u.fullName || '');
+  if (renderAccount._av !== avk) { renderAccount._av = avk; $('#avBtn').innerHTML = avatarBox(u.profilePicture, u.fullName, 'fill'); }
   $('#ddName').textContent = u.fullName || '';
   $('#ddPhone').textContent = u.phone || u.email || '';
   renderRank(); renderWallet(); renderStats(); renderEmailBanner();
@@ -730,6 +748,8 @@ function updateGreeting() {
 }
 
 /* ----- slider helper ----- */
+const SLIDE_TRANS = 'transform .3s cubic-bezier(.25,.8,.25,1)';      // fast, not slow
+const WAUTO = { t: 0, timer: null };                                  // t = last time the user touched the slider
 /* Drag slider: the cards follow the finger, then snap to the nearest card.
    Vertical scrolling is left alone; only a mostly horizontal drag moves the cards. */
 function attachSwipe(el, track, kind, countFn) {
@@ -739,7 +759,7 @@ function attachSwipe(el, track, kind, countFn) {
   let x0 = 0, y0 = 0, t0 = 0, dx = 0, drag = false, lock = null;
   el.addEventListener('touchstart', e => {
     const t = e.touches[0];
-    x0 = t.clientX; y0 = t.clientY; t0 = Date.now(); dx = 0; lock = null; drag = true;
+    WAUTO.t = Date.now(); x0 = t.clientX; y0 = t.clientY; t0 = Date.now(); dx = 0; lock = null; drag = true;
   }, { passive: true });
   el.addEventListener('touchmove', e => {
     if (!drag) return;
@@ -756,7 +776,7 @@ function attachSwipe(el, track, kind, countFn) {
   const end = () => {
     if (!drag) return;
     drag = false;
-    track.style.transition = '';
+    track.style.transition = SLIDE_TRANS; WAUTO.t = Date.now();
     if (lock !== 'x') return;
     const n = countFn(), w = el.offsetWidth || 300;
     const fast = Math.abs(dx) / Math.max(1, Date.now() - t0) > 0.4 && Math.abs(dx) > 20;
@@ -841,13 +861,37 @@ function bindVaButtons(root, copyAttr, genAttr) {
    just those texts are updated, so the slider is never reset or rebuilt under the user's finger. */
 let walletSig = '';
 const vaSig = (cards) => JSON.stringify(cards.map(c => [c.key, c.bankName, c.color, c.fee, c.acc ? [c.acc.accountNumber, c.acc.accountName, c.acc.status, c.acc.isDefault] : null]));
-function walletBalText() { return S.balHidden ? '••••••' : num(S.wallet.balance).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-function walletSubText() { return 'Available Balance' + DOT + (S.balFresh ? 'Updated just now' : (S.balNote || 'Updating...')); }
+const BAL_MASK = String.fromCharCode(8226).repeat(6);
+let balShown = null, balRaf = 0;
+const fmtBal = (n) => n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function walletBalText() {
+  if (S.balHidden) return BAL_MASK;
+  if (!S.balKnown) return '--.--';
+  return fmtBal(num(balShown === null ? S.wallet.balance : balShown));
+}
+/* New balance arrives: the number counts from the old value to the new one (like OPay).
+   It never drops to 0.00 first, and when the value is the same nothing moves. */
+function paintBalance() {
+  const el = $('#walletNum'); if (!el) return;
+  cancelAnimationFrame(balRaf);
+  const target = num(S.wallet.balance);
+  if (S.balHidden || !S.balKnown) { if (S.balKnown) balShown = target; el.textContent = walletBalText(); return; }
+  if (balShown === null || balShown === target || document.visibilityState !== 'visible') { balShown = target; el.textContent = fmtBal(target); return; }
+  const from = balShown, t0 = performance.now(), dur = 800;
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    balShown = p < 1 ? from + (target - from) * e : target;
+    el.textContent = fmtBal(balShown);
+    if (p < 1) balRaf = requestAnimationFrame(step);
+  };
+  balRaf = requestAnimationFrame(step);
+}
+function walletSubText() { return 'Available Balance' + DOT + (S.balFresh ? 'Updated just now' : (S.balNote || (S.balKnown ? 'Updating...' : 'Loading...'))); }
 function renderWallet() {
   const cards = buildVaCards(), total = 1 + cards.length, sig = vaSig(cards);
   const numEl = $('#walletNum');
   if (sig === walletSig && numEl) {
-    numEl.textContent = walletBalText();
+    paintBalance();
     const sub = $('#walletSub'); if (sub) sub.textContent = walletSubText();
     const eye = $('#eyeBtn i'); if (eye) eye.className = 'fas fa-eye' + (S.balHidden ? '-slash' : '');
     return;
@@ -865,15 +909,16 @@ function renderWallet() {
   const track = $('#walletTrack');
   track.style.transition = 'none';
   track.innerHTML = html;
+  paintBalance();
   $('#walletDots').innerHTML = Array.from({ length: total }).map((_, i) => '<div class="wd' + (i === 0 ? ' on' : '') + '" data-slide="' + i + '"></div>').join('');
-  $$('#walletDots .wd').forEach(d => { d.onclick = () => slideTo('wallet', parseInt(d.dataset.slide, 10), total); });
+  $$('#walletDots .wd').forEach(d => { d.onclick = () => { WAUTO.t = Date.now(); slideTo('wallet', parseInt(d.dataset.slide, 10), total); }; });
   $('#eyeBtn').onclick = () => { S.balHidden = !S.balHidden; store.setRaw('sh_bal_hidden', S.balHidden ? '1' : '0'); renderWallet(); };
   $('#wcFundBtn').onclick = openFundModal;
   $('#wcTransferBtn').onclick = openTransferChooser;
   bindVaButtons(track, 'data-copy-va', 'data-gen-va');
   attachSwipe($('#walletSlider'), track, 'wallet', () => 1 + buildVaCards().length);
   slideTo('wallet', Sl.wallet, total);
-  void track.offsetWidth; track.style.transition = '';
+  void track.offsetWidth; track.style.transition = SLIDE_TRANS;
   if ($('#fundModal').classList.contains('show')) renderFundCards();
 }
 
@@ -927,15 +972,15 @@ async function submitVA(card, ident) {
 }
 
 /* ----- fund modal ----- */
-function openFundModal() { Sl.fund = 0; renderFundCards(); $('#fundMoreOptionsBtn').onclick = openDepositOptions; Modal.open('fundModal'); }
+function openFundModal() { Sl.fund = 0; renderFundCards(); $('#fundMoreOptionsBtn').onclick = openDepositOptions; Modal.open('fundModal'); const ft = $('#fundVATrack'); if (ft) ft.scrollTop = 0; }
 function renderFundCards() {
-  const cards = buildVaCards(), total = cards.length;
-  $('#fundVATrack').innerHTML = cards.map(c => vaCardHTML(c, 'data-fund-copy', 'data-fund-gen')).join('');
-  $('#fundVADots').innerHTML = Array.from({ length: total }).map((_, i) => '<div class="wd' + (i === 0 ? ' on' : '') + '" data-fva="' + i + '"></div>').join('');
-  $$('#fundVADots .wd').forEach(d => { d.onclick = () => slideTo('fund', parseInt(d.dataset.fva, 10), total); });
-  bindVaButtons($('#fundVATrack'), 'data-fund-copy', 'data-fund-gen');
-  attachSwipe($('#fundSlider'), $('#fundVATrack'), 'fund', () => buildVaCards().length);
-  slideTo('fund', Math.min(Sl.fund, Math.max(0, total - 1)), total);
+  const cards = buildVaCards();
+  const track = $('#fundVATrack');
+  track.classList.add('fund-list');                 // vertical list: no slider, no dots, no swipe
+  track.style.transform = 'none'; track.style.transition = 'none';
+  track.innerHTML = cards.map(c => vaCardHTML(c, 'data-fund-copy', 'data-fund-gen')).join('');
+  const dots = $('#fundVADots'); if (dots) { dots.innerHTML = ''; dots.style.display = 'none'; }
+  bindVaButtons(track, 'data-fund-copy', 'data-fund-gen');
 }
 function openDepositOptions() {
   const rows = [
@@ -1207,8 +1252,17 @@ function closeContactsPage() {
   const i = Modal.stack.indexOf('contactsPage'); if (i > -1) Modal.stack.splice(i, 1);
   if (!Modal.stack.length) document.body.style.overflow = '';
 }
-async function loadDeviceContacts() {
-  const lw = $('#ctList'); if (lw) lw.innerHTML = emptyHTML('fa-address-book', 'Loading your contacts...');
+let ctRun = null;
+function loadDeviceContacts() { if (!ctRun) ctRun = loadDeviceContactsRun().finally(() => { ctRun = null; }); return ctRun; }
+function contactSkeleton(n) {
+  return Array.from({ length: n || 8 }).map((_, i) =>
+    '<div class="contact-item ct-skel"><div class="skeleton" style="width:42px;height:42px;border-radius:50%;flex:none"></div>' +
+    '<div class="contact-details"><div class="skeleton" style="height:12px;width:' + (48 + (i * 17) % 38) + '%;border-radius:6px;margin-bottom:8px"></div>' +
+    '<div class="skeleton" style="height:10px;width:' + (30 + (i * 11) % 22) + '%;border-radius:6px"></div></div>' +
+    '<div class="skeleton" style="width:48px;height:22px;border-radius:11px;flex:none"></div></div>').join('');
+}
+async function loadDeviceContactsRun() {
+  const lw = $('#ctList'); if (lw) lw.innerHTML = contactSkeleton(9);
   const r = await getDeviceContacts();
   const seen = new Set(); const out = [];
   (r.contacts || []).forEach(c => {
@@ -1217,7 +1271,7 @@ async function loadDeviceContacts() {
   });
   out.sort((a, b) => (a.name || '~').localeCompare(b.name || '~'));
   CT.device = out; CT.loaded = r.success;
-  CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'We could not read your contacts. Allow contact access and try again.';
+  CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'Contact access is off. Tap Open settings, allow Contacts for SubHub, then come back.';
 }
 function renderContactsShell() {
   $('#contactsPageBody').innerHTML =
@@ -1234,8 +1288,11 @@ function renderContactsList(more) {
   saved.concat(CT.device).forEach(c => { if (seen.has(c.phone)) return; seen.add(c.phone); all.push(c); });
   const list = all.filter(c => !f || (c.name || '').toLowerCase().includes(f) || c.phone.includes(f));
   if (!list.length) {
-    wrap.innerHTML = emptyHTML('fa-user-slash', f ? 'No matches' : (CT.msg || 'No contacts yet'), !CT.loaded && !f && isApp() ? 'ctRetry' : null);
+    const failed = !CT.loaded && !f && isApp();
+    wrap.innerHTML = emptyHTML('fa-user-slash', f ? 'No matches' : (CT.msg || 'No contacts yet'), failed ? 'ctRetry' : null);
+    if (failed) wrap.querySelector('.empty').insertAdjacentHTML('beforeend', '<button class="btn-sec" id="ctSettings" style="width:auto;margin:10px auto 0;padding:9px 20px"><i class="fas fa-gear"></i><span>Open settings</span></button>');
     const rb = $('#ctRetry'); if (rb) rb.onclick = async () => { await loadDeviceContacts(); renderContactsList(); };
+    const sb = $('#ctSettings'); if (sb) sb.onclick = () => openAppSettings();
     return;
   }
   if (!more) CT.shown = 0;
@@ -1367,7 +1424,10 @@ async function loadTransactions(quiet) {
 }
 function renderTransactions() {
   const list = S.txns.slice(0, 6);
-  if (!list.length) { $('#txList').innerHTML = emptyHTML('fa-receipt', 'No transactions yet'); return; }
+  if (!list.length) { renderTransactions._sig = ''; $('#txList').innerHTML = emptyHTML('fa-receipt', 'No transactions yet'); return; }
+  const tsig = JSON.stringify(list.map(t => [t.requestId, t.status, t.amount, t.createdAt]));
+  if (renderTransactions._sig === tsig && $('#txList .tx')) return;      // same data: leave the list alone, nothing flickers
+  renderTransactions._sig = tsig;
   $('#txList').innerHTML = list.map(tx => {
     const i = txInfo(tx), st = String(tx.status || 'pending').toLowerCase();
     return '<div class="tx" data-ref="' + esc(tx.requestId) + '"><div class="tx-ico ' + i.cls + '"><i class="fas ' + i.icon + '"></i></div>' +
@@ -1526,7 +1586,7 @@ async function startPurchase(cfg) {
   if (S.busy || S.checking) return;
   if (!ensurePinSet()) return;
   if (!S.balFresh) {                       // the balance on screen may be from the last visit: get the real one first
-    S.checking = true; showProc('Please wait', 'Checking your balance');
+    S.checking = true; showProc('Checking balance', '');
     try { await loadMe(true); } finally { hideProc(); S.checking = false; }
   }
   if (needFunds(cfg.amount)) return;
@@ -1643,15 +1703,21 @@ async function loadDataPlans(netId, o) {
   }
   if (dataCtx.network !== netId) return;
   dataCtx.plans = plans;
-  const tabs = plans.map(p => p.planType).filter((t, i, a) => t && a.indexOf(t) === i);
+  const tabs = planTabsOf(plans);
   const target = o.planId != null ? plans.find(p => String(p.planId) === String(o.planId)) : null;
   dataCtx.tab = target ? target.planType : tabs[0] || null;
   dataCtx.planId = target ? target.planId : null;
   renderDataPlans(true);
   if (o.planId != null && !target) toast('blue', 'Offer', 'That offer is no longer available');
 }
+/* plan types in order: SME first (left), the others follow to the right in their own order */
+function planTabsOf(plans) {
+  const rank = (t) => /^\s*sme/i.test(String(t)) ? 0 : 1;
+  return plans.map(p => p.planType).filter((t, i, a) => t && a.indexOf(t) === i)
+    .map((t, i) => ({ t: t, i: i })).sort((a, b) => rank(a.t) - rank(b.t) || a.i - b.i).map(x => x.t);
+}
 function renderDataPlans(focus) {
-  const tabs = dataCtx.plans.map(p => p.planType).filter((t, i, a) => t && a.indexOf(t) === i);
+  const tabs = planTabsOf(dataCtx.plans);
   $('#planTabs').innerHTML = tabs.map(t => '<button class="pt' + (t === dataCtx.tab ? ' active' : '') + '" data-tab="' + esc(t) + '">' + esc(t) + '</button>').join('');
   $$('#planTabs [data-tab]').forEach(b => { b.onclick = () => { dataCtx.tab = b.dataset.tab; dataCtx.planId = null; renderDataPlans(); }; });
   const list = dataCtx.plans.filter(p => p.planType === dataCtx.tab);
@@ -2212,24 +2278,32 @@ function clearNotifs() {
 /* ============================================================================
    23. ADMIN CONTENT: banner, service notices, popups, slides
 ============================================================================ */
+/* [label](https://...) and plain https://... links in admin messages. Only http(s) and in-app / paths are allowed. */
+function linkify(html) {
+  return html.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)|(^|[\s(>])(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, (m, label, url, pre, bare) => {
+    const u = url || bare, text = label || bare;
+    return (pre || '') + '<a href="#" class="fmt-link" data-href="' + u + '">' + text + '</a>';
+  });
+}
 function formatMessage(text) {
-  const bold = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  const bold = (t) => linkify(esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'));
   let html = '', list = [];
   const flush = () => { if (list.length) { html += '<ul>' + list.map(li => '<li><i class="fas fa-check-circle"></i><span>' + bold(li) + '</span></li>').join('') + '</ul>'; list = []; } };
   String(text || '').split('\n').forEach(l => { if (/^\s*-\s+/.test(l)) list.push(l.replace(/^\s*-\s+/, '')); else if (l.trim()) { flush(); html += '<p>' + bold(l) + '</p>'; } });
   flush(); return html;
 }
 const KIND_ICON = { info: 'fa-info', warn: 'fa-triangle-exclamation', success: 'fa-circle-check', danger: 'fa-circle-xmark' };
-async function loadContent() {
+async function loadContent(noPopups) {
   const r = await api(EP.content);
   if (!r.ok || !r.data.success) return;
   const d = r.data;
   S.content = { banner: d.banner || null, notices: d.notices || {}, popups: d.popups || [], slides: d.slides || [] };
   renderAdminBanner(); renderNotices(); renderSlides();
-  showPopups();
+  if (!noPopups) showPopups();
 }
 function renderAdminBanner() {
   const el = $('#adminBanner'), b = S.content.banner;
+  const bsig = JSON.stringify(b || null); if (renderAdminBanner._sig === bsig) return; renderAdminBanner._sig = bsig;
   if (!b || b.active === false || !b.message) { el.style.display = 'none'; el.innerHTML = ''; return; }
   const kind = KIND_ICON[b.kind] ? b.kind : 'info';
   el.className = 'admin-banner ' + kind; el.style.display = 'block';
@@ -2238,6 +2312,7 @@ function renderAdminBanner() {
   if ($('#abBtn')) $('#abBtn').onclick = () => openTarget(b.button.action || (b.button.href ? { href: b.button.href } : null));
 }
 function renderNotices() {
+  const nsig = JSON.stringify(S.content.notices || {}); if (renderNotices._sig === nsig) return; renderNotices._sig = nsig;
   $$('[data-notice]').forEach(el => {
     const n = S.content.notices[el.dataset.notice];
     if (!n || n.active === false || !n.message) { el.style.display = 'none'; el.innerHTML = ''; return; }
@@ -2268,14 +2343,19 @@ function renderPopup(a) {
   const buttons = (a.primary || a.secondary) ? '<div class="ann-btns">' + (a.primary ? '<button class="ann-btn" id="annCta">' + esc(a.primary.label) + '</button>' : '') + (a.secondary ? '<button class="ann-btn2" id="annDismiss">' + esc(a.secondary.label) + '</button>' : '') + '</div>' : '';
   const tgt = (b) => b ? (b.action || (b.href ? { href: b.href } : null)) : null;
   let html;
-  if (type === 'image') html = '<div class="ann-hero solo"' + ((a.action || a.href) ? ' style="cursor:pointer"' : '') + '>' + imgBox('cover', a.image) + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div>';
+  if (type === 'image') {          // an image popup can also carry title, text, links and buttons
+    const below = !!(a.title || a.message || buttons);
+    html = '<div class="ann-hero' + (below ? '' : ' solo') + '">' + imgBox('cover', a.image) + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div>' +
+      (below ? '<div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + (a.message ? '<div class="ann-msg">' + formatMessage(a.message) + '</div>' : '') + buttons + '</div>' : '');
+  }
   else if (type === 'text') html = '<button class="ann-x light" id="annX" aria-label="Close"><i class="fas fa-times"></i></button><div class="ann-wrap solo"><div class="alert-ico info"><i class="fas fa-bullhorn"></i></div>' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
   else html = '<div class="ann-hero">' + (a.image ? imgBox('cover', a.image) : '<i class="fas fa-rocket"></i>') + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div><div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
   $('#annContent').innerHTML = html; $('#annContent').style.position = 'relative';
   $('#annX').onclick = (e) => { e.stopPropagation(); done(); };
   if ($('#annDismiss')) $('#annDismiss').onclick = () => { const t = tgt(a.secondary); done(); if (t) setTimeout(() => openTarget(t), 250); };
   if ($('#annCta')) $('#annCta').onclick = () => { const t = tgt(a.primary); done(); if (t) setTimeout(() => openTarget(t), 250); };
-  if (type === 'image') $('#annContent .ann-hero').onclick = () => { const t = a.action || (a.href ? { href: a.href } : null); if (t) { done(); setTimeout(() => openTarget(t), 250); } };
+  const heroEl = $('#annContent .ann-hero');
+  if (heroEl && (a.action || a.href)) { heroEl.style.cursor = 'pointer'; heroEl.onclick = () => { const t = a.action || { href: a.href }; done(); setTimeout(() => openTarget(t), 250); }; }
   Modal.hooks.annModal = done;
   Modal.open('annModal', true);
 }
@@ -2505,8 +2585,77 @@ document.getElementById('viewAllServicesBtn')?.addEventListener('click', () => {
 });
 
 
+/* ----- phone settings (Android) ----- */
+function openAppSettings() {
+  try { if (window.AndroidApp && window.AndroidApp.openAppSettings) { window.AndroidApp.openAppSettings(); return; } } catch (e) {}
+  toast('blue', 'Settings', 'Open your phone Settings, then Apps, SubHub, Permissions.');
+}
+function openNotifSettings() {
+  try { if (window.AndroidApp && window.AndroidApp.openNotificationSettings) { window.AndroidApp.openNotificationSettings(); return; } } catch (e) {}
+  openAppSettings();
+}
+function notifEnabled() {
+  try { return !(window.AndroidApp && window.AndroidApp.notificationsEnabled) || window.AndroidApp.notificationsEnabled() !== false; } catch (e) { return true; }
+}
+/* Android stops asking for notification permission after two refusals, so the user has to go to Settings. */
+function maybePromptNotifications() {
+  if (!isApp() || notifEnabled() || document.visibilityState !== 'visible') return;
+  if (Date.now() < num(store.raw('sh_notif_snooze'))) return;
+  if (Modal.stack.length || popShowing || procOpen()) return;
+  showAlert({
+    icon: 'info', title: 'Turn on notifications', message: 'Notifications are off for SubHub. Turn them on to get instant alerts for your payments and wallet funding.',
+    okLabel: 'Open settings', cancelLabel: 'Not now', onOk: openNotifSettings,
+    onCancel: () => store.setRaw('sh_notif_snooze', String(Date.now() + 3 * 86400000))
+  });
+}
+
+/* ----- pull to refresh (the Android app calls this): data is replaced in place, the page never reloads or jumps ----- */
+async function refreshData() {
+  await Promise.all([loadMe(true), loadTransactions(true), loadContent(true), loadUnread()]);
+}
+window.__subhubRefresh = function () {
+  refreshData().catch(() => {}).then(() => { try { if (window.AndroidApp && window.AndroidApp.refreshDone) window.AndroidApp.refreshDone(); } catch (e) {} });
+  return true;
+};
+/* the user came back to the app (for example from the phone's settings after allowing contacts) */
+window.__subhubAppResumed = function () {
+  try {
+    if ($('#contactsPage').classList.contains('show') && !CT.loaded && CT.msg && isApp()) loadDeviceContacts().then(() => renderContactsList());
+    if (S.user && Date.now() - S.lastMe > 30000) loadMe(true);
+  } catch (e) {}
+};
+
+function startWalletAuto() {
+  if (WAUTO.timer) return;
+  WAUTO.timer = setInterval(() => {
+    if (document.visibilityState !== 'visible' || Modal.stack.length || procOpen()) return;
+    if (Date.now() - WAUTO.t < 8000) return;                     // the user just used the slider
+    const total = 1 + buildVaCards().length; if (total < 2) return;
+    const sl = $('#walletSlider'); if (!sl) return;
+    const r = sl.getBoundingClientRect(); if (r.bottom < 0 || r.top > window.innerHeight) return;
+    slideTo('wallet', Sl.wallet + 1, total);
+  }, 4500);
+}
+
+/* styles that belong to the scripts above (kept here so the CSS files do not have to change) */
+function injectCss() {
+  if (document.getElementById('sh-js-css')) return;
+  const st = document.createElement('style'); st.id = 'sh-js-css';
+  st.textContent = [
+    '#fundVATrack.fund-list{display:flex!important;flex-direction:column;gap:12px;transform:none!important;width:100%;max-height:min(54vh,430px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2px 0 6px}',
+    '#fundVATrack.fund-list>.wallet-card{flex:0 0 auto!important;width:100%!important;min-width:0;margin:0}',
+    '#fundSlider{overflow:visible!important;height:auto!important;touch-action:auto!important}',
+    '.proc-wait{margin-top:14px;font-size:.74rem;font-weight:600;color:var(--muted);animation:procPulse 1.4s ease-in-out infinite}',
+    '@keyframes procPulse{0%,100%{opacity:.4}50%{opacity:1}}',
+    '.fmt-link{color:#00aaff;font-weight:700;text-decoration:underline;word-break:break-word}',
+    '.ct-skel{pointer-events:none}'
+  ].join('\n');
+  document.head.appendChild(st);
+}
+
 async function init() {
   if (!localStorage.getItem(TOKEN_KEY)) { goLogin(); return; }
+  injectCss();
   applyTheme(store.raw('sh_dark') === '1');
   S.recents = loadRecents();
   const cached = loadCache();
@@ -2516,8 +2665,14 @@ async function init() {
   if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
   else { renderWallet(); renderStats(); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
   bindEvents(); initPasteChips(); watchImages();
+  document.addEventListener('click', e => {                     // links inside admin messages
+    const a = e.target.closest && e.target.closest('a.fmt-link'); if (!a) return;
+    e.preventDefault(); const h = a.dataset.href; if (h) openTarget({ href: h });
+  });
+  startWalletAuto();
   await loadMe();
   loadTransactions(); loadContent(); loadUnread();
+  setTimeout(maybePromptNotifications, 8000);
   setInterval(() => { if (document.visibilityState === 'visible') loadUnread(); }, 60000);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
