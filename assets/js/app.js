@@ -44,6 +44,8 @@ const EP = {
   refresh: '/auth/refresh-token',
   verifyEmail: '/auth/verify-email',
   resendEmail: '/auth/resend-verification',
+  forgotPin: '/auth/forgot-pin',
+  verifyForgotPin: '/auth/verify-forgot-pin',
 
   transactions: '/transactions',                       // ASSUMED, confirm
 
@@ -419,7 +421,16 @@ function showAlert(o) {
   if (o.cancelLabel) {
     btns.className = 'alert-btns';
     btns.innerHTML = '<button class="btn-cancel" id="alertCancelBtn">' + esc(o.cancelLabel) + '</button><button class="btn-confirm" id="alertOkBtn">' + esc(o.okLabel || 'OK') + '</button>';
-    $('#alertOkBtn').onclick = () => { Modal.close('alertModal'); if (o.onOk) o.onOk(); };
+    $('#alertOkBtn').onclick = () => {
+      if (o.loading) {                                   // keep the dialog open, show a spinner on the button while the work runs
+        const ok = $('#alertOkBtn'), cn = $('#alertCancelBtn');
+        if (ok.disabled) return;
+        setBtnLoading(ok, o.loading); if (cn) cn.disabled = true;
+        Promise.resolve().then(() => o.onOk && o.onOk()).catch(() => {}).then(() => { if (!o.keepOpen) Modal.close('alertModal'); });
+        return;
+      }
+      Modal.close('alertModal'); if (o.onOk) o.onOk();
+    };
     $('#alertCancelBtn').onclick = () => { Modal.close('alertModal'); if (o.onCancel) o.onCancel(); };
   } else {
     btns.className = 'alert-btns single';
@@ -1153,6 +1164,83 @@ function loadRecents() {
   return a;
 }
 function saveRecents() { store.set(RECENT_KEY, S.recents); }
+/* ----- pinned numbers (max 5), favourites and "last used" ----- */
+const PIN_MAX = 5, FAV_KEY = 'sh_fav_numbers';
+let FAVS = [];
+function loadFavs() { const a = store.get(FAV_KEY, []); return Array.isArray(a) ? a.filter(x => x && x.phone) : []; }
+function saveFavs() { store.set(FAV_KEY, FAVS); }
+const isFav = (p) => FAVS.some(f => f.phone === p);
+function usedOf(phone) {
+  const r = S.recents.find(x => x.phone === phone), f = FAVS.find(x => x.phone === phone);
+  return Math.max((r && r.used) || 0, (f && f.used) || 0);
+}
+function lastUsedPhone() {                       // the number used for the most recent purchase
+  let best = '', t = 0;
+  S.recents.concat(FAVS).forEach(n => { const u = usedOf(n.phone); if (u > t) { t = u; best = n.phone; } });
+  return best;
+}
+function usedAgo(ts) {
+  if (!ts) return '';
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return 'just now'; if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+  const d = Math.floor(h / 24); if (d === 1) return 'yesterday'; if (d < 30) return d + ' days ago';
+  return new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+function togglePin(id) {
+  const n = S.recents.find(x => x.id === id); if (!n) return;
+  if (!n.pin) {
+    if (S.recents.filter(x => x.pin).length >= PIN_MAX) { toast('warn', 'Pinned numbers', 'You can pin up to ' + PIN_MAX + ' numbers. Unpin one first.'); return; }
+    n.pin = true; toast('green', 'Pinned', (n.name || n.phone) + ' is pinned to the top');
+  } else { delete n.pin; toast('green', 'Unpinned', (n.name || n.phone) + ' is no longer pinned'); }
+  saveRecents(); renderRecents();
+}
+function toggleFav(phone, name) {
+  const i = FAVS.findIndex(f => f.phone === phone);
+  if (i > -1) { FAVS.splice(i, 1); toast('green', 'Favourites', 'Removed from favourites'); }
+  else {
+    const r = S.recents.find(x => x.phone === phone);
+    FAVS.push({ phone: phone, name: name || (r && r.name) || contactName(phone) || '', network: (r && r.network) || detectNetwork(phone) || 'MTN', added: Date.now(), used: (r && r.used) || 0 });
+    toast('green', 'Favourites', 'Added to favourites');
+  }
+  saveFavs(); renderFavs();
+  $$('#ctList .ct-star').forEach(b => { if (b.dataset.star !== phone) return; const on = isFav(phone); b.classList.toggle('on', on); b.innerHTML = '<i class="fas ' + (on ? 'fa-star-fill' : 'fa-star') + '"></i>'; b.setAttribute('aria-label', on ? 'Remove from favourites' : 'Add to favourites'); });
+}
+function renderFavs() {
+  const w = $('#ctFavs'); if (!w) return;
+  if (!FAVS.length || CT.filter.trim()) { w.innerHTML = ''; w.style.display = 'none'; return; }
+  w.style.display = '';
+  const lu = lastUsedPhone();
+  const sorted = FAVS.slice().sort((a, b) => usedOf(b.phone) - usedOf(a.phone));
+  w.innerHTML = '<div class="fav-ttl"><i class="fas fa-star-fill"></i><span>Favourites</span><b>' + FAVS.length + '</b></div><div class="fav-row">' + sorted.map(f => {
+    const net = netOf(f.network) || NETWORKS[0];
+    return '<div class="fav-chip" data-p="' + esc(f.phone) + '" data-n="' + esc(f.name || '') + '"><div class="fav-av">' + imgBox('fill', net.logo, { text: initials(f.name || f.phone.slice(-2)), bg: net.color, fg: net.fg }) +
+      '<span class="fav-star"><i class="fas fa-star-fill"></i></span></div><div class="fav-name">' + esc(f.name || 'No name') + '</div><div class="fav-num">' + esc(f.phone) + '</div>' +
+      (f.phone === lu ? '<div class="chip-last">Last used</div>' : '') + '</div>';
+  }).join('') + '</div>';
+  $$('#ctFavs .fav-chip').forEach(el => { el.onclick = () => pickContact(el.dataset.p, el.dataset.n); });
+}
+function pickContact(phone, name) {
+  const r = S.recents.find(x => x.phone === phone), f = FAVS.find(x => x.phone === phone);
+  const rec = { name: name || '', phone: phone, network: (r && r.network) || (f && f.network) || detectNetwork(phone) || 'MTN' };
+  if (rec.name) pickedNames[rec.phone] = rec.name;
+  closeContactsPage(); setTimeout(() => openQuickService(rec), 200);
+}
+/* The contacts button says what it will do */
+function contactsPerm() { try { return !!(window.AndroidContacts && window.AndroidContacts.hasContactsPermission && window.AndroidContacts.hasContactsPermission()); } catch (e) { return false; } }
+function updateContactsBtn() {
+  const b = $('#viewAllContactsBtn'); if (!b) return;
+  let label = 'Saved numbers', hint = '';
+  if (isApp() && window.AndroidContacts) {
+    if (contactsPerm()) label = 'Pick from contacts';
+    else { label = 'Allow contacts access'; hint = 'Choose numbers without typing them'; }
+  }
+  const key = label + '|' + hint; if (b.dataset.lbl === key) return; b.dataset.lbl = key;
+  b.innerHTML = '<i class="fas fa-address-book"></i>' + esc(label);
+  let h = $('#viewAllHint');
+  if (!h) { h = document.createElement('div'); h.id = 'viewAllHint'; h.className = 'vac-hint'; b.insertAdjacentElement('afterend', h); }
+  h.textContent = hint; h.style.display = hint ? '' : 'none';
+}
 const pickedNames = {};                       // phone -> name, remembered when the user picks a contact
 function contactName(phone) {
   if (pickedNames[phone]) return pickedNames[phone];
@@ -1175,28 +1263,36 @@ function rememberNumber(phone, networkId) {
   else item = { id: 'rn' + Math.random().toString(36).slice(2, 8), name: '', phone: phone, network: networkId || detectNetwork(phone) || 'MTN' };
   item.ts = Date.now();
   if (networkId) item.network = networkId;
+  item.used = item.ts;                                          // a purchase was made to this number
+  const fv = FAVS.find(x => x.phone === phone); if (fv) { fv.used = item.ts; if (networkId) fv.network = networkId; saveFavs(); }
   if (!item.name) { const nm = contactName(phone); if (nm) item.name = nm; }      // saved with the contact's name
   S.recents.unshift(item);
-  const named = S.recents.filter(x => x.name), unnamed = S.recents.filter(x => !x.name).slice(0, 12);
-  S.recents = S.recents.filter(x => named.includes(x) || unnamed.includes(x));
+  const named = S.recents.filter(x => x.name), unnamed = S.recents.filter(x => !x.name && !x.pin).slice(0, 12);
+  S.recents = S.recents.filter(x => x.pin || named.includes(x) || unnamed.includes(x));
   saveRecents(); renderRecents();
 }
 function renderRecents(filter) {
   filter = String(filter == null ? ($('#rnSearch') ? $('#rnSearch').value : '') : filter).trim().toLowerCase();
   const wrap = $('#rnScroll');
-  const list = S.recents.filter(n => !filter || (n.name || '').toLowerCase().includes(filter) || n.phone.includes(filter));
+  const found = S.recents.filter(n => !filter || (n.name || '').toLowerCase().includes(filter) || n.phone.includes(filter));
+  const list = found.filter(n => n.pin).concat(found.filter(n => !n.pin));          // pinned numbers first
   if (!list.length) { wrap.innerHTML = '<div class="rn-empty"><i class="fas fa-users"></i><span>' + (filter ? 'No matches' : 'No recent numbers yet') + '</span></div>'; return; }
+  const lu = lastUsedPhone();
   wrap.innerHTML = list.map(n => {
     const net = netOf(n.network) || NETWORKS[0];
-    return '<div class="chip" data-id="' + n.id + '"><div class="chip-av">' + imgBox('fill', net.logo, { text: initials(n.name || n.phone.slice(-2)), bg: net.color, fg: net.fg }) + '<span class="sdot ok"></span></div>' +
+    return '<div class="chip' + (n.pin ? ' pinned' : '') + '" data-id="' + n.id + '">' + (n.pin ? '<span class="chip-pinmark"><i class="fas fa-thumbtack-fill"></i></span>' : '') +
+      '<div class="chip-av">' + imgBox('fill', net.logo, { text: initials(n.name || n.phone.slice(-2)), bg: net.color, fg: net.fg }) + '<span class="sdot ok"></span></div>' +
       '<div class="chip-name">' + esc(n.name || 'No name') + '</div><div class="chip-num">' + esc(n.phone) + '</div><div class="chip-net">' + esc(net.name) + '</div>' +
-      '<div class="chip-actions"><button class="chip-act-btn edit" data-edit="' + n.id + '" aria-label="Edit"><i class="fas fa-pen"></i></button>' +
+      (n.phone === lu ? '<div class="chip-last">Last used</div>' : '') +
+      '<div class="chip-actions"><button class="chip-act-btn pin' + (n.pin ? ' on' : '') + '" data-pin="' + n.id + '" aria-label="' + (n.pin ? 'Unpin' : 'Pin') + '"><i class="fas ' + (n.pin ? 'fa-thumbtack-fill' : 'fa-thumbtack') + '"></i></button>' +
+      '<button class="chip-act-btn edit" data-edit="' + n.id + '" aria-label="Edit"><i class="fas fa-pen"></i></button>' +
       '<button class="chip-act-btn del" data-del="' + n.id + '" aria-label="Delete"><i class="fas fa-trash"></i></button></div></div>';
   }).join('');
   $$('#rnScroll .chip').forEach(ch => ch.addEventListener('click', e => {
     if (e.target.closest('.chip-act-btn')) return;
     const n = S.recents.find(x => x.id === ch.dataset.id); if (n) openQuickService(n);
   }));
+  $$('#rnScroll [data-pin]').forEach(b => { b.onclick = e => { e.stopPropagation(); togglePin(b.dataset.pin); }; });
   $$('#rnScroll [data-edit]').forEach(b => { b.onclick = e => { e.stopPropagation(); editRecent(b.dataset.edit); }; });
   $$('#rnScroll [data-del]').forEach(b => { b.onclick = e => { e.stopPropagation(); deleteRecent(b.dataset.del); }; });
 }
@@ -1279,6 +1375,7 @@ function closeContactsPage() {
   $('#contactsPage').classList.remove('show');
   const i = Modal.stack.indexOf('contactsPage'); if (i > -1) Modal.stack.splice(i, 1);
   if (!Modal.stack.length) document.body.style.overflow = '';
+  updateContactsBtn();
 }
 let ctRun = null;
 function loadDeviceContacts() { if (!ctRun) ctRun = loadDeviceContactsRun().finally(() => { ctRun = null; }); return ctRun; }
@@ -1299,18 +1396,19 @@ async function loadDeviceContactsRun() {
   });
   out.sort((a, b) => (a.name || '~').localeCompare(b.name || '~'));
   CT.device = out; CT.loaded = r.success;
-  syncRecentNames();
+  syncRecentNames(); updateContactsBtn();
   CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'Contact access is off. Tap Open settings, allow Contacts for SubHub, then come back.';
 }
 function renderContactsShell() {
   $('#contactsPageBody').innerHTML =
-    '<div class="contacts-page-search"><i class="fas fa-search"></i><input type="text" id="ctSearch" placeholder="Search by name or number" autocomplete="off"/></div><div class="ct-count" id="ctCount"></div><div class="contacts-page-list" id="ctList"></div>';
+    '<div class="contacts-page-search"><i class="fas fa-search"></i><input type="text" id="ctSearch" placeholder="Search by name or number" autocomplete="off"/></div><div class="fav-wrap" id="ctFavs" style="display:none"></div><div class="ct-count" id="ctCount"></div><div class="contacts-page-list" id="ctList"></div>';
   $('#ctSearch').oninput = e => { CT.filter = e.target.value; CT.shown = 0; renderContactsList(); };
   $('#contactsPageBody').onscroll = () => { const b = $('#contactsPageBody'); if (b.scrollTop + b.clientHeight > b.scrollHeight - 200) renderContactsList(true); };
 }
 function renderContactsList(more) {
   const wrap = $('#ctList'); if (!wrap) return;
   const f = CT.filter.trim().toLowerCase();
+  if (!more) renderFavs();
   const saved = S.recents.map(n => ({ name: n.name, phone: n.phone, network: n.network }));
   const all = [];
   const seen = new Set();
@@ -1328,17 +1426,22 @@ function renderContactsList(more) {
   }
   if (!more) CT.shown = 0;
   const end = Math.min(list.length, CT.shown + 60);
+  const lu = lastUsedPhone();
   const html = list.slice(CT.shown, end).map(c => {
     const net = netOf(c.network) || NETWORKS[0];
+    const fav = isFav(c.phone), u = usedOf(c.phone);
     return '<div class="contact-item" data-p="' + esc(c.phone) + '" data-n="' + esc(c.name || '') + '"><div class="contact-avatar">' + imgBox('fill', net.logo, { text: initials(c.name || c.phone.slice(-2)), bg: net.color, fg: net.fg }) + '</div>' +
-      '<div class="contact-details"><div class="contact-name">' + esc(c.name || c.phone) + '</div><div class="contact-phone">' + esc(c.phone) + '</div></div>' +
-      '<div class="contact-badge" style="background:' + net.color + ';color:' + net.fg + '">' + esc(net.name) + '</div></div>';
+      '<div class="contact-details"><div class="contact-name">' + esc(c.name || c.phone) + '</div><div class="contact-phone">' + esc(c.phone) + (u ? '<span class="ct-used"> &middot; used ' + usedAgo(u) + '</span>' : '') + '</div></div>' +
+      (c.phone === lu ? '<span class="chip-last ct-last">Last used</span>' : '') +
+      '<div class="contact-badge" style="background:' + net.color + ';color:' + net.fg + '">' + esc(net.name) + '</div>' +
+      '<button class="ct-star' + (fav ? ' on' : '') + '" data-star="' + esc(c.phone) + '" aria-label="' + (fav ? 'Remove from favourites' : 'Add to favourites') + '"><i class="fas ' + (fav ? 'fa-star-fill' : 'fa-star') + '"></i></button></div>';
   }).join('');
   if (more) wrap.insertAdjacentHTML('beforeend', html); else wrap.innerHTML = html;
   CT.shown = end;
   $$('#ctList .contact-item:not([data-b])').forEach(el => {
     el.dataset.b = '1';
-    el.onclick = () => { const rec = { name: el.dataset.n, phone: el.dataset.p, network: detectNetwork(el.dataset.p) || 'MTN' }; if (rec.name) pickedNames[rec.phone] = rec.name; closeContactsPage(); setTimeout(() => openQuickService(rec), 200); };
+    el.onclick = () => pickContact(el.dataset.p, el.dataset.n);
+    const st = el.querySelector('.ct-star'); if (st) st.onclick = ev => { ev.stopPropagation(); toggleFav(el.dataset.p, el.dataset.n); };
   });
 }
 
@@ -1453,27 +1556,8 @@ async function loadTransactions(quiet) {
   renderTransactions();
   saveCache();
 }
-/* The number in "Recent (6) Transactions" is the real count. Put <span id="txCount">6</span> around it in the HTML;
-   if it is not there yet, the script wraps the number in the existing label by itself. */
+/* The number in "Recent (6) Transactions": the HTML has <span id="txCount">6</span> and the script only fills in the real count. */
 function setTxCount(n) { const el = $('#txCount'); if (el) el.textContent = n; }
-function ensureTxCount() {
-  if ($('#txCount')) return;
-  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  let node;
-  while ((node = w.nextNode())) {
-    const par = node.parentElement; if (!par || /^(SCRIPT|STYLE|TEXTAREA)$/.test(par.tagName)) continue;
-    const m = /\(\s*(\d+)\s*\)/.exec(node.data); if (!m) continue;
-    const label = par.textContent || '';
-    if (label.length > 70 || !/recent/i.test(label) || !/transaction/i.test(label)) continue;
-    const before = node.data.slice(0, m.index) + '(', after = ')' + node.data.slice(m.index + m[0].length);
-    const frag = document.createDocumentFragment();
-    frag.appendChild(document.createTextNode(before));
-    const sp = document.createElement('span'); sp.id = 'txCount'; sp.textContent = m[1]; frag.appendChild(sp);
-    frag.appendChild(document.createTextNode(after));
-    par.replaceChild(frag, node);
-    return;
-  }
-}
 function renderTransactions() {
   const list = S.txns.slice(0, 6);
   setTxCount(list.length);
@@ -2508,6 +2592,178 @@ async function resendEv() {
 /* ============================================================================
    25. THEME, BACK BUTTON, LOGOUT
 ============================================================================ */
+/* ============================================================================
+   FORGOT PIN: code by email -> new PIN. A pending reset is remembered for 10 minutes, so if the phone closes the
+   app while the user fetches the code, the dialog opens again by itself.
+============================================================================ */
+const PR_KEY = 'sh_pin_reset', PR_MIN = 10;
+const PR = { step: 'code', code: '', timer: null, dismissed: false, resendAt: 0, sending: false };
+function prLoad() {
+  const o = store.get(PR_KEY, null);
+  if (!o || !o.exp || o.exp <= Date.now()) return null;
+  const tag = sessionTag(); if (o.uid && tag && o.uid !== tag) return null;           // another account
+  return o;
+}
+function prClear() { try { store.set(PR_KEY, null); } catch (e) {} }
+function prStop() { if (PR.timer) { clearInterval(PR.timer); PR.timer = null; } }
+Modal.hooks.pinResetModal = function () { PR.dismissed = true; prStop(); };
+function ensurePrModal() {
+  if ($('#pinResetModal')) return;
+  const d = document.createElement('div'); d.className = 'ov center'; d.id = 'pinResetModal';
+  d.innerHTML = '<div class="modal"><div class="modal-drag"><div class="drag-pill"></div></div><div class="modal-hd"><div class="modal-ttl"><i class="fas fa-lock"></i>Reset PIN</div>' +
+    '<button class="m-close" data-close="pinResetModal" aria-label="Close"><i class="fas fa-times"></i></button></div><div id="prBody"></div></div>';
+  document.body.appendChild(d);
+}
+/* a row of single-digit boxes (code or PIN) */
+function bindBoxGroup(boxes, onChange) {
+  const val = () => boxes.map(b => b.value).join('');
+  const fill = (start, digits) => {
+    digits.split('').forEach((c, k) => { const b = boxes[start + k]; if (b) { b.value = c; b.classList.add('filled'); } });
+    const nx = boxes[Math.min(start + digits.length, boxes.length - 1)]; if (nx) nx.focus();
+    onChange(val());
+  };
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      const e = $('#prErr'); if (e) e.textContent = '';
+      boxes.forEach(x => x.parentElement.classList.remove('err'));
+      const d = b.value.replace(/\D/g, '');
+      if (d.length > 1) { b.value = ''; fill(i, d.slice(0, boxes.length - i)); return; }
+      b.value = d; b.classList.toggle('filled', !!d);
+      if (d && i < boxes.length - 1) boxes[i + 1].focus();
+      onChange(val());
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].value = ''; boxes[i - 1].classList.remove('filled'); boxes[i - 1].focus(); }
+    });
+    b.addEventListener('paste', e => { e.preventDefault(); const t = digitsOnly((e.clipboardData || window.clipboardData).getData('text'), boxes.length); if (t) fill(0, t); });
+  });
+  return { val: val, fill: fill, clear: () => { boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); }); } };
+}
+const prBoxes = (n, cls, mask, ac) => '<div class="eb-boxes pr-b' + n + '" ' + (cls ? 'id="' + cls + '"' : '') + '>' + Array.from({ length: n }).map((_, i) =>
+  '<input class="eb-box pr-box" ' + (mask ? 'type="password"' : 'type="text"') + ' inputmode="numeric" autocomplete="' + (ac && i === 0 ? 'one-time-code' : 'off') + '" aria-label="Digit ' + (i + 1) + '"/>').join('') + '</div>';
+function prLeftText() {
+  const p = prLoad(); if (!p) return '0:00';
+  const sec = Math.max(0, Math.ceil((p.exp - Date.now()) / 1000));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+function prTick() {
+  const p = prLoad();
+  if (!p) {
+    prStop(); prClear();
+    if ($('#pinResetModal') && $('#pinResetModal').classList.contains('show')) {
+      Modal.close('pinResetModal');
+      showAlert({ icon: 'warn', title: 'Code expired', message: 'The code is only valid for ' + PR_MIN + ' minutes. Tap Forgot PIN? again to get a new one.' });
+    }
+    return;
+  }
+  const l = $('#prLeft'); if (l) l.textContent = prLeftText();
+  const b = $('#prResend');
+  if (b && !b.dataset.busy) {
+    const left = Math.ceil((PR.resendAt - Date.now()) / 1000);
+    if (left > 0) { b.disabled = true; b.textContent = 'Resend in ' + left + 's'; } else { b.disabled = false; b.textContent = 'Resend code'; }
+  }
+}
+function renderPrCode(err) {
+  PR.step = 'code'; PR.code = '';
+  const p = prLoad(), email = (p && p.email) || (S.user && S.user.email) || 'your email';
+  $('#prBody').innerHTML = '<div class="eb-lead">Enter the 6-digit code we sent to <b>' + esc(email) + '</b>. It expires in <b id="prLeft">' + prLeftText() + '</b>.</div>' +
+    '<div class="paste-row"><button type="button" class="paste-chip" id="prPaste"><i class="fas fa-clipboard"></i> Paste code</button></div>' +
+    prBoxes(6, 'prCodeBoxes', false, true) + '<div class="eb-err" id="prErr">' + esc(err || '') + '</div>' +
+    '<button class="btn-p" id="prNext" style="margin-top:0"><span>Continue</span></button>' +
+    '<div class="eb-resend"><span>Did not get it?</span><button id="prResend"></button></div>' +
+    '<button class="pr-cancel" id="prCancel">Cancel reset</button>';
+  const g = bindBoxGroup($$('#prCodeBoxes .pr-box'), v => { if (v.length === 6) prToPin(v); });
+  if (err) $('#prCodeBoxes').classList.add('err');
+  $('#prNext').onclick = () => { const v = g.val(); if (v.length !== 6) { $('#prErr').textContent = 'Enter all 6 digits'; return; } prToPin(v); };
+  $('#prPaste').onclick = async () => { const t = await readClipboard(); if (t == null) { toast('warn', 'Paste', 'Long-press a box and tap Paste'); return; } const d = digitsOnly(t, 6); if (d) g.fill(0, d); else toast('warn', 'Paste', 'No 6-digit code found'); };
+  $('#prResend').onclick = () => prSend(true);
+  $('#prCancel').onclick = () => { prClear(); prStop(); Modal.close('pinResetModal'); toast('blue', 'Reset cancelled', 'Your PIN was not changed'); };
+  prTick();
+  const f = $('#prCodeBoxes .pr-box'); if (f) setTimeout(() => f.focus(), 60);
+}
+function prToPin(code) { PR.code = code; renderPrPin(); }
+function renderPrPin() {
+  PR.step = 'pin';
+  $('#prBody').innerHTML = '<div class="eb-lead">Now choose your new 4-digit transaction PIN. <span class="pr-left">Code valid for <b id="prLeft">' + prLeftText() + '</b></span></div>' +
+    '<div class="pr-lbl">New PIN</div>' + prBoxes(4, 'prNew', true) + '<div class="pr-lbl">Confirm new PIN</div>' + prBoxes(4, 'prConf', true) +
+    '<div class="eb-err" id="prErr"></div><button class="btn-p" id="prSave" style="margin-top:0"><span>Set new PIN</span></button>' +
+    '<button class="pr-cancel" id="prBack">Back</button>';
+  const gn = bindBoxGroup($$('#prNew .pr-box'), v => { if (v.length === 4) { const f = $('#prConf .pr-box'); if (f) f.focus(); } });
+  const gc = bindBoxGroup($$('#prConf .pr-box'), v => { if (v.length === 4 && gn.val().length === 4) prSubmit(gn, gc); });
+  $('#prSave').onclick = () => prSubmit(gn, gc);
+  $('#prBack').onclick = () => renderPrCode();
+  const f = $('#prNew .pr-box'); if (f) setTimeout(() => f.focus(), 60);
+}
+async function prSubmit(gn, gc) {
+  if (PR.sending) return;
+  const np = gn.val(), cp = gc.val();
+  if (np.length !== 4) { $('#prErr').textContent = 'Enter a 4-digit PIN'; $('#prNew').classList.add('err'); return; }
+  if (cp !== np) { $('#prErr').textContent = cp.length === 4 ? 'The two PINs do not match' : 'Confirm your new PIN'; $('#prConf').classList.add('err'); gc.clear(); const f = $('#prConf .pr-box'); if (f) f.focus(); return; }
+  PR.sending = true;
+  const btn = $('#prSave'); setBtnLoading(btn, 'Setting PIN');
+  const r = await api(EP.verifyForgotPin, { method: 'POST', body: { code: PR.code, newPin: np } });
+  PR.sending = false;
+  if (r.ok && r.data.success) {
+    prClear(); prStop(); Modal.close('pinResetModal');
+    try { if (bioHas('transaction')) window.AndroidAuth.disableBiometricCredential('transaction'); } catch (e) {}      // the saved fingerprint belongs to the old PIN
+    if (S.user) S.user.transactionPinSet = true;
+    showAlert({ icon: 'ok', title: 'PIN updated', message: 'Your new transaction PIN is active. If you used fingerprint for payments, turn it on again from the PIN pad.' });
+    return;
+  }
+  resetBtn(btn);
+  if (r.network) { toast('red', 'No connection', 'Please try again.'); return; }
+  const msg = (r.data && r.data.message) || 'That code is not correct.';
+  if (/expire/i.test(msg)) { prClear(); prStop(); Modal.close('pinResetModal'); showAlert({ icon: 'warn', title: 'Code expired', message: 'Tap Forgot PIN? again to get a new code.' }); return; }
+  toast('red', 'Could not set PIN', msg);
+  renderPrCode(msg);
+}
+/* asks the server for a code. true when sent */
+async function prSend(resend) {
+  const rb = $('#prResend');
+  if (resend && rb) { if (rb.disabled) return; rb.disabled = true; rb.dataset.busy = '1'; rb.textContent = 'Sending...'; }
+  const r = await api(EP.forgotPin, { method: 'POST' });
+  if (rb) delete rb.dataset.busy;
+  if (r.ok && r.data.success) {
+    store.set(PR_KEY, { uid: sessionTag(), exp: Date.now() + PR_MIN * 60000, email: (S.user && S.user.email) || '' });
+    PR.resendAt = Date.now() + 30000;
+    if (resend) toast('green', 'Code sent', 'Check your email for the new code'); 
+    return true;
+  }
+  if (r.status === 429) { PR.resendAt = Date.now() + num(r.data.retryAfter || 30) * 1000; toast('warn', 'Please wait', r.data.message || 'Wait a moment before asking for another code'); }
+  else toast('red', 'Could not send code', r.network ? 'No connection. Please try again.' : ((r.data && r.data.message) || 'Please try again'));
+  prTick();
+  return false;
+}
+function openPrModal() {
+  ensurePrModal(); PR.dismissed = false; PR.sending = false;
+  renderPrCode(); Modal.open('pinResetModal', true);
+  prStop(); PR.timer = setInterval(prTick, 1000);
+}
+async function startForgotPin() {
+  const link = $('#pinForgot'); if (!link || link.disabled) return;
+  if (prLoad()) { finishPin(null); openPrModal(); toast('blue', 'Code already sent', 'Enter the code we emailed you'); return; }
+  setBtnLoading(link, 'Sending code');
+  const ok = await prSend(false);
+  resetBtn(link);
+  if (!ok) return;
+  finishPin(null); openPrModal();
+  toast('green', 'Code sent', 'Check your email. The code is valid for ' + PR_MIN + ' minutes.');
+}
+function ensureForgotUi() {
+  const kp = $('#pinKp'); if (!kp) return;
+  if (!$('#pinForgot')) kp.insertAdjacentHTML('afterend', '<button type="button" class="pin-forgot" id="pinForgot">Forgot PIN?</button>');
+  $('#pinForgot').onclick = startForgotPin;
+}
+/* opens the dialog again when a reset is still waiting (the app may have been closed in the background) */
+function resumePinReset() {
+  try {
+    if (!localStorage.getItem(TOKEN_KEY) || !prLoad()) return;
+    if (PR.dismissed || Modal.stack.indexOf('pinResetModal') > -1 || procOpen()) return;
+    openPrModal(); toast('blue', 'Reset your PIN', 'Enter the code we emailed you to finish.');
+  } catch (e) {}
+}
+window.__subhubPinReset = resumePinReset;
+
 function applyTheme(dark) { document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light'); const i = $('#dmIco'); if (i) i.className = dark ? 'fas fa-sun' : 'fas fa-moon'; }
 function toggleTheme() { const dark = document.documentElement.getAttribute('data-theme') !== 'dark'; applyTheme(dark); store.setRaw('sh_dark', dark ? '1' : '0'); }
 
@@ -2520,19 +2776,31 @@ function handleBack() {
   if ($('#saveBar').classList.contains('open')) { $('#saveBar').classList.remove('open'); editingId = null; return true; }
   const id = Modal.stack[Modal.stack.length - 1];
   if (!id) return false;
+  if (id === 'alertModal' && alertBusy()) return true;            // logging out: do not close
   if (id === 'contactsPage') closeContactsPage(); else Modal.close(id);
   return true;
 }
 window.__subhubHandleBack = handleBack;
 window.subhubClearCache = clearCache;            // logout.js can call this too
 
+function alertBusy() { const ok = $('#alertOkBtn'); return !!(ok && ok.disabled && $('#alertModal').classList.contains('show')); }
+function logoutFailed() {
+  const ok = $('#alertOkBtn'); resetBtn(ok);
+  const c = $('#alertCancelBtn'); if (c) c.disabled = false;
+  toast('red', 'Log out', 'Could not log out. Please try again.');
+}
+async function doLogout() {
+  prClear(); clearCache();
+  const guard = setTimeout(() => { if (alertBusy()) logoutFailed(); }, 15000);          // the page normally leaves before this
+  try {
+    if (typeof window.subhubLogout === 'function') { await window.subhubLogout(); return; }
+    await api('/auth/logout', { method: 'POST', body: { refreshToken: localStorage.getItem(REFRESH_KEY) || '' } });
+    localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(REFRESH_KEY); goLogin();
+  } catch (e) { clearTimeout(guard); logoutFailed(); }
+}
 function logout() {
   $('#avDrop').classList.remove('show');
-  showAlert({ icon: 'warn', title: 'Log out?', message: 'Are you sure you want to log out of your account?', okLabel: 'Log out', cancelLabel: 'Cancel', onOk: () => {
-    clearCache();
-    if (typeof window.subhubLogout === 'function') window.subhubLogout();
-    else { api('/auth/logout', { method: 'POST', body: { refreshToken: localStorage.getItem(REFRESH_KEY) || '' } }).finally(() => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(REFRESH_KEY); goLogin(); }); }
-  } });
+  showAlert({ icon: 'warn', title: 'Log out?', message: 'Are you sure you want to log out of your account?', okLabel: 'Log out', cancelLabel: 'Cancel', loading: 'Logging out', keepOpen: true, onOk: doLogout });
 }
 
 /* ============================================================================
@@ -2541,7 +2809,7 @@ function logout() {
 function bindEvents() {
   document.addEventListener('click', e => {
     const c = e.target.closest('[data-close]'); if (c) { Modal.close(c.dataset.close); return; }
-    if (e.target.classList && e.target.classList.contains('ov') && e.target.classList.contains('show')) Modal.close(e.target.id);
+    if (e.target.classList && e.target.classList.contains('ov') && e.target.classList.contains('show')) { if (e.target.id === 'alertModal' && alertBusy()) return; Modal.close(e.target.id); }
   });
   document.addEventListener('click', e => { if (e.target.closest('button,.svc,.prio-item,.nc,.dc,.denom,.qs-svc,.more-item,.bnav-i,.tx,.chip,.notif-item,.deposit-option,.contact-item,.promo-slide')) feedback('tap'); }, true);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') handleBack(); });
@@ -2676,6 +2944,7 @@ window.__subhubAppResumed = function () {
   try {
     if ($('#contactsPage').classList.contains('show') && !CT.loaded && CT.msg && isApp()) loadDeviceContacts().then(() => renderContactsList());
     if (S.user && Date.now() - S.lastMe > 30000) loadMe(true);
+    updateContactsBtn(); resumePinReset();
   } catch (e) {}
 };
 
@@ -2692,6 +2961,7 @@ function startWalletAuto() {
 }
 
 /* styles that belong to the scripts above (kept here so the CSS files do not have to change) */
+const ICO = (name, body, fill) => '.fa-' + name + '{--i:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'1 1 22 22\' fill=\'' + (fill ? '%23000' : 'none') + '\' stroke=\'%23000\' stroke-width=\'2.3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E' + body + '%3C/svg%3E")}';
 function injectCss() {
   if (document.getElementById('sh-js-css')) return;
   const st = document.createElement('style'); st.id = 'sh-js-css';
@@ -2705,6 +2975,40 @@ function injectCss() {
     '@keyframes procPulse{0%,100%{opacity:.4}50%{opacity:1}}',
     '.fmt-link{color:#00aaff;font-weight:700;text-decoration:underline;word-break:break-word}',
     '.ct-skel{pointer-events:none}',
+    ICO('thumbtack', '%3Cpath d=\'M12 17v5\'/%3E%3Cpath d=\'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z\'/%3E', false),
+    ICO('thumbtack-fill', '%3Cpath d=\'M12 17v5\'/%3E%3Cpath d=\'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z\'/%3E', true),
+    ICO('star-fill', '%3Cpath d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z\'/%3E', true),
+    '.chip.pinned{box-shadow:0 0 0 1.5px rgba(0,170,255,.5)}',
+    '.chip-pinmark{position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:var(--pr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.54rem;z-index:2;box-shadow:0 2px 6px rgba(0,170,255,.35)}',
+    '.chip-act-btn.pin{background:rgba(0,170,255,.1);color:var(--pr)}',
+    '.chip-act-btn.pin.on{background:var(--pr);color:#fff}',
+    '.chip-last{margin-top:2px;font-size:.5rem;font-weight:800;color:var(--pr);background:rgba(0,170,255,.12);padding:1px 6px;border-radius:999px;white-space:nowrap;letter-spacing:.2px;align-self:center}',
+    '.ct-last{margin:0 6px 0 0;font-size:.56rem;padding:2px 7px;flex:none}',
+    '.ct-used{color:var(--muted);font-size:.68rem}',
+    '.ct-star{flex:none;width:32px;height:32px;margin-left:6px;border-radius:50%;border:none;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:1rem}',
+    '.ct-star.on{color:#f59e0b}',
+    '.fav-wrap{margin:2px 0 10px}',
+    '.fav-ttl{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:800;color:var(--text);padding:2px 4px 8px}',
+    '.fav-ttl i{color:#f59e0b}',
+    '.fav-ttl b{font-size:.64rem;color:var(--muted);font-weight:700;margin-left:auto}',
+    '.fav-row{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}',
+    '.fav-row::-webkit-scrollbar{display:none}',
+    '.fav-chip{flex:0 0 auto;width:76px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px 8px;border:1px solid var(--border);border-radius:14px;background:var(--card)}',
+    '.fav-chip:active{transform:scale(.97)}',
+    '.fav-av{position:relative;width:44px;height:44px}',
+    '.fav-av .imgbox{width:44px;height:44px;border-radius:50%;overflow:hidden}',
+    '.fav-star{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#f59e0b;color:#fff;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:.55rem;box-sizing:content-box}',
+    '.fav-name{font-size:.66rem;font-weight:700;color:var(--text);max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px}',
+    '.fav-num{font-size:.58rem;color:var(--muted);font-family:"JetBrains Mono",monospace}',
+    '.vac-hint{text-align:center;font-size:.66rem;color:var(--muted);margin-top:6px}',
+    '.pin-forgot{display:block;margin:12px auto 2px;background:none;border:none;color:var(--pr);font-size:.8rem;font-weight:800;padding:8px 14px;border-radius:999px}',
+    '.pin-forgot:disabled{opacity:.7}',
+    '.pr-b4{grid-template-columns:repeat(4,1fr)!important;max-width:240px;margin:0 auto 12px}',
+    '.pr-lbl{font-size:.72rem;font-weight:800;color:var(--muted);text-align:center;margin:10px 0 6px}',
+    '.pr-left{display:block;margin-top:4px;font-size:.7rem;color:var(--muted)}',
+    '.pr-cancel{display:block;margin:10px auto 2px;background:none;border:none;color:var(--muted);font-size:.76rem;font-weight:700;padding:8px 14px}',
+    '.alert-btns button i.fa-spinner{margin-right:6px}',
+    '.alert-btns button:disabled{opacity:.85}',
     '.ct-count{font-size:.74rem;font-weight:700;color:var(--muted);padding:2px 4px 8px}',
     '#annContent{max-height:92vh;overflow-y:auto}',
     '.ann-hero.full{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;display:block!important}',
@@ -2717,22 +3021,23 @@ function injectCss() {
 
 async function init() {
   if (!localStorage.getItem(TOKEN_KEY)) { goLogin(); return; }
-  injectCss(); ensureTxCount();
+  injectCss();
   applyTheme(store.raw('sh_dark') === '1');
-  S.recents = loadRecents();
+  S.recents = loadRecents(); FAVS = loadFavs();
   const cached = loadCache();
   updateGreeting(); setInterval(updateGreeting, 30000);
   renderServices(); renderSlides(); startPromoTimer(); renderRecents();
   renderBadge();
   if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
   else { renderWallet(); renderStats(); setTxCount('...'); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
-  bindEvents(); initPasteChips(); watchImages();
+  bindEvents(); initPasteChips(); watchImages(); ensureForgotUi(); updateContactsBtn();
   document.addEventListener('click', e => {                     // links inside admin messages
     const a = e.target.closest && e.target.closest('a.fmt-link'); if (!a) return;
     e.preventDefault(); const h = a.dataset.href; if (h) openTarget({ href: h });
   });
   startWalletAuto();
   await loadMe();
+  resumePinReset();
   loadTransactions(); loadContent(); loadUnread();
   setTimeout(maybePromptNotifications, 8000);
   setTimeout(() => {                                             // names for saved numbers + the contacts count, without asking for anything
