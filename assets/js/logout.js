@@ -110,6 +110,7 @@ async function subhubLogout() {
   ]);
 
   wipe(ACCESS_KEYS);
+  localStorage.removeItem('subhubPushLink');     // <- ƙara
   if (!keep) wipe(REFRESH_KEYS);                 // kept on fingerprint phones so fingerprint can log in next time
   try { sessionStorage.clear(); } catch (e) {}
   location.replace(LOGIN_URL);
@@ -163,6 +164,7 @@ async function runLogoutAll() {
   /* 3) this phone: the saved fingerprint token is dead now, remove it and clear everything */
   try { if (window.AndroidAuth && window.AndroidAuth.disableBiometricCredential) window.AndroidAuth.disableBiometricCredential('login'); } catch (e) {}
   localStorage.removeItem('sh_bio_owner');
+  localStorage.removeItem('subhubPushLink');     // <- ƙara
   wipe(ACCESS_KEYS); wipe(REFRESH_KEYS);
   try { sessionStorage.clear(); } catch (e) {}
   return { ok: true };
