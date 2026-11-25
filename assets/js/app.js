@@ -25,12 +25,12 @@
 /* ============================================================================
    1. CONFIG
 ============================================================================ */
-const API_BASE = 'https://api.subhub.ng/api';                 // logout.js reads this
+const API_BASE = 'https://api.subhub.ng/api';
 const TOKEN_KEY = 'sh_access_token';
 const REFRESH_KEY = 'sh_refresh_token';
 const LOGIN_URL = '/';
-const PLACEHOLDER = '/placeholder.png';
-const DEFAULT_AVATAR = '/avatar.png';
+const PLACEHOLDER = '/assets/images/placeholder.png';
+const DEFAULT_AVATAR = '/assets/images/avatar.png';
 const EXAMPLE_PHONE = '08012345678';           // the placeholder number shown in the phone boxes, not a real phone
 const EXAMPLE_PHONE_MSG = 'This is just an example number, not a real phone number. Enter your own number.';
 const CACHE_KEY = 'sh_cache_v1';              // last known account data, shown at once on the next visit
@@ -104,7 +104,7 @@ const VA_PROVIDERS = [
     endpoint: '/wallet/virtual-account/paymentpoint',
     aliases: ['paymentpoint', 'payment-point', 'pp'],
     banks: [
-      { id: 'palmpay', bank: 'PalmPay', match: 'palmpay', color: '#7c3aed', fee: '',
+      { id: 'palmpay', bank: 'PalmPay', match: 'palmpay', color: '#7c3aed', fee: '1.5%',
         requiresId: true, idTypes: ['BVN', 'NIN'], active: true,
         benefits: ['Your own account number to fund your wallet', 'Funds reach your wallet automatically', 'Required by the bank to keep your account safe'] }
     ] },
@@ -112,7 +112,7 @@ const VA_PROVIDERS = [
     endpoint: '/wallet/virtual-account/xixa',
     aliases: ['xixa', 'xixapay'],
     banks: [
-      { id: 'kolomoni', bank: 'Kolomoni MFB', match: 'kolomoni', color: '#0d9488', fee: '',
+      { id: 'kolomoni', bank: 'Kolomoni MFB', match: 'kolomoni', color: '#0d9488', fee: '1.5%',
         requiresId: false, idTypes: [], active: true,
         benefits: ['No ID needed', 'Quick setup', 'Great for small top-ups'] },
       { id: 'palmpay', bank: 'PalmPay', match: 'palmpay', color: '#6d28d9', fee: '',
@@ -146,7 +146,7 @@ const CABLES = [
 const DISCO_COLORS = { ikeja: '#e11d48', eko: '#0284c7', kano: '#16a34a', port: '#7c3aed', phed: '#7c3aed', jos: '#f59e0b',
   ibadan: '#2563eb', kaduna: '#0d9488', abuja: '#dc2626', enugu: '#9333ea', yola: '#ea580c', benin: '#0891b2', aba: '#65a30d' };
 
-const AIRTIME_MIN = 50;
+const AIRTIME_MIN = 100;
 const AIRTIME_MAX = 50000;
 const SMS_RATE = 100;
 
@@ -714,7 +714,7 @@ const fresh = (k) => planCache[k] && Date.now() - planCache[k].t < 5 * 60 * 1000
 async function loadMe(quiet) {
   const r = await api(EP.me);
   if (!r.ok || !r.data.success) {
-    if (!quiet) toast('warn', r.network ? 'No connection' : 'Account', r.network ? 'Could not reach SubHub. Check your internet.' : (r.data.message || 'Could not load your account'));
+    if (!quiet) toast('warn', r.network ? 'No internet connection' : 'Account', r.network ? 'Could not reach SubHub. Check your internet.' : (r.data.message || 'Could not load your account'));
     if (!S.balFresh) { S.balNote = 'Last saved balance'; renderWallet(); }
     return false;
   }
@@ -768,7 +768,7 @@ function renderStats() {
 }*/
 function updateGreeting() {
   const now = new Date(), h = now.getHours();
-  const greet = h < 12 ? 'Good morning!' : h < 17 ? 'Good afternoon!' : 'Good evening!';
+  const greet = h < 5 ? 'Good night!' : h < 12 ? 'Good morning!' : h < 17 ? 'Good afternoon!' : h < 21 ? 'Good evening!' : 'Good night!';
   $('#greetMsg').innerHTML = esc(greet) + '<span class="greet-s">Explore all our services</span>';
   $('#wDate').textContent = now.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   $('#wTime').textContent = 'Time: ' + fmtClock(now);
@@ -842,7 +842,7 @@ function buildVaCards() {
       const idx = accs.findIndex((a, i) => !used.has(i) && matchAcc(a, p, b));
       const acc = idx > -1 ? accs[idx] : null;
       if (idx > -1) used.add(idx);
-      const card = { key: p.id + ':' + b.id, provider: p, bank: b, bankName: b.bank, color: b.color, fee: (acc && acc.fee) || b.fee || '', acc: acc };
+      const card = { key: p.id + ':' + b.id, provider: p, bank: b, bankName: b.bank, color: b.color, fee: (acc && (acc.fee || acc.charge || acc.charges || acc.fundingFee || acc.feeAmount)) || b.fee || '', acc: acc };
       (acc ? have : missing).push(card);
     });
   });
@@ -1253,6 +1253,8 @@ function pickContact(phone, name) {
   const r = S.recents.find(x => x.phone === phone), f = FAVS.find(x => x.phone === phone);
   const rec = { name: name || '', phone: phone, network: (r && r.network) || (f && f.network) || detectNetwork(phone) || 'MTN' };
   if (rec.name) pickedNames[rec.phone] = rec.name;
+  const cb = CT.pick;
+  if (cb) { closeContactsPage(); cb(toLocalPhone(phone) || phone); return; }          // picking for a phone field
   closeContactsPage(); setTimeout(() => openQuickService(rec), 200);
 }
 /* The contacts button says what it will do */
@@ -1382,14 +1384,27 @@ function openQuickService(rec) {
       Modal.close('quickSvcModal');
       if (s === 'data') openDataModal({ network: net.id, phone: rec.phone });
       else if (s === 'airtime') openAirtimeModal({ network: net.id, phone: rec.phone });
-      else if (s === 'sms') openSmsModal({ phone: rec.phone });
+      else if (s === 'transfer') { openTransferModal(); const tp = $('#trRecipient'); if (tp) { tp.value = rec.phone; tp.dispatchEvent(new Event('input', { bubbles: true })); } }
     };
   });
   Modal.open('quickSvcModal');
 }
 
 /* ----- full contacts screen (phone contacts via AndroidContacts) ----- */
-const CT = { device: [], loaded: false, shown: 0, filter: '', msg: '' };
+const CT = { device: [], loaded: false, shown: 0, filter: '', msg: '', pick: null };
+/* the small contacts icon inside a phone field: opens the contacts page and puts the chosen number in that field */
+function pickFromContacts(cb) { CT.pick = cb; openContactsPage(); }
+function ensurePhonePickers() {
+  ['dataPhone', 'atPhone'].forEach(id => {
+    const input = document.getElementById(id); if (!input || input.dataset.pk) return;
+    const wrap = input.closest('.phone-wrap'); if (!wrap) return;
+    input.dataset.pk = '1';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'phone-pick'; b.setAttribute('aria-label', 'Choose from contacts');
+    b.innerHTML = '<i class="fas fa-address-book"></i>';
+    b.onclick = () => pickFromContacts(ph => { input.value = cleanPhoneInput(ph); input.dispatchEvent(new Event('input', { bubbles: true })); });
+    wrap.appendChild(b); wrap.classList.add('has-pick');
+  });
+}
 function toLocalPhone(raw) { const d = normalizePhone(raw); return validLocal11(d) ? d : ''; }
 async function openContactsPage() {
   $('#contactsPage').classList.add('show');
@@ -1401,6 +1416,7 @@ async function openContactsPage() {
   renderContactsList();
 }
 function closeContactsPage() {
+  CT.pick = null;
   $('#contactsPage').classList.remove('show');
   const i = Modal.stack.indexOf('contactsPage'); if (i > -1) Modal.stack.splice(i, 1);
   if (!Modal.stack.length) document.body.style.overflow = '';
@@ -2429,7 +2445,7 @@ async function checkLoan() {
   const [r] = await Promise.all([api(EP.loan), sleep(1200)]);
   if (!r.ok || !r.data.success) {
     resetBtn(btn);
-    toast('red', 'Loan', r.network ? 'No internet  connection. Please try again.' : (r.data.message || 'Loan check is not available right now'));
+    toast('red', 'Loan', r.network ? 'No connection. Please try again.' : (r.data.message || 'Loan check is not available right now'));
     return;
   }
   const d = r.data;
@@ -3059,7 +3075,7 @@ function maybePromptNotifications() {
   if (Date.now() < num(store.raw('sh_notif_snooze'))) return;
   if (Modal.stack.length || popShowing || procOpen()) return;
   showAlert({
-    icon: 'info', title: 'Turn on notifications', message: 'Notifications are off for SubHub. Turn them on to get instant alerts for your payments and wallet funding.',
+    icon: 'info', title: 'Turn on notifications', message: 'Notifications are off for SubHub. Turn them on to get instant alerts for your payments, wallet funding and security alert.',
     okLabel: 'Open settings', cancelLabel: 'Not now', onOk: openNotifSettings,
     onCancel: () => store.setRaw('sh_notif_snooze', String(Date.now() + 86400000))
   });
@@ -3132,12 +3148,21 @@ function injectCss() {
     '.ab-dots{display:flex;justify-content:center;margin-top:0}',
     '.ab-dot{width:6px;height:6px;border-radius:3px;background:var(--border);margin:0 3px;transition:.2s}',
     '.ab-dot.on{width:18px;background:var(--pr)}',
-    '.va-top{align-items:flex-start}',
+    '.wallet-card{height:208px}',
+    '.bnav-fab{flex:none}',
+    '.bnav-i[data-nav="fund"]{overflow:visible;padding-top:0}',
+    '.phone-wrap.has-pick .fi{padding-right:88px}',
+    '.phone-wrap.has-pick .phone-state{right:52px}',
+    '.phone-pick{position:absolute;right:6px;top:50%;margin-top:-18px;width:36px;height:36px;border-radius:11px;border:none;background:rgba(0,170,255,.12);color:var(--pr);display:flex;align-items:center;justify-content:center;font-size:1.05rem}',
+    '.phone-pick:active{transform:scale(.92)}',
+    '.va-top{align-items:flex-start;margin-bottom:4px}',
+    '.va-body.center{position:absolute;top:0;right:0;bottom:0;left:0;padding:0;display:flex;align-items:center;justify-content:center;flex-direction:column;pointer-events:none}',
+    '.va-body.center>*{pointer-events:auto}',
     '.va-bankblk{min-width:0;flex:1}',
     '.va-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:3px}',
     '.va-bank{font-size:1rem}',
     '.va-bank span{overflow:hidden;text-overflow:ellipsis}',
-    '.va-body{justify-content:space-between;padding-top:6px}',
+    '.va-body{justify-content:space-between;padding-top:14px}',
     '.va-acct{font-size:1.5rem}',
     '.va-name-row{align-items:flex-end}',
     '.va-nameblk{min-width:0;flex:1}',
@@ -3199,7 +3224,7 @@ async function init() {
   renderBadge();
   if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
   else { renderWallet(); renderStats(); setTxCount('...'); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
-  bindEvents(); initPasteChips(); watchImages(); ensureForgotUi(); updateContactsBtn(); ensureAvailBars(); updateNotifBar();
+  bindEvents(); initPasteChips(); watchImages(); ensureForgotUi(); updateContactsBtn(); ensureAvailBars(); updateNotifBar(); ensurePhonePickers();
   document.addEventListener('click', e => {                     // links inside admin messages
     const a = e.target.closest && e.target.closest('a.fmt-link'); if (!a) return;
     e.preventDefault(); const h = a.dataset.href; if (h) openTarget({ href: h });

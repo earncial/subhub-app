@@ -1114,7 +1114,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     <label class="flbl">Select Network</label>
     <div class="nets" id="atChips"></div>
     <div class="fg">
-      <label class="flbl">Phone Number</label>
+      <label class="flbl">Phone Number <small>• who receives airtime?</small></label>
       <div class="phone-wrap">
         <input type="tel" class="fi" id="atPhone" placeholder="e.g. 08012345678" maxlength="11" inputmode="numeric"/>
         <span class="phone-state" id="atPhoneState"></span>
@@ -1133,7 +1133,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
       <input type="number" class="fi" id="atAmt" placeholder="select or enter amount"/>
       <div class="fi-err" id="atAmtErr"></div>
     </div>
-    <button class="btn-p" id="atSubmit"><span>Continue</span></button>
+    <button class="btn-p" id="atSubmit"><i class="fas fa-arrow-right"></i><span>Continue</span></button>
   </div>
 </div>
 
@@ -1166,7 +1166,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
       <div class="fi-err" id="cableCardErr"></div>
       <div id="cableVerifyRes"></div>
     </div>
-    <button class="btn-p" id="cableSubmit"><span>Continue</span></button>
+    <button class="btn-p" id="cableSubmit"><i class="fas fa-arrow-right"></i><span>Continue</span></button>
   </div>
 </div>
 
@@ -1203,7 +1203,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
       <div class="fi-err" id="elecAmtErr"></div>
       <div class="fee-hint" id="elecFee"></div>
     </div>
-    <button class="btn-p" id="elecSubmit"><span>Continue</span></button>
+    <button class="btn-p" id="elecSubmit"><i class="fas fa-arrow-right"></i><span>Continue</span></button>
   </div>
 </div>
 
@@ -1219,7 +1219,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     <div class="plans-wrap" id="examCards" style="max-height:none;margin-bottom:13px"></div>
     <div class="fg"><label class="flbl">Quantity <small>(max 20)</small></label><input type="number" class="fi" id="examQty" value="1" min="1" max="20"/></div>
     <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="examTotal">&#8358;0</span></div>
-    <button class="btn-p" id="examSubmit"><span>Continue</span></button>
+    <button class="btn-p" id="examSubmit"><i class="fas fa-arrow-right"></i><span>Continue</span></button>
   </div>
 </div>
 
@@ -1235,9 +1235,9 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     <div class="nets" id="rcChips"></div>
     <label class="flbl">Select Amount</label>
     <div class="denom-grid" id="rcDenomGrid"></div>
-    <div class="fg"><label class="flbl">Quantity <small>(max 35)</small></label><input type="number" class="fi" id="rcQty" value="1" min="1" max="35"/></div>
+    <div class="fg"><label class="flbl">Quantity <small>(max 35)</small></label><input type="number" class="fi" id="rcQty" value="1" min="1" max="10"/></div>
     <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="rcTotal">&#8358;100</span></div>
-    <button class="btn-p" id="rcSubmit"><span>Continue</span></button>
+    <button class="btn-p" id="rcSubmit"><i class="fas fa-arrow-right"></i><span>Continue</span></button>
   </div>
 </div>
 
@@ -1260,7 +1260,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
       <textarea class="fi" id="smsMsg" rows="4" placeholder="Type your message here..."></textarea>
     </div>
     <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total Cost</span><span class="pbox-val" id="smsCost">&#8358;0</span></div>
-    <button class="btn-p" id="smsSubmit"><span>Send SMS</span></button>
+    <button class="btn-p" id="smsSubmit"><i class="fas fa-arrow-right"></i><span>Send SMS</span></button>
   </div>
 </div>
 
@@ -1316,7 +1316,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     <div class="qs-svc-list">
       <div class="qs-svc" data-qsvc="data"><i class="fas fa-wifi"></i><span>Buy Data</span></div>
       <div class="qs-svc" data-qsvc="airtime"><i class="fas fa-phone"></i><span>Buy Airtime</span></div>
-      <div class="qs-svc" data-qsvc="sms"><i class="fas fa-comment-dots"></i><span>Send SMS</span></div>
+      <div class="qs-svc" data-qsvc="transfer"><i class="fas fa-paper-plane"></i><span>Transfer</span></div>
       <div class="qs-svc" data-qsvc="copy"><i class="fas fa-copy"></i><span>Copy Number</span></div>
     </div>
   </div>
