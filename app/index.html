@@ -154,7 +154,7 @@ button { font-family: 'Sora', sans-serif; cursor: pointer; }
 .av-wrap { position: relative; }
 .av-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: linear-gradient(135deg, var(--pr), var(--pr-d)); color: #fff; font-weight: 800; font-size: .8rem; display: flex; align-items: center; justify-content: center; transition: .18s; position: relative; overflow: hidden; }
 .av-btn:hover { opacity: .88; }
-.av-img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; position: absolute; inset: 0; }
+.av-img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; position: absolute; top:0;right:0;bottom:0;left:0; }
 .av-drop { position: absolute; top: calc(100% + 10px); right: 0; background: var(--card); border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 6px; min-width: 220px; z-index: 999; display: none; border: 1px solid var(--border); animation: popIn .18s cubic-bezier(.34,1.5,.64,1); }
 .av-drop.show { display: block; }
 @keyframes popIn { from { opacity: 0; transform: translateY(-8px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -237,7 +237,7 @@ button { font-family: 'Sora', sans-serif; cursor: pointer; }
 .promo-slide { min-width: 100%; flex-shrink: 0; position: relative; height: 140px; border-radius: var(--r-lg); overflow: hidden; background: linear-gradient(135deg, #003d7a, #00aaff); cursor: pointer; }
 .promo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .promo-slide.no-img .promo-overlay { background: linear-gradient(135deg, rgba(0,61,122,.85), rgba(0,170,255,.55)); }
-.promo-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,13,26,.05), rgba(7,13,26,.78)); display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; color: #fff; }
+.promo-overlay { position: absolute; top:0;right:0;bottom:0;left:0; background: linear-gradient(180deg, rgba(7,13,26,.05), rgba(7,13,26,.78)); display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; color: #fff; }
 .promo-cat { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,.2); backdrop-filter: blur(6px); padding: 3px 9px; border-radius: 12px; font-size: .58rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; margin-bottom: 6px; width: fit-content; }
 .promo-title { font-size: .92rem; font-weight: 800; line-height: 1.2; margin-bottom: 3px; letter-spacing: -.3px; }
 .promo-desc { font-size: .68rem; opacity: .9; line-height: 1.4; margin-bottom: 6px; }
@@ -350,7 +350,7 @@ button { font-family: 'Sora', sans-serif; cursor: pointer; }
 .bnav-i i { font-size: 1.05rem; }
 .bnav-i span { font-size: .58rem; font-weight: 700; }
 
-.ov { position: fixed; inset: 0; background: rgba(7,13,26,.65); z-index: 300; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(6px); }
+.ov { position: fixed; top:0;right:0;bottom:0;left:0; background: rgba(7,13,26,.65); z-index: 300; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(6px); }
 .ov.show { display: flex; animation: ovFade .2s ease; }
 @keyframes ovFade { from { opacity: 0; } to { opacity: 1; } }
 .modal { background: var(--card); border-radius: var(--r-xl) var(--r-xl) 0 0; padding: 0 17px 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: slideUp .28s cubic-bezier(.34,1.25,.64,1); border-top: 1px solid var(--border); }
@@ -427,17 +427,17 @@ select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg x
 .dc-buy:disabled { background: var(--border2); cursor: not-allowed; }
 
 /* Loader: static logo, ONE colour ring, no zoom */
-.proc-ov{position:fixed;inset:0;z-index:900;background:var(--overlay);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px}
+.proc-ov{position:fixed;top:0;right:0;bottom:0;left:0;z-index:900;background:var(--overlay);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px}
 .proc-ov:not(.show){display:none}
 .loader{display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;color:#fff}
 .loader-orb{position:relative;width:128px;height:128px;display:grid;place-items:center}
-.loader-spin{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,255,255,.22);border-top-color:#fff;animation:spin var(--spin) linear infinite}
-.loader-logo-wrap{position:absolute;inset:12px;border-radius:50%;overflow:hidden;background:#fff;display:grid;place-items:center}
+.loader-spin{position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;border:4px solid rgba(255,255,255,.22);border-top-color:#fff;animation:spin var(--spin) linear infinite}
+.loader-logo-wrap{position:absolute;top:12px;right:12px;bottom:12px;left:12px;border-radius:50%;overflow:hidden;background:#fff;display:grid;place-items:center}
 .loader-logo{display:block;width:100%;height:100%;object-fit:contain;padding:14px}
 .loader-text{display:flex;flex-direction:column;gap:4px;max-width:300px}
 .loader-text strong{font-size:1.1rem;font-weight:800}
 .loader-text span{font-size:.85rem;opacity:.85;line-height:1.4}
-.proc-fb{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand),#0066cc);color:#fff;font-weight:800;font-size:3rem;display:grid;place-items:center}
+.proc-fb{position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(135deg,var(--brand),#0066cc);color:#fff;font-weight:800;font-size:3rem;display:grid;place-items:center}
 
 .confirm-details { background: var(--bg); border-radius: 12px; padding: 3px; margin-bottom: 14px; }
 .cd-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 12px; border-bottom: 1px solid var(--border); gap: 10px; }
@@ -541,7 +541,7 @@ select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg x
 
 .tr-av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .86rem; font-weight: 800; color: #fff; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, var(--pr), var(--pr-d)); }
 
-.fullscreen-page { position: fixed; inset: 0; background: var(--bg); z-index: 700; display: none; flex-direction: column; overflow: hidden; }
+.fullscreen-page { position: fixed; top:0;right:0;bottom:0;left:0; background: var(--bg); z-index: 700; display: none; flex-direction: column; overflow: hidden; }
 .fullscreen-page.show { display: flex; animation: slideInRight .3s ease; }
 @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 .page-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -650,8 +650,8 @@ select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg x
 /* Announcement */
 .ov.center .modal.ann-modal { padding: 0; overflow-y: auto; overflow-x: hidden; max-width: 390px; }
 .ann-hero { position: relative; height: 220px; background: linear-gradient(135deg, #003d7a, #00aaff); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 3.4rem; overflow: hidden; }
-.ann-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ann-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.18), transparent 40%); pointer-events: none; }
+.ann-hero > img { position: absolute; top:0;right:0;bottom:0;left:0; width: 100%; height: 100%; object-fit: cover; }
+.ann-hero::after { content: ''; position: absolute; top:0;right:0;bottom:0;left:0; background: linear-gradient(180deg, rgba(0,0,0,.18), transparent 40%); pointer-events: none; }
 .ann-x { position: absolute; top: 12px; right: 12px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; border: none; display: flex; align-items: center; justify-content: center; font-size: .95rem; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .ann-x:active { transform: scale(.92); }
 .ann-wrap { padding: 20px 20px 22px; }
@@ -834,7 +834,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
 [data-theme="dark"] .imgbox { background: #1b2a40; }
 .imgbox > img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .imgbox.cover > img { object-fit: cover; }
-.imgbox.fill { position: absolute; inset: 0; border-radius: inherit; }
+.imgbox.fill { position: absolute; top:0;right:0;bottom:0;left:0; border-radius: inherit; }
 .imgbox.fb { background-clip: padding-box; }
 .imgbox-t { font-size: .66rem; letter-spacing: .3px; }
 .nc-logo.imgbox { width: 34px; height: 34px; border-radius: 10px; margin: 0 auto 4px; }
@@ -848,10 +848,10 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
 .tr-av { padding: 0; }
 .tr-av.imgbox { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
 .tr-av.imgbox > img { object-fit: cover; }
-.promo-slide > .imgbox { position: absolute; inset: 0; border-radius: 0; }
+.promo-slide > .imgbox { position: absolute; top:0;right:0;bottom:0;left:0; border-radius: 0; }
 .promo-slide > .imgbox > img { object-fit: cover; }
 .promo-overlay { z-index: 1; }
-.ann-hero > .imgbox { position: absolute; inset: 0; border-radius: 0; background: #0b2540; }
+.ann-hero > .imgbox { position: absolute; top:0;right:0;bottom:0;left:0; border-radius: 0; background: #0b2540; }
 .ann-hero > .imgbox > img { object-fit: cover; }
 .ann-hero.solo > .imgbox { position: static; display: block; background: #e6edf5; min-height: 160px; }
 .ann-hero.solo > .imgbox > img { width: 100%; height: auto; max-height: 72vh; object-fit: cover; }
@@ -1026,7 +1026,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
   </div>
   
   <div class="sec-hd">
-    <div class="sec-t"><i class="fas fa-receipt"></i>Recent (<span id="txCount">6</span>) Transactions</div>
+    <div class="sec-t"><i class="fas fa-receipt"></i><span>Recent (<span id="txCount">6</span>) Transactions</span></div>
     <button class="sec-a" id="viewAllBtn"><i class="fas fa-arrow-right"></i>View All</button>
   </div>
   <div class="tx-list" id="txList"></div>
@@ -1235,7 +1235,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     <div class="nets" id="rcChips"></div>
     <label class="flbl">Select Amount</label>
     <div class="denom-grid" id="rcDenomGrid"></div>
-    <div class="fg"><label class="flbl">Quantity <small>(max 10)</small></label><input type="number" class="fi" id="rcQty" value="1" min="1" max="10"/></div>
+    <div class="fg"><label class="flbl">Quantity <small>(max 35)</small></label><input type="number" class="fi" id="rcQty" value="1" min="1" max="35"/></div>
     <div class="price-box"><span class="pbox-lbl"><i class="fas fa-tag"></i>Total</span><span class="pbox-val" id="rcTotal">&#8358;100</span></div>
     <button class="btn-p" id="rcSubmit"><span>Continue</span></button>
   </div>
@@ -1387,11 +1387,9 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
     </div>
     <div class="fg">
       <label class="flbl">Recipient phone number</label>
-      <div style="display:flex;gap:8px">
-        <input type="tel" class="fi" id="trRecipient" placeholder="e.g: 08012345678" maxlength="11" inputmode="numeric" autocomplete="off"/>
-        <button class="btn-p" id="trLookupBtn" style="width:auto;margin:0;padding:10px 16px" aria-label="Find user"><i class="fas fa-search"></i></button>
-      </div>
+      <input type="tel" class="fi" id="trRecipient" placeholder="e.g: 08012345678" maxlength="11" inputmode="numeric" autocomplete="off"/>
       <div class="fi-err" id="trErr"></div>
+      <button class="btn-p" id="trLookupBtn" style="margin-top:10px"><i class="fas fa-search"></i><span>Verify number</span></button>
     </div>
     <div id="trRecipientCard" style="display:none"></div>
     <div class="fg" id="trAmtGroup" style="display:none">
@@ -1486,8 +1484,7 @@ i.fas, i.far { width: 1.08em; height: 1.08em; vertical-align: -.15em; }
 
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="/assets/js/app.js" defer></script>
-<script src="/assets/js/push-install.js" defer></script>
 <script src="/assets/js/logout.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
 </body>
 </html>

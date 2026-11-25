@@ -10,6 +10,15 @@
      new       /notifications  /content/dashboard  /loan/eligibility
    Change any endpoint name in the EP block below, nothing else needs touching.
 ============================================================================ */
+/* small polyfills for old Android WebViews (Android 7 to 10 with an old WebView) */
+(function () {
+  try {
+    if (!Promise.prototype.finally) Promise.prototype.finally = function (f) { var P = this.constructor; return this.then(function (v) { return P.resolve(f()).then(function () { return v; }); }, function (e) { return P.resolve(f()).then(function () { throw e; }); }); };
+    if (!String.prototype.padStart) String.prototype.padStart = function (n, c) { var t = String(this); c = c == null ? ' ' : String(c); while (t.length < n) t = c + t; return t; };
+    if (!Element.prototype.closest) Element.prototype.closest = function (s) { var e = this; while (e && e.nodeType === 1) { if ((e.matches || e.webkitMatchesSelector).call(e, s)) return e; e = e.parentElement; } return null; };
+    if (window.NodeList && !NodeList.prototype.forEach) NodeList.prototype.forEach = Array.prototype.forEach;
+  } catch (e) {}
+})();
 (function () {
 'use strict';
 
@@ -334,9 +343,13 @@ function bioGet(slot, title, subtitle) {
 }
 
 /* 3.4 phone contacts (read on the phone only, never sent anywhere) */
+const CT_DENY = 'sh_contacts_denied';
 function getDeviceContacts() {
   return new Promise(resolve => {
     if (!window.AndroidContacts) return resolve({ success: false, contacts: [], noBridge: true });
+    let has = true; try { if (window.AndroidContacts.hasContactsPermission) has = !!window.AndroidContacts.hasContactsPermission(); } catch (e) {}
+    /* Android shows its question only twice. After that nothing would answer, so go straight to the "open settings" message. */
+    if (!has && num(store.raw(CT_DENY)) >= 2) return resolve({ success: false, contacts: [], denied: true });
     const id = 'contacts_' + Date.now();
     const prev = window.__subhubContactsCallback;
     let done = false, timer;
@@ -346,7 +359,9 @@ function getDeviceContacts() {
       if (cbId === id) {
         let arr = list;
         if (typeof arr === 'string') { try { arr = JSON.parse(arr); } catch (e) { arr = []; } }
-        finish({ success: success === true || success === 'true', contacts: Array.isArray(arr) ? arr : [] });
+        const ok = success === true || success === 'true';
+        try { store.setRaw(CT_DENY, ok ? '0' : String(num(store.raw(CT_DENY)) + 1)); } catch (e) {}
+        finish({ success: ok, contacts: Array.isArray(arr) ? arr : [] });
       } else if (typeof prev === 'function') prev(cbId, success, list);
     };
     try { window.AndroidContacts.getContacts(id); } catch (e) { finish({ success: false, contacts: [] }); }
@@ -388,6 +403,7 @@ const Modal = {
     const i = this.stack.indexOf(id); if (i > -1) this.stack.splice(i, 1);
     this.stack.push(id);
     document.body.style.overflow = 'hidden';
+    if (typeof updateAvail === 'function') updateAvail();
   },
   close(id) {
     const el = document.getElementById(id); if (!el) return;
@@ -531,9 +547,9 @@ const netLogo = (n, cls) => imgBox(cls, n.logo, { text: n.name.slice(0, 3).toUpp
 ============================================================================ */
 /*API-START*/
 function timedFetch(url, init, ms) {
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), ms);
-  return fetch(url, Object.assign({}, init, { signal: ctl.signal })).finally(() => clearTimeout(t));
+  const ctl = (typeof AbortController === 'function') ? new AbortController() : null;      // very old WebViews have none
+  const t = setTimeout(() => { if (ctl) ctl.abort(); }, ms);
+  return fetch(url, ctl ? Object.assign({}, init, { signal: ctl.signal }) : init).finally(() => clearTimeout(t));
 }
 
 let sessionEnded = false;
@@ -848,14 +864,15 @@ const vaGradient = (c) => 'linear-gradient(145deg,' + shade(c, -.55) + ' 0%,' + 
 function vaCardHTML(card, copyAttr, genAttr) {
   const a = card.acc, has = !!(a && a.accountNumber);
   const inactive = !has || String(a.status || 'active').toLowerCase() === 'inactive';
-  const top = '<div class="va-top"><div class="va-bank"><i class="fas fa-building-columns"></i>' + esc(card.bankName) + '</div>' +
-    (card.fee ? '<div class="va-fee">Fee ' + esc(card.fee) + '</div>' : '') + '</div>';
+  const fee = card.fee === '' || card.fee == null ? '' : (isNum(card.fee) ? naira0(card.fee) : String(card.fee));
+  const top = '<div class="va-top"><div class="va-bankblk"><div class="va-lbl">Bank name</div><div class="va-bank"><i class="fas fa-building-columns"></i><span>' + esc(card.bankName) + '</span></div></div>' +
+    '<span class="va-chip ' + (inactive ? 'off' : 'on') + '">' + (inactive ? 'Inactive' : 'Active') + '</span></div>';
   const body = has
-    ? '<div class="va-body"><div class="va-acct-row"><div class="va-acct">' + esc(a.accountNumber) + '</div>' +
-      '<button class="va-copy" ' + copyAttr + '="' + esc(a.accountNumber) + '" aria-label="Copy account number"><i class="fas fa-copy"></i></button></div>' +
-      '<div class="va-name-row"><div class="va-name">' + esc(a.accountName || '') + '</div><span class="va-chip ' + (inactive ? 'off' : 'on') + '">' + (inactive ? 'Inactive' : 'Active') + '</span></div></div>'
-    : '<div class="va-body center"><span class="va-chip off">Inactive</span>' +
-      '<button class="va-gen" ' + genAttr + '="' + esc(card.key) + '"><i class="fas fa-plus"></i>Generate Account</button></div>';
+    ? '<div class="va-body"><div class="va-numblk"><div class="va-lbl">Account number</div><div class="va-acct-row"><div class="va-acct">' + esc(a.accountNumber) + '</div>' +
+      '<button class="va-copy" ' + copyAttr + '="' + esc(a.accountNumber) + '" aria-label="Copy account number"><i class="fas fa-copy"></i></button></div></div>' +
+      '<div class="va-name-row"><div class="va-nameblk"><div class="va-lbl">Account name</div><div class="va-name">' + esc(a.accountName || '-') + '</div></div>' +
+      (fee ? '<button class="va-feebtn" data-vafee="' + esc(fee) + '" data-vabank="' + esc(card.bankName) + '">Fee ' + esc(fee) + '<i class="fas fa-circle-info"></i></button>' : '') + '</div></div>'
+    : '<div class="va-body center"><button class="va-gen" ' + genAttr + '="' + esc(card.key) + '"><i class="fas fa-plus"></i>Generate Account</button>' + (fee ? '<div class="va-feenote">Fee ' + esc(fee) + '</div>' : '') + '</div>';
   return '<div class="wallet-card" style="background:' + vaGradient(card.color) + '"><div class="wc-ring1"></div><div class="wc-ring2"></div><div class="wc-blob"></div><div class="wc-in">' + top + body + '</div></div>';
 }
 function bindVaButtons(root, copyAttr, genAttr) {
@@ -867,6 +884,7 @@ function bindVaButtons(root, copyAttr, genAttr) {
     };
   });
   $$('[' + genAttr + ']', root).forEach(b => { b.onclick = () => generateVA(b.getAttribute(genAttr)); });
+  $$('[data-vafee]', root).forEach(b => { b.onclick = () => showAlert({ icon: 'info', title: 'Funding fee', message: 'A fee of ' + b.dataset.vafee + ' applies to deposits made to this ' + b.dataset.vabank + ' account.' }); });
 }
 /* The wallet cards are built once. When only the balance, the eye or the "updated" text change,
    just those texts are updated, so the slider is never reset or rebuilt under the user's finger. */
@@ -898,7 +916,18 @@ function paintBalance() {
   balRaf = requestAnimationFrame(step);
 }
 function walletSubText() { return 'Available Balance' + DOT + (S.balFresh ? 'Updated just now' : (S.balNote || (S.balKnown ? 'Updating...' : 'Loading...'))); }
+/* "Available balance" line at the top of every purchase sheet (the ones that carry a service notice) */
+function availText() { return S.balHidden ? BAL_MASK : (!S.balKnown ? '--.--' : naira(S.wallet.balance)); }
+function updateAvail() { $$('.avail-amt').forEach(e => { e.textContent = availText(); }); }
+function ensureAvailBars() {
+  $$('.svc-notice[data-notice]').forEach(n => {
+    if (n.previousElementSibling && n.previousElementSibling.classList.contains('avail-bar')) return;
+    n.insertAdjacentHTML('beforebegin', '<div class="avail-bar"><span class="avail-l"><i class="fas fa-wallet"></i>Available balance</span><b class="avail-amt"></b></div>');
+  });
+  updateAvail();
+}
 function renderWallet() {
+  updateAvail();
   const cards = buildVaCards(), total = 1 + cards.length, sig = vaSig(cards);
   const numEl = $('#walletNum');
   if (sig === walletSig && numEl) {
@@ -1397,7 +1426,7 @@ async function loadDeviceContactsRun() {
   out.sort((a, b) => (a.name || '~').localeCompare(b.name || '~'));
   CT.device = out; CT.loaded = r.success;
   syncRecentNames(); updateContactsBtn();
-  CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'Contact access is off. Tap Open settings, allow Contacts for SubHub, then come back.';
+  CT.msg = r.success ? '' : r.noBridge ? 'Open SubHub in the Android app to load your phone contacts.' : 'Contacts permission is off. Tap Open settings, allow Contacts for SubHub, then come back.';
 }
 function renderContactsShell() {
   $('#contactsPageBody').innerHTML =
@@ -1409,10 +1438,7 @@ function renderContactsList(more) {
   const wrap = $('#ctList'); if (!wrap) return;
   const f = CT.filter.trim().toLowerCase();
   if (!more) renderFavs();
-  const saved = S.recents.map(n => ({ name: n.name, phone: n.phone, network: n.network }));
-  const all = [];
-  const seen = new Set();
-  saved.concat(CT.device).forEach(c => { if (seen.has(c.phone)) return; seen.add(c.phone); all.push(c); });
+  const all = CT.device;                       // only the phone's own contacts. Saved / recent numbers are a separate list.
   const list = all.filter(c => !f || (c.name || '').toLowerCase().includes(f) || c.phone.includes(f));
   const cc = $('#ctCount');
   if (cc) cc.textContent = !all.length ? '' : (f ? list.length + ' of ' + all.length + ' contacts' : all.length + (all.length === 1 ? ' contact' : ' contacts'));
@@ -1477,14 +1503,19 @@ function initPasteChips() {
     const input = document.getElementById(f.id); if (!input || input.dataset.pc) return;
     input.dataset.pc = '1';
     const anchor = input.closest('.phone-wrap, .verify-wrap') || input;
-    const row = document.createElement('div');
-    row.className = 'paste-row';
     const btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'paste-chip';
     btn.innerHTML = '<i class="fas fa-clipboard"></i> Paste';
     btn.onclick = () => pasteInto(f.id, f.mode, f.max);
-    row.appendChild(btn);
-    anchor.parentNode.insertBefore(row, anchor);
+    let lbl = null;                                          // the label above the field: the chip goes on the same line
+    Array.prototype.forEach.call(anchor.parentNode.children, c => { if (!lbl && c.tagName === 'LABEL' && (c.compareDocumentPosition(anchor) & 4)) lbl = c; });
+    if (lbl) {
+      const lr = document.createElement('div'); lr.className = 'lbl-row';
+      lbl.parentNode.insertBefore(lr, lbl); lr.appendChild(lbl); lr.appendChild(btn);
+    } else {
+      const row = document.createElement('div'); row.className = 'paste-row'; row.appendChild(btn);
+      anchor.parentNode.insertBefore(row, anchor);
+    }
   });
 }
 
@@ -1587,6 +1618,74 @@ function showTxDetail(ref) {
 /* receipt: no download or share here (done on the transactions page) */
 const recRowHTML = (r) => '<div class="rr"><div class="rrl">' + esc(r[0]) + '</div><div class="rrv ' + (r[2] || '') + '">' + esc(r[1]) + '</div></div>';
 const sectionTitle = (t) => t === 'wallet_fund' ? 'Sender Details' : (t === 'wallet_transfer' || t === 'earncial_transfer') ? 'Transfer Details' : 'Purchase Details';
+/* ----- balloons: they float up, pop with a sound and burst into confetti all over the screen ----- */
+let popCtx = null, popAt = 0;
+function popSound(vol) {
+  try {
+    const now = Date.now(); if (now - popAt < 40) return; popAt = now;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    if (!popCtx) popCtx = new AC();
+    if (popCtx.state === 'suspended' && popCtx.resume) popCtx.resume();
+    const len = Math.floor(popCtx.sampleRate * 0.09), buf = popCtx.createBuffer(1, len, popCtx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const src = popCtx.createBufferSource(); src.buffer = buf;
+    const f = popCtx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1600 + Math.random() * 2000;
+    const g = popCtx.createGain(); g.gain.value = vol || 0.35;
+    src.connect(f); f.connect(g); g.connect(popCtx.destination); src.start(0);
+  } catch (e) {}
+}
+function celebrate() {
+  if (celebrate.on) return; celebrate.on = true;
+  const W = window.innerWidth, H = window.innerHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cv = document.createElement('canvas');
+  cv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:950;pointer-events:none';
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d'); if (!ctx) { cv.remove(); celebrate.on = false; return; }
+  ctx.scale(dpr, dpr);
+  const cols = ['#ff4d6d', '#ffb703', '#00aaff', '#22c55e', '#a855f7', '#fb923c', '#14b8a6', '#f43f5e'];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const N = Math.min(28, Math.max(16, Math.round(W / 14)));
+  const balls = [], bits = [];
+  for (let i = 0; i < N; i++) {
+    const r = rnd(20, 34);
+    balls.push({ x: rnd(r, W - r), y: H + r * 2 + rnd(0, H * 0.55), r: r, vy: rnd(150, 270), ph: rnd(0, 6.28), sw: rnd(8, 20), c: cols[i % cols.length], popY: H * rnd(0.06, 0.7), dead: false });
+  }
+  const burst = (b) => {
+    popSound(rnd(0.22, 0.4));
+    for (let k = 0; k < 16; k++) { const an = rnd(0, 6.28), sp = rnd(90, 280); bits.push({ x: b.x, y: b.y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - 60, s: rnd(3, 6.5), c: k % 4 === 0 ? '#ffffff' : b.c, rot: rnd(0, 6.28), vr: rnd(-9, 9), life: rnd(0.9, 1.6), age: 0 }); }
+  };
+  let last = performance.now(), t0 = last;
+  const end = () => { if (cv.parentNode) cv.parentNode.removeChild(cv); celebrate.on = false; };
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    ctx.clearRect(0, 0, W, H);
+    let live = 0;
+    balls.forEach(b => {
+      if (b.dead) return; live++;
+      b.y -= b.vy * dt; b.ph += dt * 2.2;
+      const x = b.x + Math.sin(b.ph) * b.sw;
+      if (b.y <= b.popY) { b.dead = true; b.x = x; burst(b); return; }
+      if (b.y - b.r > H + 40) return;
+      ctx.strokeStyle = 'rgba(120,130,150,.55)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, b.y + b.r + 5); ctx.quadraticCurveTo(x + Math.sin(b.ph * 1.7) * 7, b.y + b.r + 22, x, b.y + b.r + 40); ctx.stroke();
+      ctx.fillStyle = b.c; ctx.beginPath(); ctx.ellipse(x, b.y, b.r * 0.82, b.r, 0, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x, b.y + b.r - 1); ctx.lineTo(x - 4, b.y + b.r + 6); ctx.lineTo(x + 4, b.y + b.r + 6); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.ellipse(x - b.r * 0.32, b.y - b.r * 0.38, b.r * 0.16, b.r * 0.3, -0.5, 0, 6.2832); ctx.fill();
+    });
+    for (let i = bits.length - 1; i >= 0; i--) {
+      const p = bits[i]; p.age += dt;
+      if (p.age > p.life) { bits.splice(i, 1); continue; }
+      p.vy += 420 * dt; p.vx *= 0.985; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      ctx.globalAlpha = Math.max(0, 1 - p.age / p.life);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.66); ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    if ((!live && !bits.length) || now - t0 > 9000) { end(); return; }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
 function showReceipt(o) {
   const st = String(o.status || 'success').toLowerCase();
   const kind = st === 'success' ? 'ok' : st === 'pending' ? 'pending' : 'fail';
@@ -1773,6 +1872,7 @@ async function handleResult(cfg, auth, r) {
         .concat(isNum(tx.oldBalance) ? [['Balance Before', naira(tx.oldBalance), 'bal']] : [], isNum(tx.newBalance) ? [['Balance After', naira(tx.newBalance), 'bal']] : []),
       details: rec, pins: cfg.pins ? cfg.pins(tx) : []
     });
+    if (!pending) celebrate();
     if (!isNum(tx.newBalance)) loadMe(true); else setTimeout(() => loadMe(true), 1500);
     loadTransactions(true);
     return;
@@ -2284,7 +2384,7 @@ async function lookupRecipient() {
   if (isExamplePhone(phone)) { fieldErr('trErr', EXAMPLE_PHONE_MSG); return; }
   if (!validLocal11(phone)) { fieldErr('trErr', 'Enter a valid 11-digit phone number starting with 0'); return; }
   if (S.user && phone === S.user.phone) { fieldErr('trErr', 'You cannot send money to yourself'); return; }
-  const btn = $('#trLookupBtn'); setBtnLoading(btn, '');
+  const btn = $('#trLookupBtn'); setBtnLoading(btn, 'Verifying');
   const r = await api(EP.transferLookup + '?phone=' + encodeURIComponent(phone));
   resetBtn(btn);
   if (!r.ok || !r.data.success) {
@@ -2329,7 +2429,7 @@ async function checkLoan() {
   const [r] = await Promise.all([api(EP.loan), sleep(1200)]);
   if (!r.ok || !r.data.success) {
     resetBtn(btn);
-    toast('red', 'Loan', r.network ? 'No connection. Please try again.' : (r.data.message || 'Loan check is not available right now'));
+    toast('red', 'Loan', r.network ? 'No internet  connection. Please try again.' : (r.data.message || 'Loan check is not available right now'));
     return;
   }
   const d = r.data;
@@ -2434,19 +2534,36 @@ async function loadContent(noPopups) {
   const r = await api(EP.content);
   if (!r.ok || !r.data.success) return;
   const d = r.data;
-  S.content = { banner: d.banner || null, notices: d.notices || {}, popups: d.popups || [], slides: d.slides || [] };
+  S.content = { banner: d.banner || null, banners: d.banners || null, notices: d.notices || {}, popups: d.popups || [], slides: d.slides || [] };
   renderAdminBanner(); renderNotices(); renderSlides();
   if (!noPopups) showPopups();
 }
+let abTimer = null, abTouch = 0;
 function renderAdminBanner() {
-  const el = $('#adminBanner'), b = S.content.banner;
-  const bsig = JSON.stringify(b || null); if (renderAdminBanner._sig === bsig) return; renderAdminBanner._sig = bsig;
-  if (!b || b.active === false || !b.message) { el.style.display = 'none'; el.innerHTML = ''; return; }
-  const kind = KIND_ICON[b.kind] ? b.kind : 'info';
-  el.className = 'admin-banner ' + kind; el.style.display = 'block';
-  el.innerHTML = '<div class="ab-row"><div class="ab-ico"><i class="fas ' + KIND_ICON[kind] + '"></i></div><div class="ab-body">' + (b.title ? '<div class="ab-title">' + esc(b.title) + '</div>' : '') +
-    '<div class="ab-msg">' + formatMessage(b.message) + '</div>' + (b.button && b.button.label ? '<button class="ab-btn" id="abBtn">' + esc(b.button.label) + '</button>' : '') + '</div></div>';
-  if ($('#abBtn')) $('#abBtn').onclick = () => openTarget(b.button.action || (b.button.href ? { href: b.button.href } : null));
+  const el = $('#adminBanner');
+  const list = [].concat(S.content.banners || S.content.banner || []).filter(b => b && b.active !== false && b.message);
+  const bsig = JSON.stringify(list); if (renderAdminBanner._sig === bsig) return; renderAdminBanner._sig = bsig;
+  if (abTimer) { clearInterval(abTimer); abTimer = null; }
+  if (!list.length) { el.style.display = 'none'; el.innerHTML = ''; el.className = 'admin-banner'; return; }
+  const kindOf = (b) => KIND_ICON[b.kind] ? b.kind : 'info';
+  const inner = (b, i) => '<div class="ab-row"><div class="ab-ico"><i class="fas ' + KIND_ICON[kindOf(b)] + '"></i></div><div class="ab-body">' + (b.title ? '<div class="ab-title">' + esc(b.title) + '</div>' : '') +
+    '<div class="ab-msg">' + formatMessage(b.message) + '</div>' + (b.button && b.button.label ? '<button class="ab-btn" data-abi="' + i + '">' + esc(b.button.label) + '</button>' : '') + '</div></div>';
+  if (list.length === 1) { el.className = 'admin-banner ' + kindOf(list[0]); el.style.display = 'block'; el.innerHTML = inner(list[0], 0); }
+  else {
+    el.className = 'ab-multi'; el.style.display = 'block';
+    el.innerHTML = '<div class="ab-track" id="abTrack">' + list.map((b, i) => '<div class="ab-slide"><div class="admin-banner ' + kindOf(b) + '" style="display:block;margin:0">' + inner(b, i) + '</div></div>').join('') + '</div>' +
+      '<div class="ab-dots" id="abDots">' + list.map((b, i) => '<span class="ab-dot' + (i === 0 ? ' on' : '') + '"></span>').join('') + '</div>';
+    const tr = $('#abTrack'), dots = $$('#abDots .ab-dot');
+    const cur = () => Math.max(0, Math.min(list.length - 1, Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth))));
+    tr.addEventListener('scroll', () => { const c = cur(); dots.forEach((d, i) => d.classList.toggle('on', i === c)); });
+    tr.addEventListener('touchstart', () => { abTouch = Date.now(); }, { passive: true });
+    abTimer = setInterval(() => {
+      if (document.visibilityState !== 'visible' || Date.now() - abTouch < 9000 || !document.body.contains(tr)) return;
+      const r = tr.getBoundingClientRect(); if (r.bottom < 0 || r.top > window.innerHeight) return;
+      tr.scrollLeft = ((cur() + 1) % list.length) * tr.clientWidth;
+    }, 6000);
+  }
+  $$('#adminBanner [data-abi]').forEach(btn => { btn.onclick = () => { const b = list[parseInt(btn.dataset.abi, 10)]; openTarget(b.button.action || (b.button.href ? { href: b.button.href } : null)); }; });
 }
 function renderNotices() {
   const nsig = JSON.stringify(S.content.notices || {}); if (renderNotices._sig === nsig) return; renderNotices._sig = nsig;
@@ -2487,7 +2604,7 @@ function renderPopup(a) {
       (below ? '<div class="ann-wrap" style="padding-top:14px">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + (a.message ? '<div class="ann-msg">' + formatMessage(a.message) + '</div>' : '') + buttons + '</div>' : '');
   }
   else if (type === 'text') html = '<button class="ann-x light" id="annX" aria-label="Close"><i class="fas fa-times"></i></button><div class="ann-wrap solo"><div class="alert-ico info"><i class="fas fa-bullhorn"></i></div>' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
-  else html = '<div class="ann-hero">' + (a.image ? imgBox('cover', a.image) : '<i class="fas fa-rocket"></i>') + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div><div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
+  else html = '<div class="ann-hero' + (a.image ? ' full' : '') + '">' + (a.image ? imgBox('cover', a.image) : '<i class="fas fa-rocket"></i>') + '<button class="ann-x" id="annX" aria-label="Close"><i class="fas fa-times"></i></button></div><div class="ann-wrap">' + (a.title ? '<div class="ann-title">' + esc(a.title) + '</div>' : '') + '<div class="ann-msg">' + formatMessage(a.message) + '</div>' + buttons + '</div>';
   $('#annContent').innerHTML = html; $('#annContent').style.position = 'relative';
   $('#annX').onclick = (e) => { e.stopPropagation(); done(); };
   if ($('#annDismiss')) $('#annDismiss').onclick = () => { const t = tgt(a.secondary); done(); if (t) setTimeout(() => openTarget(t), 250); };
@@ -2813,7 +2930,7 @@ function bindEvents() {
   });
   document.addEventListener('click', e => { if (e.target.closest('button,.svc,.prio-item,.nc,.dc,.denom,.qs-svc,.more-item,.bnav-i,.tx,.chip,.notif-item,.deposit-option,.contact-item,.promo-slide')) feedback('tap'); }, true);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') handleBack(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { if (Date.now() - S.lastMe > 30000) loadMe(true); loadUnread(); } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { updateNotifBar(); if (Date.now() - S.lastMe > 30000) loadMe(true); loadUnread(); } });
 
   $('#dmBtn').onclick = toggleTheme;
   $('#annBtn').onclick = openNotifications;
@@ -2889,7 +3006,8 @@ function bindEvents() {
 }
 
 //SCROLL FROM EVERYDAY SERVICES TO OTHER SERVICES
-document.getElementById('viewAllServicesBtn')?.addEventListener('click', () => {
+var __vas = document.getElementById('viewAllServicesBtn');
+if (__vas) __vas.addEventListener('click', () => {
   const target = document.getElementById('otherServices');
   
   if (!target) return;
@@ -2920,6 +3038,22 @@ function notifEnabled() {
   try { return !(window.AndroidApp && window.AndroidApp.notificationsEnabled) || window.AndroidApp.notificationsEnabled() !== false; } catch (e) { return true; }
 }
 /* Android stops asking for notification permission after two refusals, so the user has to go to Settings. */
+let notifBarHidden = false;
+function updateNotifBar() {
+  let bar = $('#notifBar');
+  const need = isApp() && !notifEnabled() && !notifBarHidden;
+  if (!need) { if (bar) bar.style.display = 'none'; return; }
+  if (!bar) {
+    bar = document.createElement('div'); bar.id = 'notifBar'; bar.className = 'notif-bar';
+    bar.innerHTML = '<div class="nb-ico"><i class="fas fa-bell-slash"></i></div><div class="nb-txt"><b>Notifications are off</b><span>Turn them on so you never miss a payment or wallet alert.</span></div>' +
+      '<button class="nb-btn" id="nbOpen">Turn on</button><button class="nb-x" id="nbX" aria-label="Hide"><i class="fas fa-times"></i></button>';
+    const anchor = $('#emailBanner') || $('#adminBanner');
+    if (anchor) anchor.insertAdjacentElement('beforebegin', bar); else document.body.insertBefore(bar, document.body.firstChild);
+    $('#nbOpen').onclick = openNotifSettings;
+    $('#nbX').onclick = () => { notifBarHidden = true; updateNotifBar(); };
+  }
+  bar.style.display = 'flex';
+}
 function maybePromptNotifications() {
   if (!isApp() || notifEnabled() || document.visibilityState !== 'visible') return;
   if (Date.now() < num(store.raw('sh_notif_snooze'))) return;
@@ -2927,7 +3061,7 @@ function maybePromptNotifications() {
   showAlert({
     icon: 'info', title: 'Turn on notifications', message: 'Notifications are off for SubHub. Turn them on to get instant alerts for your payments and wallet funding.',
     okLabel: 'Open settings', cancelLabel: 'Not now', onOk: openNotifSettings,
-    onCancel: () => store.setRaw('sh_notif_snooze', String(Date.now() + 3 * 86400000))
+    onCancel: () => store.setRaw('sh_notif_snooze', String(Date.now() + 86400000))
   });
 }
 
@@ -2944,7 +3078,7 @@ window.__subhubAppResumed = function () {
   try {
     if ($('#contactsPage').classList.contains('show') && !CT.loaded && CT.msg && isApp()) loadDeviceContacts().then(() => renderContactsList());
     if (S.user && Date.now() - S.lastMe > 30000) loadMe(true);
-    updateContactsBtn(); resumePinReset();
+    updateContactsBtn(); resumePinReset(); updateNotifBar();
   } catch (e) {}
 };
 
@@ -2968,13 +3102,48 @@ function injectCss() {
   st.textContent = [
     '#fundVATrack.fund-list{display:flex!important;flex-direction:column;gap:12px;transform:none!important;width:100%;padding:2px 0 6px;touch-action:pan-y}',
     '#fundVATrack.fund-list *{touch-action:pan-y}',
-    '#fundVATrack.fund-list.fund-inner{max-height:min(54vh,430px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
+    '#fundVATrack.fund-list.fund-inner{max-height:430px;max-height:min(54vh,430px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
     '#fundVATrack.fund-list>.wallet-card{flex:0 0 auto!important;width:100%!important;min-width:0;margin:0}',
     '#fundSlider{overflow:visible!important;height:auto!important;touch-action:auto!important}',
     '.proc-wait{margin-top:14px;font-size:.74rem;font-weight:600;color:var(--muted);animation:procPulse 1.4s ease-in-out infinite}',
     '@keyframes procPulse{0%,100%{opacity:.4}50%{opacity:1}}',
     '.fmt-link{color:#00aaff;font-weight:700;text-decoration:underline;word-break:break-word}',
     '.ct-skel{pointer-events:none}',
+    '.lbl-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}',
+    '.lbl-row .flbl{margin:0}',
+    '.lbl-row .paste-chip{margin-left:10px;flex:none}',
+    '#dataModal #planSection>.fg{position:-webkit-sticky;position:sticky;bottom:0;z-index:3;background:var(--card);padding:10px 0 2px;margin-top:8px;box-shadow:0 -10px 14px -8px var(--card)}',
+    '.avail-bar{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;padding:9px 13px;border-radius:12px;background:rgba(0,170,255,.07);border:1px solid rgba(0,170,255,.22)}',
+    '.avail-l{font-size:.72rem;font-weight:700;color:var(--muted)}',
+    '.avail-l i{color:var(--pr);margin-right:7px}',
+    '.avail-amt{font-size:.86rem;font-weight:800;color:var(--text)}',
+    '.notif-bar{display:flex;align-items:center;margin:0 0 12px;padding:11px 12px;border-radius:16px;background:linear-gradient(135deg,rgba(245,158,11,.14),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.4)}',
+    '.nb-ico{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(245,158,11,.2);color:#d97706;display:flex;align-items:center;justify-content:center;font-size:.95rem;margin-right:10px}',
+    '.nb-txt{flex:1;min-width:0;display:flex;flex-direction:column}',
+    '.nb-txt b{font-size:.78rem;font-weight:800;color:var(--text)}',
+    '.nb-txt span{font-size:.68rem;color:var(--muted);line-height:1.4;margin-top:1px}',
+    '.nb-btn{flex:none;margin-left:8px;border:none;border-radius:999px;background:#f59e0b;color:#fff;font-size:.72rem;font-weight:800;padding:8px 14px}',
+    '.nb-x{flex:none;width:26px;height:26px;margin-left:4px;border:none;background:transparent;color:var(--muted);font-size:.8rem}',
+    '.ab-multi{margin-bottom:13px}',
+    '.ab-track{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;align-items:stretch}',
+    '.ab-track::-webkit-scrollbar{display:none}',
+    '.ab-slide{flex:0 0 100%;min-width:100%;box-sizing:border-box;scroll-snap-align:center;padding:2px 2px 8px}',
+    '.ab-slide .admin-banner{height:100%;box-sizing:border-box}',
+    '.ab-dots{display:flex;justify-content:center;margin-top:0}',
+    '.ab-dot{width:6px;height:6px;border-radius:3px;background:var(--border);margin:0 3px;transition:.2s}',
+    '.ab-dot.on{width:18px;background:var(--pr)}',
+    '.va-top{align-items:flex-start}',
+    '.va-bankblk{min-width:0;flex:1}',
+    '.va-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:3px}',
+    '.va-bank{font-size:1rem}',
+    '.va-bank span{overflow:hidden;text-overflow:ellipsis}',
+    '.va-body{justify-content:space-between;padding-top:6px}',
+    '.va-acct{font-size:1.5rem}',
+    '.va-name-row{align-items:flex-end}',
+    '.va-nameblk{min-width:0;flex:1}',
+    '.va-feebtn{flex:none;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:7px 12px;font-size:.72rem;font-weight:800;white-space:nowrap}',
+    '.va-feebtn i{margin-left:6px;font-size:.78rem;opacity:.9}',
+    '.va-feenote{font-size:.72rem;font-weight:700;opacity:.85}',
     ICO('thumbtack', '%3Cpath d=\'M12 17v5\'/%3E%3Cpath d=\'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z\'/%3E', false),
     ICO('thumbtack-fill', '%3Cpath d=\'M12 17v5\'/%3E%3Cpath d=\'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z\'/%3E', true),
     ICO('star-fill', '%3Cpath d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z\'/%3E', true),
@@ -3014,7 +3183,7 @@ function injectCss() {
     '.ann-hero.full{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;display:block!important}',
     '.ann-hero.full .imgbox{position:relative!important;display:block!important;width:100%!important;height:auto!important;aspect-ratio:auto!important;min-height:170px}',
     '.ann-hero.full .imgbox.loaded{min-height:0!important}',
-    '.ann-hero.full .imgbox img{position:static!important;display:block!important;width:100%!important;height:auto!important;max-height:72vh;object-fit:contain!important}'
+    '.ann-hero.full .imgbox img{position:static!important;display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important}'
   ].join('\n');
   document.head.appendChild(st);
 }
@@ -3030,7 +3199,7 @@ async function init() {
   renderBadge();
   if (cached) { renderAccount(); renderTransactions(); }          // last known data at once, the API updates it a moment later
   else { renderWallet(); renderStats(); setTxCount('...'); $('#txList').innerHTML = ''; skeleton($('#txList'), 3); }
-  bindEvents(); initPasteChips(); watchImages(); ensureForgotUi(); updateContactsBtn();
+  bindEvents(); initPasteChips(); watchImages(); ensureForgotUi(); updateContactsBtn(); ensureAvailBars(); updateNotifBar();
   document.addEventListener('click', e => {                     // links inside admin messages
     const a = e.target.closest && e.target.closest('a.fmt-link'); if (!a) return;
     e.preventDefault(); const h = a.dataset.href; if (h) openTarget({ href: h });
