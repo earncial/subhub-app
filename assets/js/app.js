@@ -3163,7 +3163,7 @@ function injectCss() {
     '.va-bank{font-size:1rem}',
     '.va-bank span{overflow:hidden;text-overflow:ellipsis}',
     '.va-body{justify-content:flex-start;padding-top:12px}',
-    '.va-name-row{margin-top:14px}',
+    '.va-name-row{margin-top:10px}',
     '.va-acct{font-size:1.5rem}',
     '.va-name-row{align-items:flex-end}',
     '.va-nameblk{min-width:0;flex:1}',
