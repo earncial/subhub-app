@@ -1,9 +1,10 @@
+/* ============================================================
    SubHub — index.css  (login + signup screen)                        ============================================================ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}        [hidden]{display:none!important}
                                                                       :root{
   --brand:#00aaff;--brand-dark:#0088cc;--brand-dim:rgba(0,170,255,.12);--brand-glow:rgba(0,170,255,.32);
   --error:#e8334a;--success:#00c07a;--warn:#f59e0b;                     --logo-h:72px;          /* logo height on the page */
-  --zoom:.1s;             /* card zoom-in when the screen changes */    --pulse:1.9s;            /* fingerprint button pulse (smaller = faster) */
+  --zoom:.1s;             /* card zoom-in when the screen changes */    --pulse:1.8s;            /* fingerprint button pulse (smaller = faster) */
   --err-pulse:3s;       /* login-failed icon pulse (bigger = slower) */                                                                       --spin:.8s;             /* loader ring speed */
 }                                                                     :root,[data-theme="light"]{
   --bg:#f3f8ff;--surface:#fff;--surface2:#f7faff;--border:rgba(0,100,200,.14);
@@ -14,7 +15,7 @@
   --text:#eef2ff;--sub:#8fa0bf;--muted:#7080a0;--shadow:rgba(0,0,0,.55);--overlay:rgba(0,0,0,.65);                                          }                                                                     html{font-size:16px}
 body{
   font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);
-  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;                                                  padding:20px 16px;padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));
+  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;                                                  padding:20px 6px;padding:max(20px,env(safe-area-inset-top)) 6px max(20px,env(safe-area-inset-bottom));
   transition:background .2s,color .2s;-webkit-tap-highlight-color:transparent;
 }
 .shell{width:100%;max-width:420px}                                                                                                          /* Offline SVG icons */
@@ -245,3 +246,29 @@ body.pin-mode::before{content:'';position:fixed;top:0;right:0;bottom:0;left:0;ba
 .key-icon{color:var(--muted)}
 .key-icon .i{width:22px;height:22px}
 @media (max-height:700px){.key{padding:13px 12px}}
+
+
+/* ============================================================
+   DESIGN v2: card nearly edge to edge, animated border, better footer
+============================================================ */
+body{padding-left:6px;padding-right:6px}
+.shell{max-width:480px}
+.card{padding:28px 20px 24px;border:2px solid transparent;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,
+             linear-gradient(120deg,#00aaff,#7c5cff,#00d6a4,#00aaff,#7c5cff) border-box;
+  background-size:auto,300% 300%;
+  animation:cardBorder 7s linear infinite;
+  box-shadow:0 20px 50px var(--shadow),0 0 28px rgba(0,170,255,.10)}
+.card.enter{animation:zoomIn var(--zoom) cubic-bezier(.2,.9,.3,1.1) both,cardBorder 7s linear infinite}
+@keyframes cardBorder{0%{background-position:0 0,0% 50%}50%{background-position:0 0,100% 50%}100%{background-position:0 0,0% 50%}}
+.card[data-mode="pin"]{border-bottom:0}
+@media (prefers-reduced-motion:reduce){.card,.card.enter{animation:none}}
+.foot{margin-top:22px;padding-bottom:84px;text-align:center;font-size:.74rem;color:var(--muted);line-height:1.6}
+.foot p{margin:0}
+.foot-brand{display:inline-block;padding:8px 16px;border-radius:999px;background:var(--surface);border:1.5px solid var(--border);color:var(--sub);box-shadow:0 4px 14px var(--shadow)}
+.foot-brand b,.foot-pw b{color:var(--text)}
+.foot-pw{margin-top:10px}
+.foot-copy{margin-top:2px;opacity:.9}
+.foot-links{margin-top:14px!important}
+.foot-links a{display:inline-block;margin:4px 3px;padding:7px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface2);color:var(--sub);font-weight:600;text-decoration:none}
+.foot-links a:active{background:var(--brand-dim);color:var(--brand)}

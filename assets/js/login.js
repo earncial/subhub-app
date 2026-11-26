@@ -96,7 +96,7 @@ function writeSaved(username, fullName, avatar){
 /* Profile photo: the API may call it avatar / profilePicture / profileImage / photo */
 function userPhoto(u){ return (u && (u.avatar || u.profilePicture || u.profileImage || u.photo)) || undefined; }
 /* Avatar order: user's photo -> /avatar.png (SubHub default) -> initials (only if avatar.png is missing too) */
-const DEFAULT_AVATAR = '/avatar.png';
+const DEFAULT_AVATAR = '/assets/images/avatar.png';
 function setAvatar(el, s){
   el.textContent = initials(displayName(s));
   const id = (el._av = (el._av || 0) + 1);                  // ignore late loads from an older render
