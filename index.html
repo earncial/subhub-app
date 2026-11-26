@@ -102,7 +102,7 @@
 
     <!-- Login form -->
     <form id="loginForm" novalidate data-show="first pw">
-      <div class="identity" id="identity">
+      <div class="identity" id="identity" hidden>
         <span class="avatar" id="avatar">A</span>
         <span class="identity-text"><small>Logging in as</small><strong id="identityName"></strong><span class="handle" id="identityHandle"></span></span>
         <button type="button" class="link" id="changeIdBtn">Change</button>
@@ -236,62 +236,48 @@
       </div>
       <div class="error-text" id="pinError" role="alert"></div>
 
-      <div class="keypad" id="keypad">
-        <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button><button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button><button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button>
-        <button type="button" class="key key-icon" id="keyEye" aria-label="Show PIN"><svg class="i"><use href="#i-eye"/></svg></button>
-        <button type="button" class="key" data-k="0">0</button>
+      <div class="keypad" id="keypad">                                        <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button><button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button><button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button>
+        <button type="button" class="key key-icon" id="keyEye" aria-label="Show PIN"><svg class="i"><use href="#i-eye"/></svg></button>             <button type="button" class="key" data-k="0">0</button>
         <button type="button" class="key key-icon" id="keyDel" aria-label="Delete"><svg class="i"><use href="#i-backspace"/></svg></button>
       </div>
-
-      <button type="submit" class="btn btn-primary" id="pinBtn" hidden disabled><span class="spinner"></span><span class="btn-label">Set PIN</span></button>
+                                                                            <button type="submit" class="btn btn-primary" id="pinBtn" hidden disabled><span class="spinner"></span><span class="btn-label">Set PIN</span></button>
      <p class="pin-note">SubHub will never ask you to disclose your PIN. Keep it secure and private.</p>
     </form>
 
   </section>
 
-<footer class="foot">
-  <p><b>SubHub</b>. A product of <b>Earncial Global</b>.</p>
-  <p>Powered by <b>SubHub Engine</b></p>
-  <p>&copy; <span id="footerYear">2026</span> All rights reserved.</p>
+<footer class="foot">                                                   <p><b>SubHub</b>. A product of <b>Earncial Global</b>.</p>
+  <p>Powered by <b>SubHub Engine</b></p>                                <p>&copy; <span id="footerYear">2026</span> All rights reserved.</p>
   <p><a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a> &middot; <a href="/faq">FAQ</a></p>
 </footer>
-<script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
-</main>
-
-  <!-- ============ Loader (fingerprint login + create account) + error sheet ============ -->
-<div class="proc-ov" id="procOverlay" hidden>
+<script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>                                              </main>
+                                                                        <!-- ============ Loader (fingerprint login + create account) + error sheet ============ -->                                              <div class="proc-ov" id="procOverlay" hidden>
   <div class="loader" id="procLoader" role="status" aria-live="polite" hidden>
     <div class="loader-orb">
       <span class="loader-spin"></span>
-      <span class="loader-logo-wrap">
-        <img class="loader-logo" src="/logo.png" alt="" id="procLogo">
+      <span class="loader-logo-wrap">                                         <img class="loader-logo" src="/logo.png" alt="" id="procLogo">
         <span class="proc-fb" id="procFb" hidden>S</span>
-      </span>
-    </div>
-    <div class="loader-text"><strong id="procLoadTitle">Logging you in...</strong><span id="procLoadSub"></span></div>
-  </div>
+      </span>                                                             </div>
+    <div class="loader-text"><strong id="procLoadTitle">Logging you in...</strong><span id="procLoadSub"></span></div>                        </div>
 
   <div class="proc-sheet" id="procBox" role="alert" hidden>
     <span class="proc-handle"></span>
+    <button type="button" class="sheet-close" id="procClose" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button>
     <div class="orb">
       <span class="orb-ring o1"></span><span class="orb-ring o2"></span><span class="orb-ripple"></span>
-      <span class="orb-core"><svg class="i"><use href="#i-lock"/></svg></span>
-    </div>
+      <span class="orb-core"><svg class="i"><use href="#i-lock"/></svg></span>                                                                  </div>
     <div class="proc-title" id="procTitle"></div>
     <div class="proc-sub" id="procSub"></div>
-    <button type="button" class="btn btn-primary proc-btn" id="procBtn">Try again</button>
-  </div>
+    <button type="button" class="btn btn-primary proc-btn" id="procBtn">Try again</button>                                                    </div>
 </div>
 
   <div class="toasts" id="toastContainer" aria-live="polite"></div>
 
   <!-- Load order matters: config.js first -->
-  <script src="/assets/js/config.js?v=3" defer></script>
-  <script src="/assets/js/push-install.js?v=3" defer></script>
-  <script src="/assets/js/login.js?v=3" defer></script>
-  <script src="/assets/js/forgot.js?v=4" defer></script>
-  <script src="/assets/js/sign-up.js?v=2" defer></script>
-  <script src="/assets/js/pin.js?v=2" defer></script>
+  <script src="/assets/js/config.js?v=4" defer></script>
+  <script src="/assets/js/push-install.js?v=4" defer></script>
+  <script src="/assets/js/login.js?v=4" defer></script>                 <script src="/assets/js/forgot.js?v=4" defer></script>
+  <script src="/assets/js/sign-up.js?v=3" defer></script>
+  <script src="/assets/js/pin.js?v=3" defer></script>
   <script src="/assets/js/support.js" data-position="right"></script>
 </body>
-</html>

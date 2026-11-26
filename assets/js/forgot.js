@@ -23,8 +23,8 @@ const USE_MOCK = false;                       // true = test the screens with fa
 const FORGOT_ENDPOINT = '/auth/forgot-password';     // POST { email }              -> sends the 6-digit code
 const VERIFY_ENDPOINT = '/auth/verify-reset-code';   // POST { email, code }        -> { success, resetToken, expiresIn? }   <- NEW, confirm with backend
 const RESET_ENDPOINT  = '/auth/reset-password';     // POST /:resetToken { password }
-const RESEND_SECONDS  = 300;                          // wait before "Resend code" current: 5 minutes 
-const CODE_SCREEN_TTL = 15 * 60 * 1000;              // how long the code screen is remembered after closing the app current: 15 minutes 
+const RESEND_SECONDS  = 300;                          // wait before "Resend code" current: 5 minutes
+const CODE_SCREEN_TTL = 15 * 60 * 1000;              // how long the code screen is remembered after closing the app current: 15 minutes
 
 /* ============================================================
    SMALL HELPERS
@@ -59,7 +59,7 @@ function readState(){
     const s = JSON.parse(store.get(STORE_KEY) || 'null');
     if (s && s.email) {
       if (s.step === 'code' && Date.now() - s.sentAt < CODE_SCREEN_TTL) return s;
-      if (s.step === 'password' && s.code && s.exp > Date.now()) return s;
+      if (s.step === 'password' && (s.code || s.resetToken) && s.exp > Date.now()) return s;
     }
   } catch (e) {}
   store.del(STORE_KEY);
@@ -90,6 +90,8 @@ const CSS = `
 .fg-resend{text-align:center;font-size:.82rem;color:var(--muted);margin:14px 0 2px;min-height:1.6em}
 .fg-resend .link{padding:2px 4px}
 .fg-links{display:flex;justify-content:center;margin-top:4px}
+.fg-clip{display:flex;align-items:center;margin:0 auto 6px;padding:8px 14px;border-radius:999px;border:1.5px dashed var(--brand);background:var(--brand-dim);color:var(--brand);font:700 .8rem 'Sora',system-ui,sans-serif;cursor:pointer}
+.fg-clip .i{margin-right:6px}
 .fg-links .link{color:var(--muted);font-weight:600}
 @media (max-height:700px){.fg-sheet .key{height:46px}.fg-sheet .keypad{gap:7px}}
 `;
@@ -125,6 +127,7 @@ const HTML = `
       <div class="fg-otp" id="fgOtp" aria-live="polite">
         <span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span><span class="fg-box"></span>
       </div>
+      <button type="button" class="fg-clip" id="fgClip" hidden>${PASTE_ICON} Paste copied code</button>
       <div class="fg-err" id="fgCodeErr" role="alert"></div>
       <div class="keypad" id="fgKeypad">
         ${keyBtns}
@@ -226,7 +229,8 @@ function showStep(name){
   if (name === 'code') {
     $('fgMask').textContent = mask(st.email);
     code = ''; paintBoxes(); clearCodeErr(); startResendTimer();
-  }
+    setTimeout(sniffClipboard, 350);
+  } else { $('fgClip').hidden = true; }
   if (name === 'pass') setTimeout(() => $('fgPass').focus(), 250);
 }
 
@@ -247,7 +251,7 @@ async function sendCode(){
   const d = await api(FORGOT_ENDPOINT, { method: 'POST', body: JSON.stringify({ email }) });
   busy = false; setLoading($('fgSend'), false);
 
-  if (!isOk(d)) return emailErr((d && d.message) || 'Could not send the code. Please try again.');
+  if (!isOk(d)) return emailErr(limitMsg(d, 'Could not send the code. Please try again.'));
   saveState({ step: 'code', email, sentAt: Date.now() });
   showStep('code');
   showToast('Code sent', 'If ' + mask(email) + ' has a SubHub account, a 6-digit code is on its way.', 'success', 4500);
@@ -267,6 +271,7 @@ function paintBoxes(){
     b.classList.toggle('active', i === Math.min(code.length, 5));
   });
   $('fgVerify').disabled = code.length !== 6 || busy;
+  if (code.length) $('fgClip').hidden = true;
 }
 function popBox(i){ const b = boxes()[i]; if (!b) return; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
 function clearCodeErr(){ $('fgCodeErr').textContent = ''; $('fgOtp').classList.remove('err'); }
@@ -291,13 +296,44 @@ async function fill(digits){
   filling = false;
   if (code.length === 6) { clearTimeout(autoTimer); autoTimer = setTimeout(verify, 320); }
 }
+/* same clipboard bridge as the dashboard (AndroidClipboard). navigator.clipboard does not work inside the app. */
+function readClipboard(){
+  return new Promise(resolve => {
+    if (window.AndroidClipboard && typeof window.AndroidClipboard.getText === 'function') {
+      const id = 'clip_' + Date.now();
+      const prev = window.__subhubClipboardCallback;
+      let done = false, timer;
+      const finish = t => { if (done) return; done = true; clearTimeout(timer); window.__subhubClipboardCallback = prev; resolve(t == null ? null : String(t)); };
+      timer = setTimeout(() => finish(null), 1500);
+      window.__subhubClipboardCallback = function (cb, text) { if (cb === id) finish(text); else if (typeof prev === 'function') prev(cb, text); };
+      try { window.AndroidClipboard.getText(id); } catch (e) { finish(null); }
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.readText) { navigator.clipboard.readText().then(t => resolve(t), () => resolve(null)); return; }
+    resolve(null);
+  });
+}
+/* finds a stand-alone 6-digit code, even inside a whole email sentence */
+function extractCode(t){ const m = String(t).match(/(^|\D)(\d{6})(?!\D)/); return m ? m[2] : ''; }
 async function pasteCode(){
-  try {
-    const t = await navigator.clipboard.readText();
-    const digits = (String(t).match(/\d/g) || []).join('');
-    if (digits.length >= 6) fill(digits.slice(0, 6));
-    else showToast('No code found', 'Copy the 6-digit code from your email first.', 'info');
-  } catch (e) { showToast('Cannot paste here', 'Type the code with the keypad.', 'info'); }
+  const t = await readClipboard();
+  if (t == null) { showToast('Cannot paste here', 'Type the code with the keypad.', 'info'); return; }
+  const c = extractCode(t);
+  if (c) fill(c); else showToast('No code found', 'Copy the 6-digit code from your email first.', 'info');
+}
+/* when the user comes back from the email app, offer the copied code */
+let clipCode = '';
+async function sniffClipboard(){
+  const chip = $('fgClip');
+  if (!built || $('fgOv').hidden || $('fgStepCode').hidden || busy || code.length) { if (chip) chip.hidden = true; return; }
+  const t = await readClipboard();
+  clipCode = t == null ? '' : extractCode(t);
+  chip.hidden = !clipCode;
+}
+function limitMsg(d, fallback){
+  let m = (d && d.message) || fallback;
+  if (d && d.status === 429 && Number(d.retryAfter) > 0) m += ' Try again in ' + Math.ceil(Number(d.retryAfter) / 60) + ' min.';
+  return m;
 }
 
 function startResendTimer(){
@@ -320,7 +356,7 @@ async function resend(){
   busy = true; $('fgResend').textContent = 'Sending...';
   const d = await api(FORGOT_ENDPOINT, { method: 'POST', body: JSON.stringify({ email: st.email }) });
   busy = false;
-  if (!isOk(d)) { showToast('Could not send code', (d && d.message) || 'Please try again.', 'error'); startResendTimer(); return; }
+  if (!isOk(d)) { showToast('Could not send code', limitMsg(d, 'Please try again.'), 'error'); startResendTimer(); return; }
   saveState({ step: 'code', email: st.email, sentAt: Date.now() });
   code = ''; paintBoxes(); clearCodeErr(); startResendTimer();
   showToast('Code sent', 'Check ' + mask(st.email) + ' (and your spam folder).', 'success');
@@ -336,14 +372,16 @@ async function verify(){
   procHide(); setLoading($('fgVerify'), false); busy = false;
 
   if (isOk(d)) {
-    saveState({ step: 'password', email: st.email, code, exp: (st.sentAt || Date.now()) + 15 * 60 * 1000 });
+    const tok = d.resetToken || '';                        // if the server gives a reset token, use it; otherwise email + code
+    const exp = Number(d.expiresIn) > 0 ? Date.now() + Number(d.expiresIn) * 1000 : (st.sentAt || Date.now()) + 15 * 60 * 1000;
+    saveState({ step: 'password', email: st.email, code: tok ? '' : code, resetToken: tok, exp });
     showStep('pass');
     return;
   }
-  codeErr((d && d.message) || 'Incorrect code. Please try again.');
-    await wait(700);
-    code = ''; paintBoxes();
-  }
+  codeErr(limitMsg(d, 'Incorrect code. Please try again.'));
+  await wait(700);
+  if (!busy) { code = ''; paintBoxes(); }
+}
 
 /* ============================================================
    STEP 3: NEW PASSWORD
@@ -359,7 +397,7 @@ function passErr(msg){
   errorFeedback($('fgSheet'));
 }
 async function resetPassword(){
-  if (busy || !st || !st.code) return;
+  if (busy || !st || !(st.code || st.resetToken)) return;
   $('fgPassErr').classList.remove('show');
   const p1 = $('fgPass').value, p2 = $('fgPass2').value;
   if (p1.length < 8) return passErr('Password must be at least 8 characters.');
@@ -369,7 +407,9 @@ async function resetPassword(){
   busy = true; setLoading($('fgReset'), true);
   loaderShow('Updating your password...', 'Please wait a moment.');   // logo loader
 
-  const d = await api(RESET_ENDPOINT, { method: 'POST', body: JSON.stringify({ email: st.email, code: st.code, password: p1 }) });
+  const d = st.resetToken
+    ? await api(RESET_ENDPOINT + '/' + encodeURIComponent(st.resetToken), { method: 'POST', body: JSON.stringify({ password: p1 }) })
+    : await api(RESET_ENDPOINT, { method: 'POST', body: JSON.stringify({ email: st.email, code: st.code, password: p1 }) });
 
   procHide(); setLoading($('fgReset'), false); busy = false;
 
@@ -439,6 +479,9 @@ function bind(){
   }));
 
   $('fgGoLogin').addEventListener('click', goLogin);
+  $('fgDone').addEventListener('click', e => { if (e.target === $('fgDone')) goLogin(); });
+  $('fgClip').addEventListener('click', () => { const c = clipCode; $('fgClip').hidden = true; if (c) fill(c); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setTimeout(sniffClipboard, 400); });
 
   document.addEventListener('keydown', e => {                       // computer keyboard on the code step
     if ($('fgOv').hidden) return;
@@ -449,8 +492,8 @@ function bind(){
   });
   document.addEventListener('paste', e => {                         // Ctrl+V on the code step
     if ($('fgOv').hidden || $('fgStepCode').hidden) return;
-    const digits = ((e.clipboardData || window.clipboardData).getData('text').match(/\d/g) || []).join('');
-    if (digits.length >= 6) { e.preventDefault(); fill(digits.slice(0, 6)); }
+    const c = extractCode((e.clipboardData || window.clipboardData).getData('text'));
+    if (c) { e.preventDefault(); fill(c); }
   });
 }
 function startOver(){                                              // "Use a different email" / back arrow
@@ -466,6 +509,11 @@ if (link) {
   link.parentNode.replaceChild(fresh, link);
   fresh.addEventListener('click', open);
 }
+
+window.SubHubForgot = {
+  isOpen(){ return built && (!$('fgOv').hidden || !$('fgDone').hidden); },
+  close(){ if (built && !$('fgDone').hidden) goLogin(); else close(); }
+};
 
 /* ---- came back after closing the app: show the same step again ---- */
 if (st) open();

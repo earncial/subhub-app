@@ -17,14 +17,14 @@ function suEmpty(k, strict, msg){ if (strict) return suBad(k, msg); su[k].classL
 function vName(strict){
   const v = su.name.value.trim();
   if (!v) return suEmpty('name', strict, 'Enter your full name.');
-  if (!/^[A-Za-z\s]+$/.test(v)) return suBad('name', 'Only letters and spaces allowed.');
+  if (!/^[A-Za-z][A-Za-z\s'\-]*$/.test(v)) return suBad('name', 'Only letters, spaces, hyphen and apostrophe allowed.');
   const w = v.split(/\s+/);
   if (w.length < 2 || w.length > 3) return suBad('name', 'Enter 2 or 3 names (e.g. Abdulmalik Salisu).');
   if (w.some(x => x.length < 2)) return suBad('name', 'Each name must be at least 2 letters.');
   return suGood('name');
 }
 
-const RESERVED = ['admin','administrator','test','user','subhub','support','earncial','demo','root','system','moderator','help','info','contact','webmaster','noreply','no-reply','abuse','security','studio','reseller','data','airtime','nigeria','company','subhubng','subhub.ng','api','ceo','owner','founder',' moderator','superadmin','superuser','sysadmin','operator',
+const RESERVED = ['admin','administrator','test','user','subhub','support','earncial','demo','root','system','moderator','help','info','contact','webmaster','noreply','no-reply','abuse','security','studio','reseller','data','airtime','nigeria','company','subhubng','subhub.ng','api','ceo','owner','founder','superadmin','superuser','sysadmin','operator',
 'backend','frontend','server','database','devops',
 'apiadmin','administrator1','staff','team','official',
 'verified','verification','bot','automation','service','earncialglobal','earncial_global','subhubglobal',
@@ -108,7 +108,11 @@ function vTerms(){ const ok = su.terms.checked; $('suTermsErr').classList.toggle
 su.name.addEventListener('input', () => vName(false));  su.name.addEventListener('blur', () => vName(false));
 su.user.addEventListener('input', function(){ const p = this.selectionStart, l = this.value.toLowerCase(); if (this.value !== l) { this.value = l; this.setSelectionRange(p, p); } vUser(false); });
 su.email.addEventListener('input', () => vEmail(false)); su.email.addEventListener('blur', () => vEmail(false));
-su.phone.addEventListener('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0, 11); vPhone(false); });
+su.phone.addEventListener('input', function(){
+  let d = this.value.replace(/\D/g, '');
+  if (d.indexOf('234') === 0 && d.length > 11) d = '0' + d.slice(3);          // +234 801... pasted -> 0801...
+  this.value = d.slice(0, 11); vPhone(false);
+});
 su.pass.addEventListener('input', () => { vPass(false); if (su.confirm.value) vConfirm(false); });
 su.confirm.addEventListener('input', () => vConfirm(false));
 su.terms.addEventListener('change', vTerms);
@@ -146,7 +150,7 @@ async function handleSignUp(e){
 
   if (!data || !data.success) {
     const msg = (data && data.message) || 'Registration failed. Please try again.';
-    suFormError(msg); errorSheet('Sign up failed', msg);
+    errorSheet('Sign up failed', msg);
     return;
   }
 
@@ -156,6 +160,7 @@ async function handleSignUp(e){
 }
 
 function resetSignup(){
+  try { sessionStorage.removeItem(DRAFT); } catch (e) {}
   $('signupForm').reset();
   Object.keys(su).forEach(k => { if (suErrEl[k]) suGood(k); });
   uStatus(''); uAvail = false; uChecked = ''; uChecking = false; uSeq++; clearTimeout(uTimer);
@@ -173,4 +178,36 @@ function checkRefParam(){
 
 $('signupForm').addEventListener('submit', handleSignUp);
 checkRefParam();
+
+/* ---- email typo hint (gmial.com -> gmail.com) ---- */
+const TYPOS = { 'gmial.com':'gmail.com', 'gmai.com':'gmail.com', 'gmail.co':'gmail.com', 'gamil.com':'gmail.com', 'gmal.com':'gmail.com', 'gmail.con':'gmail.com', 'gmaill.com':'gmail.com',
+  'yaho.com':'yahoo.com', 'yahoo.co':'yahoo.com', 'yahooo.com':'yahoo.com', 'hotmal.com':'hotmail.com', 'hotmial.com':'hotmail.com', 'outlok.com':'outlook.com', 'outloook.com':'outlook.com' };
+function emailHint(){
+  let h = $('suEmailHint');
+  const v = su.email.value.trim().toLowerCase(), at = v.lastIndexOf('@'), fix = at > 0 ? TYPOS[v.slice(at + 1)] : null;
+  if (!fix) { if (h) h.hidden = true; return; }
+  if (!h) { h = document.createElement('div'); h.id = 'suEmailHint'; h.className = 'email-hint'; suErrEl.email.parentNode.insertBefore(h, suErrEl.email.nextSibling); }
+  const sug = v.slice(0, at + 1) + fix;
+  h.hidden = false; h.innerHTML = 'Did you mean <button type="button" class="link" id="suEmailFix"></button>?';
+  const b = $('suEmailFix'); b.textContent = sug;
+  b.onclick = () => { su.email.value = sug; h.hidden = true; vEmail(false); saveDraft(); };
+}
+su.email.addEventListener('blur', emailHint);
+
+/* ---- keep what was typed (not the password) if the user leaves to read the Terms or Privacy page ---- */
+const DRAFT = 'sh_su_draft';
+function saveDraft(){ try { sessionStorage.setItem(DRAFT, JSON.stringify({ name:su.name.value, user:su.user.value, email:su.email.value, phone:su.phone.value, ref:su.ref.value, terms:su.terms.checked })); } catch (e) {} }
+function restoreDraft(){
+  try {
+    const d = JSON.parse(sessionStorage.getItem(DRAFT) || 'null'); if (!d) return;
+    su.name.value = d.name || ''; su.user.value = d.user || ''; su.email.value = d.email || ''; su.phone.value = d.phone || '';
+    if (!su.ref.disabled) su.ref.value = d.ref || '';
+    su.terms.checked = !!d.terms;
+    if (su.name.value) vName(false); if (su.user.value) vUser(false); if (su.email.value) vEmail(false); if (su.phone.value) vPhone(false);
+  } catch (e) {}
+}
+$('signupForm').addEventListener('input', saveDraft);
+su.terms.addEventListener('change', saveDraft);
+Array.prototype.forEach.call(document.querySelectorAll('.terms a'), a => a.addEventListener('click', () => { saveDraft(); try { sessionStorage.setItem('sh_su_return', '1'); } catch (e) {} }));
+restoreDraft();
 })();

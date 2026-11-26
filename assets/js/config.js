@@ -5,7 +5,21 @@
 (function () {
 'use strict';
 
-const API_BASE = 'https://subhub-sandbox.onrender.com/api';
+/* ---- old Android WebView: flex "gap" check (adds .no-fg) + small polyfills ---- */
+(function(){
+  try {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+    d.innerHTML = '<i style="height:1px"></i><i style="height:1px"></i>';
+    document.body.appendChild(d);
+    if (d.offsetHeight !== 3) document.documentElement.classList.add('no-fg');
+    document.body.removeChild(d);
+    if (!String.prototype.padStart) String.prototype.padStart = function(n, c){ var t = String(this); c = c == null ? ' ' : String(c); while (t.length < n) t = c + t; return t; };
+    if (window.NodeList && !NodeList.prototype.forEach) NodeList.prototype.forEach = Array.prototype.forEach;
+  } catch (e) {}
+})();
+
+const API_BASE = 'https://api.subhub.ng/api';
 const REFRESH_ENDPOINT = '/auth/refresh-token';   // POST { refreshToken } -> { success, accessToken, refreshToken? }
 const HOME_URL = '/app/index.html';
 
@@ -66,7 +80,7 @@ function showToast(title, msg, type, duration){
   close.setAttribute('aria-label','Dismiss'); close.innerHTML = ico('x');
   const bar = document.createElement('div'); bar.className = 'toast-bar'; bar.style.animationDuration = duration + 'ms';
 
-  el.append(i, body, close, bar);
+  el.appendChild(i); el.appendChild(body); el.appendChild(close); el.appendChild(bar);
   const dismiss = () => { if (el.classList.contains('out')) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   close.addEventListener('click', e => { e.stopPropagation(); dismiss(); });
   el.addEventListener('click', dismiss);

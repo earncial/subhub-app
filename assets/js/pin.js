@@ -120,8 +120,8 @@ $('pinForm').addEventListener('submit', async e => {
 
   app.busy = true;                                             // stay locked while redirecting
   firstPin = ''; cur = ''; paint();
-  showToast('PIN created', 'Taking you to your dashboard\u2026', 'success', 1200);
-  setTimeout(() => { window.location.href = HOME_URL; }, 1200);
+  showToast('PIN created', 'Taking you to your dashboard\u2026', 'success', 1000);
+  setTimeout(() => { window.location.href = HOME_URL; }, 700);
 });
 
 /* ---- called by login.js ---- */

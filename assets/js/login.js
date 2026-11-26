@@ -96,7 +96,7 @@ function writeSaved(username, fullName, avatar){
 /* Profile photo: the API may call it avatar / profilePicture / profileImage / photo */
 function userPhoto(u){ return (u && (u.avatar || u.profilePicture || u.profileImage || u.photo)) || undefined; }
 /* Avatar order: user's photo -> /avatar.png (SubHub default) -> initials (only if avatar.png is missing too) */
-const DEFAULT_AVATAR = '/assets/images/avatar.png';
+const DEFAULT_AVATAR = '/avatar.png';
 function setAvatar(el, s){
   el.textContent = initials(displayName(s));
   const id = (el._av = (el._av || 0) + 1);                  // ignore late loads from an older render
@@ -151,6 +151,7 @@ function render(animate){
     $('title').textContent = 'Welcome back!';
     $('subtitle').textContent = 'Log in to your SubHub account';
   }
+  document.body.classList.toggle('pin-mode', m === 'pin');      // PIN screen = big sheet over a dim background
   updateBack();
   if (animate !== false) zoomIn();
 }
@@ -272,7 +273,7 @@ async function handleSignIn(e){
   if (!data || !data.success) {
     app.busy = false; setLoading(btn, false);
     const msg = (data && data.message) || 'Invalid credentials. Please try again.';
-    showFormError(msg); errorSheet('Login failed', msg);
+    errorSheet('Login failed', msg);
     return;
   }
 
@@ -310,8 +311,8 @@ function finishLogin(data){
 
 function goHome(){
   procHide();
-  showToast('Login successful', 'Welcome back! Taking you to your dashboard\u2026', 'success', 1400);
-  setTimeout(() => { window.location.replace(HOME_URL); }, 1400);
+  showToast('Login successful', 'Welcome back! Taking you to your dashboard\u2026', 'success', 1000);
+  setTimeout(() => { window.location.replace(HOME_URL); }, 600);
 }
 
 
@@ -332,6 +333,9 @@ $('brandLogo').addEventListener('error', () => { $('brandLogo').hidden = true; $
 $('procLogo').addEventListener('error', () => { $('procLogo').hidden = true; $('procFb').hidden = false; });
 
 proc.btn.addEventListener('click', () => { procHide(); if (state.mode === 'pin') return; (state.mode === 'signup' ? $('suName') : ($('credentialGroup').hidden ? $('password') : $('credential'))).focus(); });
+/* the error sheet closes with the X icon, with a tap outside it, or with the button */
+$('procClose').addEventListener('click', procHide);
+proc.ov.addEventListener('click', e => { if (e.target === proc.ov && !proc.box.hidden) procHide(); });
 
 card.addEventListener('click', e => { const t = e.target.closest('[data-go]'); if (t) goSection(t.dataset.go); });
 $('loginForm').addEventListener('submit', handleSignIn);
@@ -368,14 +372,20 @@ function showLoginWith(username){
 window.SubHubLogin = { showLoginWith, render, goHome, updateBack, resetNav(){ navStack.length = 0; } };
 $('backBtn').addEventListener('click', goBack);
 /* Android: in onBackPressed call  webView.evaluateJavascript("window.SubHubBack()", ...)  -> "true" means the page handled it */
-window.SubHubBack = () => backAvailable() ? goBack() : false;
+window.SubHubBack = () => {
+  if (!proc.ov.hidden) { if (!proc.box.hidden) procHide(); return true; }             // error sheet closes; the loader just ignores Back
+  if (window.SubHubForgot && window.SubHubForgot.isOpen()) { window.SubHubForgot.close(); return true; }
+  return backAvailable() ? goBack() : false;
+};
 
 initLogin();
 
 /* Open the signup section directly: /#signup (from the welcome page) or ?ref=username (referral links) */
 (function openSignupFromLink(){
   const q = new URLSearchParams(location.search);
-  if (q.get('ref') || q.get('mode') === 'signup' || location.hash === '#signup') goSection('signup');
+  let back = false;                                           // came back from reading the Terms / Privacy page while signing up
+  try { back = sessionStorage.getItem('sh_su_return') === '1'; sessionStorage.removeItem('sh_su_return'); } catch (e) {}
+  if (q.get('ref') || q.get('mode') === 'signup' || location.hash === '#signup' || back) goSection('signup');
 })();
 
 })();
