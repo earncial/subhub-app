@@ -1,8 +1,10 @@
 /* ============================================================
    SubHub — index.css  (login + signup screen)                        ============================================================ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}        [hidden]{display:none!important}
-* { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; } input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }                                                                      
-:root{
+/* disable select / copy / long-press menu (like the dashboard) */
+* { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; } input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+                                                                      :root{
   --brand:#00aaff;--brand-dark:#0088cc;--brand-dim:rgba(0,170,255,.12);--brand-glow:rgba(0,170,255,.32);
   --error:#e8334a;--success:#00c07a;--warn:#f59e0b;                     --logo-h:72px;          /* logo height on the page */
   --zoom:.1s;             /* card zoom-in when the screen changes */    --pulse:1.8s;            /* fingerprint button pulse (smaller = faster) */
@@ -274,6 +276,11 @@ body{padding-left:6px;padding-right:6px}
 .foot-links a{display:inline-block;margin:4px 3px;padding:7px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface2);color:var(--sub);font-weight:600;text-decoration:none}
 .foot-links a:active{background:var(--brand-dim);color:var(--brand)}
 
-.card[data-mode="pin"] .back-btn, .card[data-mode="pw"] .back-btn, .card[data-mode="bio"] .back-btn { display: none !important; }
-.card[data-mode="pw"].has-back, .card[data-mode="bio"].has-back { padding-top: 28px; }
-.card[data-mode="pin"].has-back { padding-top: 10px; }
+/* no back icon on the PIN and login (password/fingerprint) screens */
+.card[data-mode="pw"] .back-btn,.card[data-mode="bio"] .back-btn{display:none!important}
+.card[data-mode="pw"].has-back,.card[data-mode="bio"].has-back{padding-top:28px}
+.card[data-mode="pin"].has-back{padding-top:10px}
+
+/* fingerprint button: no zoom in/out animation, no rings */
+.fp-btn,.fp-btn.scanning{animation:none!important}
+.fp-ring{display:none!important}

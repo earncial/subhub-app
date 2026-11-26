@@ -23,7 +23,7 @@ const USE_MOCK = false;                       // true = test the screens with fa
 const FORGOT_ENDPOINT = '/auth/forgot-password';     // POST { email }              -> sends the 6-digit code
 const VERIFY_ENDPOINT = '/auth/verify-reset-code';   // POST { email, code }        -> { success, resetToken, expiresIn? }   <- NEW, confirm with backend
 const RESET_ENDPOINT  = '/auth/reset-password';     // POST /:resetToken { password }
-const RESEND_SECONDS  = 300;                          // wait before "Resend code" current: 5 minutes
+const RESEND_SECONDS  = 180;                          // wait before "Resend code" current: 5 minutes
 const CODE_SCREEN_TTL = 15 * 60 * 1000;              // how long the code screen is remembered after closing the app current: 15 minutes
 
 /* ============================================================
@@ -220,7 +220,7 @@ function close(){                                   // closing keeps the step, s
 
 function showStep(name){
   ['Email', 'Code', 'Pass'].forEach(n => { $('fgStep' + n).hidden = n.toLowerCase() !== name; });
-  $('fgBack').hidden = name !== 'code';
+  $('fgBack').hidden = true;   /* back icon removed: it covered the title. "Use a different email" does the same job */
   const el = $('fgStep' + name.charAt(0).toUpperCase() + name.slice(1));
   el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
   if (name !== 'code') clearInterval(resendTimer);
